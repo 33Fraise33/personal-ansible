@@ -23,7 +23,7 @@ I have 3 vlans configured on my router,
 `ansible-playbook -i development <playbook>.yaml --ask-vault-pass` (this last part is needed for encrypted passwords)
 
 ## Encrypting passwords
-`ansible-vault encrypt_string`
+`ansible-vault encrypt_string`    
 type in your ansible vault password (I use the same generated vault key for all my variables in this project and store the one password in my password manager.)
 Next enter your variable to encrypt and press ctrl+d twice.
 
