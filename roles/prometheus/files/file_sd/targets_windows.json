@@ -1,0 +1,34 @@
+[
+  {
+    "labels": {
+      "job": "windows_exporter",
+      "tenant": "HOME",
+      "node_name": "PC-Giamelle"
+    },
+    "targets": ["172.16.50.10:9182"]
+  },
+  {
+    "labels": {
+      "job": "PromDapter",
+      "tenant": "HOME",
+      "node_name": "PC-Giamelle"
+    },
+    "targets": ["172.16.50.10:10445"]
+  },
+  {
+    "labels": {
+      "job": "windows_exporter",
+      "tenant": "HOME",
+      "node_name": "PC-Amelle"
+    },
+    "targets": ["172.16.50.11:9182"]
+  },
+  {
+    "labels": {
+      "job": "PromDapter",
+      "tenant": "HOME",
+      "node_name": "PC-Amelle"
+    },
+    "targets": ["172.16.50.11:10445"]
+  }
+]

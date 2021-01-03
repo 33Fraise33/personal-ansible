@@ -1,0 +1,10 @@
+[
+  {
+    "labels": {
+      "job": "snmp-ruckus-ap",
+      "tenant": "HOME",
+      "node_name": "AP_R500"
+    },
+    "targets": ["172.16.33.11"]
+  }
+]

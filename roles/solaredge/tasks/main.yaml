@@ -1,0 +1,47 @@
+# install solaredge prometheus exporter
+# https://github.com/dave92082/SolarEdge-Exporter
+
+- name: create solaredge folder for git repo
+  file:
+    path: /data/solaredge
+    state: directory
+    mode: 0775
+    owner: gianni
+    group: data
+
+- name: Clone a git repo into new folder
+  git:
+    repo: https://github.com/dave92082/SolarEdge-Exporter.git
+    version: master
+    dest: /data/solaredge
+
+- name: Build image
+  docker_image:
+    name: solaredge-exporter
+    build:
+      path: /data/solaredge
+    source: build
+
+- name: get image id
+  docker_image_facts:
+    name: solaredge-exporter:latest
+  register: image_info
+
+- name: setup Solaredge Exporter docker container
+  docker_container:
+    name: solaredge-exporter
+    image: "{{ (image_info.images | first).Id}}"
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.solaredge_exporter }}"
+    env:
+      INVERTER_ADDRESS: "172.16.33.100"
+      INVERTER_PORT: "1502"
+      EXPORTER_INTERVAL: "15"
+    purge_networks: yes
+    state: started
+    restart_policy: always
+    restart: yes
+    pull: true
+    labels:
+      traefik.enable: "false"

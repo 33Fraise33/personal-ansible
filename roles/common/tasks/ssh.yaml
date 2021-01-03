@@ -1,0 +1,17 @@
+- name: set authorized keyfile for default_user user
+  authorized_key:
+    user: "{{ default_user }}"
+    state: present
+    key: "{{lookup('file', 'public_keys/{{ default_user }}')}}"
+
+- name: change ssh configs
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^PermitRootLogin', line: 'PermitRootLogin no'}
+    - { regexp: '^UsePAM ', line: 'UsePAM no'}
+    - { regexp: '^PasswordAuthentication ', line: 'PasswordAuthentication no'}
+  notify:
+    - restart sshd

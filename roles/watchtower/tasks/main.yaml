@@ -1,0 +1,21 @@
+# setup watchtower with a docker container
+# container from: https://www.portainer.io/installation/
+
+- name: setup watchtower docker container
+  docker_container:
+    name: watchtower
+    image: containrrr/watchtower:latest
+    network_mode: bridge
+    command: --cleanup --interval 7200
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.watchtower }}"
+    purge_networks: yes
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: yes
+    state: started
+    restart_policy: always
+    pull: true
+    labels:
+      traefik.enable: "false"

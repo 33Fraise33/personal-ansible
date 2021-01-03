@@ -1,0 +1,33 @@
+# setup grocy with a docker container
+# container from: https://hub.docker.com/r/linuxserver/grocy
+
+- name: create grocy config directory
+  file:
+    path: /data/grocy
+    state: directory
+    mode: 0755
+    owner: root
+    group: data
+    recurse: yes
+
+- name: setup grocy docker container
+  docker_container:
+    name: grocy
+    image: linuxserver/grocy:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.grocy }}"
+    purge_networks: yes
+    volumes:
+      - "/data/grocy:/config"
+    env:
+      TZ: "Europe/Brussels"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.grocy.rule: "Host(`grocy.frai.se`)"
+      traefik.http.routers.grocy.tls: "true"
+      traefik.http.routers.grocy.tls.certresolver: "le"
+      traefik.http.services.grocy.loadbalancer.server.port: "80"

@@ -1,0 +1,27 @@
+# setup netbox with a docker container
+# container from: https://github.com/netbox-community/netbox-docker
+
+- include_tasks:
+    file: redis.yaml
+    apply:
+      tags: redis
+  tags:
+  - always
+
+- include_tasks:
+    file: postgres.yaml
+    apply:
+      tags: postgres
+  tags: always
+
+- include_tasks:
+    file: netbox.yaml
+    apply:
+      tags: netbox
+  tags: always
+
+- include_tasks:
+    file: nginx.yaml
+    apply:
+      tags: nginx
+  tags: always

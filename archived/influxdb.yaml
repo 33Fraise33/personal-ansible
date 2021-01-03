@@ -1,0 +1,6 @@
+- name: setup influxdb docker container
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - influxdb

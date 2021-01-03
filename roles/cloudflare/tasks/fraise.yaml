@@ -1,0 +1,100 @@
+- name: set proxied cname records for ironman_ddns
+  cloudflare_dns:
+    zone: frai.se
+    type: CNAME
+    record: "{{ item }}"
+    value: "{{ ironman_ddns }}"
+    proxied: yes
+    account_email: cloudflare@frai.se
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - deluge
+    - grafana
+    - ha
+    - jackett
+    - jellyfin
+    - pihole
+    - plex
+    - portainer
+    - unms
+    - syncthing
+    - '@'
+    - netbox
+    - acserver
+    - wordpress
+    - accserver
+
+- name: set non-proxied cname records for ironman_ddns
+  cloudflare_dns:
+    zone: frai.se
+    type: CNAME
+    record: "{{ item }}"
+    value: "{{ ironman_ddns }}"
+    proxied: no
+    account_email: cloudflare@frai.se
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - impostor
+    - ironman
+
+- name: set non-proxied cname records for gsuite
+  cloudflare_dns:
+    zone: frai.se
+    type: CNAME
+    record: "{{ item }}"
+    value: ghs.googlehosted.com
+    proxied: no
+    account_email: cloudflare@frai.se
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - calendar
+    - drive
+    - mail
+
+- name: set non proxied cname records for managed networks
+  cloudflare_dns:
+    zone: frai.se
+    type: CNAME
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    proxied: no
+    account_email: cloudflare@frai.se
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - { record: 'sil', value: 'b4a00aa9382d.sn.mynetname.net'}
+    - { record: 'dad', value: '8a7709c681f5.sn.mynetname.net'}
+    - { record: 'mom', value: '8b010aa79be4.sn.mynetname.net'}
+
+- name: create TXT records
+  cloudflare_dns:
+    zone: frai.se
+    type: TXT
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: cloudflare@frai.se
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - { record: '@', value: 'v=spf1 include:_spf.google.com ~all'}
+    - { record: '@', value: 'google-site-verification=oqKYMwGek5PSBAxJw6uvZKK9Zkc6mrx9fwwkfocDWpU'}
+    - { record: 'google._domainkey', value: 'v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiaS81rGr7+59D8EocCmoI9sZEAaggwqq9lOQ5jtqTD7Wc7iEPcxyb4uIJ6MNuS6yh9Wip/uzdGc0toPrH9grzGTeBFJlvCPc3NGffCV1WAW80NzoqToD+NU7/PjS0Nb/G+B5Bn1ksaRcX8grMZ0EIyk+c5tqf+n/sKdmUcA6ebPbZDePdxUEtw/+Q98tS1kguxyZdBNKRHrNTezsNsMEziLEJKz5EAWCwU5lbpWXXXLh6l0uCAPxXOFch0ONVQY8+CRYUz8qtV1o7RjGW40lh3R3L36xVy8Ys113wgDCEmZJJ5y5rm5FNHW802GjibaAaWc66zwJLSbaxATnTv0KiwIDAQAB'}
+
+- name: create MX records
+  cloudflare_dns:
+    zone: frai.se
+    type: MX
+    priority: "{{ item.priority }}"
+    value: "{{ item.value }}"
+    account_email: cloudflare@frai.se
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - { priority: 1, value: 'aspmx.l.google.com'}
+    - { priority: 5, value: 'alt1.aspmx.l.google.com'}
+    - { priority: 5, value: 'alt2.aspmx.l.google.com'}
+    - { priority: 10, value: 'alt3.aspmx.l.google.com'}
+    - { priority: 10, value: 'alt4.aspmx.l.google.com'}

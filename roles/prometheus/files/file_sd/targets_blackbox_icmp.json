@@ -1,0 +1,65 @@
+[
+  {
+    "labels": {
+      "job": "blackbox_icmp_monitoring",
+      "node_name": "Cloudflare DNS"
+    },
+    "targets": ["1.1.1.1"]
+  },
+  {
+    "labels": {
+      "job": "blackbox_icmp_monitoring",
+      "node_name": "Google DNS"
+    },
+    "targets": ["8.8.8.8"]
+  },
+  {
+    "labels": {
+      "job": "blackbox_icmp_monitoring",
+      "node_name": "Twitter"
+    },
+    "targets": ["twitter.com"]
+  },
+  {
+    "labels": {
+      "job": "blackbox_icmp_monitoring",
+      "node_name": "Discord"
+    },
+    "targets": ["discord.com"]
+  },
+  {
+    "labels": {
+      "job": "blackbox_icmp_monitoring",
+      "node_name": "Tweakers"
+    },
+    "targets": ["tweakers.net"]
+  },
+  {
+    "labels": {
+      "job": "blackbox_icmp_monitoring",
+      "node_name": "Valorant"
+    },
+    "targets": ["euc.pp.riotgames.com"]
+  },
+  {
+    "labels": {
+      "job": "blackbox_icmp",
+      "node_name": "dad"
+    },
+    "targets": ["dad.frai.se"]
+  },
+  {
+    "labels": {
+      "job": "blackbox_icmp",
+      "node_name": "mom"
+    },
+    "targets": ["mom.frai.se"]
+  },
+  {
+    "labels": {
+      "job": "blackbox_icmp",
+      "node_name": "sil"
+    },
+    "targets": ["sil.frai.se"]
+  }
+]

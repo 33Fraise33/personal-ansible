@@ -1,0 +1,50 @@
+[
+  {
+    "labels": {
+      "job": "mikrotik-snmp",
+      "tenant": "HOME",
+      "node_name": "CR_IRONMAN"
+    },
+    "targets": ["172.16.33.1"]
+  },
+  {
+    "labels": {
+      "job": "mikrotik-snmp",
+      "tenant": "DAD",
+      "node_name": "CR_DAD"
+    },
+    "targets": ["172.17.33.6"]
+  },
+  {
+    "labels": {
+      "job": "mikrotik-snmp",
+      "tenant": "DAD",
+      "node_name": "SW_DAD"
+    },
+    "targets": ["172.16.10.34"]
+  },
+  {
+    "labels": {
+      "job": "mikrotik-snmp",
+      "tenant": "MOM",
+      "node_name": "CR_MOM"
+    },
+    "targets": ["172.17.33.4"]
+  },
+  {
+    "labels": {
+      "job": "mikrotik-snmp",
+      "tenant": "MOM",
+      "node_name": "SW_MOM"
+    },
+    "targets": ["172.16.10.2"]
+  },
+  {
+    "labels": {
+      "job": "mikrotik-snmp",
+      "tenant": "SIL",
+      "node_name": "CR_SIL"
+    },
+    "targets": ["172.17.33.5"]
+  }
+]

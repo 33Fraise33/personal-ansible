@@ -1,0 +1,6 @@
+- name: setup grocy docker container
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - grocy

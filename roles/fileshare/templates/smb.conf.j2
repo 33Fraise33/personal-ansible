@@ -1,0 +1,19 @@
+[global]
+  workgroup = FRAISE
+  server string = Samba {{ inventory_hostname }}
+  security = user
+  guest ok = yes
+  map to guest = Bad Password
+
+  log file = /var/log/samba/%m.log
+  max log size = 50
+  printcap name = /dev/null
+  load printers = no
+
+# Samba Shares
+[data]
+  comment = Storage on {{ inventory_hostname }}
+  path = /data
+  browseable = yes
+  read only = no
+  guest ok = yes

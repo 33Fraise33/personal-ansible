@@ -1,0 +1,35 @@
+- name: create plex data directories
+  file:
+    path: /data/plex/{{ item }}
+    state: directory
+    mode: 0755
+  with_items:
+    - config
+    - transcode
+    - media
+
+- name: setup plex docker container
+  docker_container:
+    name: plex
+    image: plexinc/pms-docker:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.plex}}"
+    purge_networks: yes
+    volumes:
+      - "/data/plex/config:/config"
+      - "/data/plex/transcode:/transcode"
+      - "/data/plex/media:/data"
+    env:
+      TZ: "Europe/Brussels"
+      ADVERTISE_IP: "https://plex.frai.se/"
+      HOSTNAME: "PlexFraise"
+    hostname: "PlexFraise"
+    state: started
+    restart: yes
+    restart_policy: always
+    pull: true
+    labels:
+      traefik.http.routers.plex.tls: "true"
+      traefik.http.routers.plex.tls.certresolver: "le"
+      traefik.http.services.plex.loadbalancer.server.port: "32400"

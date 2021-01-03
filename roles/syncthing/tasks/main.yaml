@@ -1,0 +1,27 @@
+# install syncthing docker container
+# https://hub.docker.com/r/syncthing/syncthing
+
+- name: create syncthing
+  file:
+    path: /data/syncthing
+    state: directory
+    mode: 0775
+
+- name: setup Syncthing docker container
+  docker_container:
+    name: syncthing
+    image: syncthing/syncthing:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.syncthing }}"
+    purge_networks: yes
+    volumes:
+      - "/data/syncthing:/var/syncthing"
+    state: started
+    restart_policy: always
+    restart: yes
+    pull: true
+    labels:
+      traefik.http.routers.syncthing.tls: "true"
+      traefik.http.routers.syncthing.tls.certresolver: "le"
+      traefik.http.services.syncthing.loadbalancer.server.port: "8384"

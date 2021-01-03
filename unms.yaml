@@ -1,0 +1,6 @@
+- name: Setup Unms
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - unms

@@ -1,0 +1,7 @@
+- name: setup invoiceninja docker container
+  hosts: compute
+  connection: ssh
+  gather_facts: false
+  become: true
+  roles:
+    - invoiceninja

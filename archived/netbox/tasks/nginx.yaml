@@ -1,0 +1,22 @@
+- name: setup nginx
+  docker_container:
+    name: nginx
+    image: nginx:1.17-alpine
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.nginx }}"
+    purge_networks: yes
+    volumes:
+      - "/data/netbox/static:/opt/netbox/netbox/static:ro"
+      - "/data/netbox/nginx:/etc/netbox-nginx/:ro"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.nginx.rule: "Host(`netbox.frai.se`)"
+      traefik.http.routers.nginx.tls: "true"
+      traefik.http.routers.nginx.tls.certresolver: "le"
+      traefik.http.services.nginx.loadbalancer.server.port: "8080"
+    command:
+      - nginx -c /etc/netbox-nginx/nginx.conf

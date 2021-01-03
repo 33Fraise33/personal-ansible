@@ -1,0 +1,39 @@
+PUID: "1000"
+PGID: "1000"
+default_user: gianni
+
+docker_network:
+  traefik: 10.33.0.10
+  plex: 10.33.0.11
+  netbox: 10.33.0.12
+  deluge: 10.33.0.13
+  graylog: 172.16.34.14 # TODO
+  grafana: 10.33.0.15
+  portainer: 10.33.0.16
+  wordpress: 10.33.0.17
+  unms: 10.33.0.18
+  influxdb: 10.33.0.19
+  mariadb: 10.33.0.20
+  watchtower: 10.33.0.21
+  syncthing: 10.33.0.22
+  prometheus: 10.33.0.23
+  prometheus_snmp_exporter: 10.33.0.24
+  prometheus_blackbox: 10.33.0.25
+  prometheus_speedtest: 10.33.0.26
+  homer: 10.33.0.28
+  homeassistant: 10.33.0.29
+  jackett: 10.33.0.30
+  pihole: 10.33.0.31
+  jellyfin: 10.33.0.32
+  redis: 10.33.0.33
+  postgres: 10.33.0.34
+  nginx: 10.33.0.35
+  netbox_worker: 10.33.0.36
+  unbound: 10.33.0.37 # TODO
+  acserver: 10.33.0.38
+  impostor: 10.33.0.39
+  accserver: 10.33.0.40
+  mariadb_invoice: 10.33.0.41
+  invoiceninja: 10.33.0.42
+  caddy: 10.33.0.43
+  solaredge_exporter: 10.33.0.44

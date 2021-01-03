@@ -1,0 +1,32 @@
+# setup wireguard with a docker container
+# container from: https://github.com/activeeos/wireguard-docker
+
+- name: install default packages
+  pacman:
+    name: ['wireguard-arch', 'wireguard-tools']
+    state: latest
+
+- name: copy config files
+  template:
+    src: "{{ item }}.j2"
+    dest: /etc/wireguard/{{ item }}
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - wg0.conf
+    - wgPC.conf
+    - wgLaptop.conf
+    - wgPhone.conf
+
+- name: start & enable iptables service
+  service:
+    name: iptables
+    state: started
+    enabled: yes
+
+- name: restart wg service
+  service:
+    name: "wg-quick@wg0"
+    state: restarted
+    enabled: yes

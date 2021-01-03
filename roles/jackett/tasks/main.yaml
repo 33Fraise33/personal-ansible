@@ -1,0 +1,36 @@
+# setup jackett with a docker container
+# container from: https://hub.docker.com/r/linuxserver/jackett/
+
+- name: create jackett config directory
+  file:
+    path: /data/jackett
+    state: directory
+    mode: 0755
+    owner: root
+    group: data
+    recurse: yes
+
+- name: setup jackett docker container
+  docker_container:
+    name: jackett
+    image: linuxserver/jackett:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.jackett }}"
+    purge_networks: yes
+    volumes:
+      - "/data/jackett/config:/config"
+      - "/data/deluge/watch:/downloads"
+    env:
+      TZ: "Europe/Brussels"
+      PUID: "0"
+      PGID: "0"
+      PASSWORD: "{{ jackett_pass }}"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.jackett.tls: "true"
+      traefik.http.routers.jackett.tls.certresolver: "le"
+      traefik.http.services.jackett.loadbalancer.server.port: "9117"

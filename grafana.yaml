@@ -1,0 +1,6 @@
+- name: Setup Grafana
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - grafana

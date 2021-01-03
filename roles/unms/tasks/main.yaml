@@ -1,0 +1,32 @@
+# setup unms with a docker container
+# container from: https://hub.docker.com/r/nico640/docker-unms
+
+- name: create unms config directory
+  file:
+    path: /data/unms
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+    recurse: yes
+
+- name: setup unms docker container
+  docker_container:
+    name: unms
+    image: nico640/docker-unms:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.unms }}"
+    purge_networks: yes
+    volumes:
+      - "/data/unms:/config"
+    env:
+      TZ: Europe/Brussels
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.tcp.routers.unms.rule: "HostSNI(`unms.frai.se`)"
+      traefik.tcp.routers.unms.tls.passthrough: "true"
+      traefik.tcp.services.portainer.loadbalancer.server.port: "443"

@@ -1,0 +1,31 @@
+# setup portainer with a docker container
+# container from: https://www.portainer.io/installation/
+
+- name: create portainer config directory
+  file:
+    path: /data/portainer
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+    recurse: yes
+
+- name: setup portainer docker container
+  docker_container:
+    name: portainer
+    image: portainer/portainer-ce:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.portainer }}"
+    purge_networks: yes
+    volumes:
+      - "/data/portainer:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.portainer.tls: "true"
+      traefik.http.routers.portainer.tls.certresolver: "le"
+      traefik.http.services.portainer.loadbalancer.server.port: "9000"

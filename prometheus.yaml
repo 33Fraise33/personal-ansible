@@ -1,0 +1,6 @@
+- name: setup prometheus docker container
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - prometheus

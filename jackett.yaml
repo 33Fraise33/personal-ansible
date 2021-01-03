@@ -1,0 +1,6 @@
+- name: setup jackett docker container
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - jackett

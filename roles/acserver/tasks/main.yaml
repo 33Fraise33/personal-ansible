@@ -1,0 +1,42 @@
+# setup acserver with a docker container
+# container from: https://github.com/JustaPenguin/assetto-server-manager
+
+- name: create acserver config directory
+  file:
+    path: /data/acserver/server
+    state: directory
+    mode: 0755
+    owner: gianni
+    group: data
+    recurse: yes
+
+- name: copy server template to server
+  template:
+    src: config.yml.j2
+    dest: /data/acserver/config.yml
+    mode: 0644
+    owner: gianni
+    group: data
+
+- name: setup acserver docker container
+  docker_container:
+    name: acserver
+    image: seejy/assetto-server-manager:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.acserver }}"
+    purge_networks: yes
+    volumes:
+      - "/data/acserver/server:/home/assetto/server-manager/assetto"
+      - "/data/acserver/config.yml:/home/assetto/server-manager/config.yml"
+    env:
+      SERVER_USER: "1000"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.acserver.rule: "Host(`acserver.frai.se`)"
+      traefik.http.routers.acserver.tls: "true"
+      traefik.http.routers.acserver.tls.certresolver: "le"
+      traefik.http.services.acserver.loadbalancer.server.port: "8772"

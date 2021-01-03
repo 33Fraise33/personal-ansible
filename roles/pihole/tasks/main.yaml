@@ -1,0 +1,53 @@
+# setup pihole with a docker container
+# container from: https://github.com/pi-hole/docker-pi-hole
+
+- name: create pihole config directory
+  file:
+    path: /data/pihole/config
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+    recurse: yes
+
+- name: copy local dns records
+  copy:
+    src: custom.list
+    dest: /data/pihole/config/custom.list
+    mode: 0644
+    owner: root
+    group: root
+
+- name: setup pihole docker container
+  docker_container:
+    name: pihole
+    image: pihole/pihole:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.pihole }}"
+    purge_networks: yes
+    volumes:
+      - "/data/pihole/config:/etc/pihole"
+      - "/data/pihole/dnsmasq:/etc/dnsmasq.d"
+    env:
+      TZ: "Europe/Brussels"
+      WEBPASSWORD: "{{ pihole_pass }}"
+      VIRTUAL_HOST: pihole.frai.se
+      DNS1: 1.1.1.1
+      DNS2: 1.0.0.1
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.pihole.tls: "true"
+      traefik.http.routers.pihole.tls.certresolver: "le"
+      traefik.http.services.pihole.loadbalancer.server.port: "80"
+  vars:
+    pihole_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          30383662616262326461366563383161346666623538663333343361316334303539613136373130
+          3764656632633164393830643133356363386437633836390a653532656634346666656661643936
+          66393862356664613337306461313334343365323832303761363539616138326535653135393936
+          3435663065636237650a613631656639373663613139316464356466613433396164666135303465
+          3063

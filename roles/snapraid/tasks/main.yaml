@@ -1,0 +1,55 @@
+# snapraid role coming from: https://github.com/IronicBadger/ansible-role-snapraid
+
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+
+- name: clone git repo
+  git:
+    repo: https://github.com/IronicBadger/docker-snapraid.git
+    dest: /tmp/snapraid
+    force: yes
+
+- name: make build script executable
+  file:
+    path: /tmp/snapraid/build.sh
+    mode: 0775
+
+- name: build and isntall package
+  block:
+    - name: build .deb package
+      shell: cd /tmp/snapraid && ./build.sh
+    - name: install built .deb
+      apt:
+        deb: /tmp/snapraid/build/snapraid-from-source.deb
+        state: present
+  when: "'snapraid' not in ansible_facts.packages"
+
+- name: install snapraid config file
+  template:
+    src: snapraid.conf.j2
+    dest: /etc/snapraid.conf
+    owner: root
+    group: root
+    mode: 0775
+
+- name: clone snapraid-runner
+  git:
+    repo: https://github.com/Chronial/snapraid-runner.git
+    dest: /opt/snapraid-runner
+
+- name: install snapraid-runner configuration file
+  template:
+    src: snapraid-runner.conf.j2
+    dest: "/opt/snapraid-runner/snapraid-runner.conf"
+    owner: root
+    group: root
+    mode: 0775
+
+- name: setup cron job snapraid-runner
+  cron:
+    user: "root"
+    job: "python3 /opt/snapraid-runner/snapraid-runner.py -c /opt/snapraid-runner/snapraid-runner.conf"
+    name: "snapraid_runner"
+    minute: "00"
+    hour: "01"

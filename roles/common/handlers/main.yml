@@ -1,0 +1,11 @@
+- name: restart sshd
+  service:
+    name: sshd
+    state: restarted
+
+- name: restart node_exporter
+  systemd:
+    daemon_reload: true
+    name: node_exporter
+    state: restarted
+    enabled: yes

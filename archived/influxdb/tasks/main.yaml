@@ -1,0 +1,29 @@
+# setup influx with a docker container
+# container from: https://hub.docker.com/_/influxdb
+
+- name: create influxdb config directories
+  file:
+    path: /data/influxdb/{{ item }}
+    state: directory
+    mode: 0755
+    owner: root
+    group: data
+  with_items:
+    - data
+
+- name: setup influxdb docker container
+  docker_container:
+    name: influxdb
+    image: influxdb:alpine
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.influxdb}}"
+    purge_networks: yes
+    volumes:
+      - "/data/influxdb:/var/lib/influxdb"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

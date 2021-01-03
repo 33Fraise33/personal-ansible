@@ -1,0 +1,26 @@
+# setup impostor with a docker container
+# container from: https://github.com/AeonLucid/Impostor
+
+- name: create impostor config directory
+  file:
+    path: /data/impostor
+    state: directory
+    mode: 0755
+    owner: root
+    group: data
+    recurse: yes
+
+- name: setup impostor docker container
+  docker_container:
+    name: impostor
+    image: aeonlucid/impostor:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.impostor }}"
+    purge_networks: yes
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

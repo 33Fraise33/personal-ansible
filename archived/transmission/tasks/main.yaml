@@ -1,0 +1,45 @@
+#install Transmission torrent client
+# https://hub.docker.com/r/linuxserver/transmission/
+
+
+- name: create transmission data directories
+  file:
+    path: /data/transmission/{{ item }}
+    state: directory
+    mode: 0755
+  with_items:
+    - config
+    - downloads
+    - watch
+
+- name: setup transmission docker container
+  docker_container:
+    name: transmission
+    image: linuxserver/transmission:latest
+    network_mode: bridge
+    networks:
+      - name: fraise_network
+        ipv4_address: "{{ docker_network.transmission }}"
+    purge_networks: yes
+    volumes:
+      - "/data/transmission/config:/config"
+      - "/data:/data"
+      - "/data/transmission/watch:/watch"
+    env:
+      PUID: "0"
+      PGID: "0"
+      TZ: "Europe/London"
+      USER: gianni
+      TRANSMISSION_WEB_HOME: "/combustion-release/"
+      PASS: "{{ transmission_pass }}"
+    state: started
+    restart: yes
+    pull: true
+  vars:
+    transmission_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          33363062306131666339363535623939393130346536393333323465396434626337626135636663
+          3532393165376364666464313938623034346533643363380a373537383266666139393632373738
+          61363565393634666566656262626361633764616233316331373039396262356665376135343330
+          3462373361306635330a616131343035643834636531353363376334303438613434633231326462
+          37656335393066313337303266373336626535336131313031353866666139383464

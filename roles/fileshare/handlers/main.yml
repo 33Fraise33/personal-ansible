@@ -1,0 +1,5 @@
+- name: restart samba service
+  service:
+    name: "{{ smb_service_name }}"
+    state: restarted
+    enabled: yes

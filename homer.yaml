@@ -1,0 +1,7 @@
+- name: setup homer docker container
+  hosts: compute
+  connection: ssh
+  gather_facts: false
+  become: true
+  roles:
+    - homer

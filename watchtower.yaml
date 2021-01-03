@@ -1,0 +1,6 @@
+- name: Setup watchtower
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - watchtower

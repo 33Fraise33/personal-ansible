@@ -1,0 +1,38 @@
+# install Deluge torrent client
+# https://hub.docker.com/r/linuxserver/deluge
+
+
+- name: create deluge data directories
+  file:
+    path: /data/deluge/{{ item }}
+    state: directory
+    mode: 0775
+  with_items:
+    - config
+    - downloads
+    - watch
+
+- name: setup Deluge docker container
+  docker_container:
+    name: deluge
+    image: linuxserver/deluge:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.deluge }}"
+    purge_networks: yes
+    volumes:
+      - "/data/deluge/config:/config"
+      - "/data:/data"
+      - "/data/deluge/watch:/watch"
+    env:
+      PUID: "0"
+      PGID: "0"
+      TZ: "Europe/London"
+    state: started
+    restart_policy: always
+    restart: yes
+    pull: true
+    labels:
+      traefik.http.routers.deluge.tls: "true"
+      traefik.http.routers.deluge.tls.certresolver: "le"
+      traefik.http.services.deluge.loadbalancer.server.port: "8112"

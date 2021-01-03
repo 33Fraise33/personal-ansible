@@ -1,0 +1,18 @@
+[
+  {
+    "labels": {
+      "job": "node_exporter",
+      "tenant": "HOME",
+      "node_name": "CAPTAIN"
+    },
+    "targets": ["172.16.33.5:9100"]
+  },
+  {
+    "labels": {
+      "job": "node_exporter",
+      "tenant": "HOME",
+      "node_name": "HULK"
+    },
+    "targets": ["172.16.33.6:9100"]
+  }
+]

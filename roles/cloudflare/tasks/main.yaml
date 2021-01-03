@@ -1,0 +1,13 @@
+- include_tasks:
+    file: fraise.yaml
+    apply:
+      tags: fraise
+  tags:
+  - always
+
+- include_tasks:
+    file: unitix.yaml
+    apply:
+      tags: unitix
+  tags:
+  - always

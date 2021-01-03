@@ -1,0 +1,8 @@
+# for initial run don't forget --ask-become-pass and --ask-pass
+
+- hosts: all
+  connection: ssh
+  become: true
+  # become_method: su # initial run
+  roles:
+    - common

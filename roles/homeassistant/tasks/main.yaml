@@ -1,0 +1,35 @@
+# setup homeassistant with a docker container
+# container from: https://www.home-assistant.io/docs/installation/docker/
+
+- name: create homeassistant config directory
+  file:
+    path: /data/homeassistant
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+    recurse: yes
+
+- name: setup homeassistant docker container
+  docker_container:
+    name: homeassistant
+    image: homeassistant/home-assistant:latest
+    networks:
+      - name: macvlan50
+        ipv4_address: 172.16.50.65
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.homeassistant }}"
+    purge_networks: yes
+    volumes:
+      - "/data/homeassistant/config:/config"
+    env:
+      TZ: "Europe/Brussels"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.homeassistant.rule: "Host(`ha.frai.se`)"
+      traefik.http.routers.homeassistant.tls: "true"
+      traefik.http.routers.homeassistant.tls.certresolver: "le"
+      traefik.http.services.homeassistant.loadbalancer.server.port: "8123"

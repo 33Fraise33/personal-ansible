@@ -1,0 +1,6 @@
+- name: setup mergerfs on storage servers
+  hosts: storage
+  connection: ssh
+  become: true
+  roles:
+    - mergerfs

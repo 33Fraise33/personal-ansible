@@ -1,0 +1,6 @@
+- name: setup  filesharing
+  hosts: all
+  connection: ssh
+  become: true
+  roles:
+    - fileshare

@@ -1,0 +1,6 @@
+- name: setup snapraid on storage servers
+  hosts: storage
+  connection: ssh
+  become: true
+  roles:
+    - snapraid

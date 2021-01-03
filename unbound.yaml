@@ -1,0 +1,6 @@
+- name: setup unbound docker container
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - unbound

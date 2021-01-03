@@ -1,0 +1,6 @@
+- name: setup nextcloud docker container
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - nextcloud

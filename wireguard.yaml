@@ -1,0 +1,6 @@
+- name: Common Tasks
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - wireguard

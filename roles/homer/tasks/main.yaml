@@ -1,0 +1,42 @@
+# setup grocy with a docker container
+# container from: https://github.com/bastienwirtz/homer
+
+- name: create homer config directory
+  file:
+    path: /data/homer
+    state: directory
+    mode: 0755
+    owner: gianni
+    group: data
+
+- name: copy config file
+  copy:
+    src: config.yml
+    dest: /data/homer/config.yml
+    mode: 0644
+    owner: gianni
+    group: data
+  tags: config
+
+- name: setup homer docker container
+  docker_container:
+    name: homer
+    image: b4bz/homer:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.homer }}"
+    purge_networks: yes
+    volumes:
+      - "/data/homer:/www/assets"
+    env:
+      UID: "1000"
+      GID: "1003"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.homer.rule: "Host(`frai.se`)"
+      traefik.http.routers.homer.tls: "true"
+      traefik.http.routers.homer.tls.certresolver: "le"
+      traefik.http.services.homer.loadbalancer.server.port: "8080"

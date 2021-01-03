@@ -1,0 +1,36 @@
+- name: create redis directory
+  file:
+    path: /data/netbox/redis
+    state: directory
+    mode: 0755
+    owner: 999
+    group: 1000
+
+- name: copy redis config
+  template:
+    src: redis.conf.j2
+    dest: /data/netbox/redis/redis.conf
+    owner: root
+    group: data
+    mode: 0644
+
+- name: setup redis & redis cache
+  docker_container:
+    name: redis
+    image: redis:5-alpine
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.redis }}"
+    purge_networks: yes
+    volumes:
+      - "/data/netbox/redis:/data"
+      - "/data/netbox/redis/redis.conf:/redis.conf"
+    command:
+      - 'redis-server /redis.conf'
+    user: 0:1003
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

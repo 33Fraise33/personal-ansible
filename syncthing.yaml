@@ -1,0 +1,6 @@
+- name: Setup Syncthing
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - syncthing

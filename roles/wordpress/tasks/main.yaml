@@ -1,0 +1,69 @@
+# setup wordpress with a docker container
+# container from: https://hub.docker.com/_/wordpress
+
+- name: create wordpress config directory
+  file:
+    path: /data/wordpress/{{ item.item }}
+    state: directory
+    mode: 0755
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+  with_items:
+    - { item: mysql, user: mysql, group: data}
+    - { item: wp-content, user: http, group: data }
+
+- name: copy uploads file
+  copy:
+    src: uploads.ini
+    dest: /data/wordpress/uploads.ini
+    mode: 0755
+    owner: root
+    group: data
+
+- name: setup mariadb docker container
+  docker_container:
+    name: mariadb
+    image: mariadb:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.mariadb }}"
+    purge_networks: yes
+    volumes:
+      - "/data/wordpress/mysql:/var/lib/mysql"
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: "{{ mysql_user_password }}"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
+
+- name: setup wordpress docker container
+  docker_container:
+    name: wordpress
+    image: wordpress:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.wordpress }}"
+    purge_networks: yes
+    env:
+      WORDPRESS_DB_HOST: "{{ docker_network.mariadb }}"
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: "{{ mysql_user_password }}"
+    volumes:
+      - "/data/wordpress/wp-content:/var/www/html/wp-content"
+      - "/data/wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.wordpress.rule: "Host(`unitix.be`)"
+      traefik.http.routers.wordpress.tls: "true"
+      traefik.http.routers.wordpress.tls.certresolver: "le"
+      traefik.http.services.wordpress.loadbalancer.server.port: "80"

@@ -1,0 +1,102 @@
+- name: clone netbox docker git repo for files
+  git:
+    repo: 'https://github.com/netbox-community/netbox-docker'
+    dest: /data/netbox/git/
+    force: yes
+
+- name: set ownership of directory
+  file:
+    path: /data/netbox/{{ item }}
+    state: directory
+    mode: 0755
+    owner: 101
+    group: 101
+    recurse: yes
+  with_items:
+    - static
+    - git
+    - media
+    - nginx
+
+- name: remove unneeded files
+  file:
+    path: /data/netbox/git/{{ item }}
+    state: absent
+  with_items:
+    - env
+    - build-functions
+    - Dockerfile
+
+- name: copy netbox config file
+  template:
+    src: netbox_configuration.py.j2
+    dest: /data/netbox/git/configuration/configuration.py
+    owner: 101
+    group: 101
+    mode: 0644
+
+- name: copy nginx config file
+  copy:
+    src: /data/netbox/git/docker/nginx.conf
+    dest: /data/netbox/nginx/nginx.conf
+    remote_src: yes
+    owner: 101
+    group: 101
+    mode: 0644
+
+- name: setup netbox-worker
+  docker_container:
+    name: netbox-worker
+    image: netboxcommunity/netbox:{{ netbox_version }}
+    purge_networks: yes
+    volumes:
+      - "/data/netbox/git/startup_scripts:/opt/netbox/startup_scripts:ro"
+      - "/data/netbox/git/initializers:/opt/netbox/initializers:ro"
+      - "/data/netbox/git/configuration:/etc/netbox/config:ro"
+      - "/data/netbox/git/reports:/etc/netbox/reports:ro"
+      - "/data/netbox/git/scripts:/etc/netbox/scripts:ro"
+      - "/data/netbox/static:/opt/netbox/netbox/static"
+      - "/data/netbox/media:/opt/netbox/netbox/media"
+      - "/data/netbox/nginx:/etc/netbox-nginx"
+    env: "{{ netbox_env }}"
+    user: 101
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.netbox_worker }}"
+    entrypoint:
+      - python3
+      - /opt/netbox/netbox/manage.py
+    command:
+    - rqworker
+
+- name: setup netbox
+  docker_container:
+    name: netbox
+    image: netboxcommunity/netbox:{{ netbox_version }}
+    purge_networks: yes
+    volumes:
+      - "/data/netbox/git/startup_scripts:/opt/netbox/startup_scripts:ro"
+      - "/data/netbox/git/initializers:/opt/netbox/initializers:ro"
+      - "/data/netbox/git/configuration:/etc/netbox/config:ro"
+      - "/data/netbox/git/reports:/etc/netbox/reports:ro"
+      - "/data/netbox/git/scripts:/etc/netbox/scripts:ro"
+      - "/data/netbox/static:/opt/netbox/netbox/static"
+      - "/data/netbox/media:/opt/netbox/netbox/media"
+      - "/data/netbox/nginx:/etc/netbox-nginx"
+    env: "{{ netbox_env }}"
+    user: 101
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.netbox }}"

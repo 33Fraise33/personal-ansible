@@ -1,0 +1,11 @@
+[Interface]
+Address = 172.16.35.3/32
+DNS = 1.1.1.1
+PrivateKey = {{ wireguard_private_key_phone }}
+
+[Peer]
+# Name = Home
+PublicKey = hm0YkMbjlbFfLUJ6p8Lulqgv3UFd4Zu014QB8tE2hFw=
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = ironman.frai.se:2034
+PersistentKeepalive = 25

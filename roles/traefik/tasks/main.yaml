@@ -1,0 +1,38 @@
+# setup traefik with a docker container
+# container from: https://docs.traefik.io/getting-started/quick-start/
+
+- name: create traefik config directory
+  file:
+    path: /data/traefik/letsencrypt
+    state: directory
+    mode: 0600
+    owner: root
+    group: root
+    recurse: yes
+
+- name: copy Traefik config
+  template:
+    src: traefik.yml.j2
+    dest: /data/traefik/traefik.yml
+    owner: root
+    group: root
+    mode: 0755
+
+- name: setup traefik docker container
+  docker_container:
+    name: traefik
+    image: traefik:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.traefik }}"
+    purge_networks: yes
+    volumes:
+      - "/data/traefik/letsencrypt:/letsencrypt"
+      - "/data/traefik/traefik.yml:/etc/traefik/traefik.yml"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

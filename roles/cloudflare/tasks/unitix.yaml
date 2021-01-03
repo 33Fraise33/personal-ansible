@@ -1,0 +1,60 @@
+- name: set proxied cname records for ironman_ddns
+  cloudflare_dns:
+    zone: unitix.be
+    type: CNAME
+    record: "{{ item }}"
+    value: "{{ ironman_ddns }}"
+    proxied: yes
+    account_email: cloudflare@frai.se
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - '@'
+    - 'invoiceninja'
+
+- name: set non-proxied cname records for gsuite
+  cloudflare_dns:
+    zone: unitix.be
+    type: CNAME
+    record: "{{ item }}"
+    value: ghs.googlehosted.com
+    proxied: yes
+    account_email: cloudflare@frai.se
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - calendar
+    - drive
+    - mail
+    - groups
+    - sites
+
+- name: create TXT records
+  cloudflare_dns:
+    zone: unitix.be
+    type: TXT
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: cloudflare@frai.se
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - { record: '@', value: 'v=spf1 include:_spf.google.com ~all'}
+    - { record: '@', value: 'google-site-verification=heZbkAh-g7hZ0L0KSG1hQUlcRRFB4EWsUj5QuWfB1i8'}
+    - { record: 'google._domainkey', value: 'v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm5XFJf6lwuOoYQw/Bizn1dbAohBdWCEbmiG5kLy448/GVKSF/9mnSg1qLCHNHaAde7ty/pqSTHxhrlSA25NyHWE5f1HvF2EJbOHXivLmnuH9PR/XQS3opJ+NnNkuVl8Cy/glNQ0kfj2DPJtw6Jp8uPvwJa18cSy3KatNtDviyTEJ9SD7VWuxCW9ggMsq2ksv/gZETB0QCMiB6lHP/V8KjDzD9m5kzn745v39Zv+W4l3GmL3MctpS7DvROgYUT9hny7DP7fXou79cuoddANzQvm+ppa7BDmIvbFolmMPoZTEpdbkh6yR69jfVB7PwrFYoNui9Ypmg0ydAfVpvl3ZYQwIDAQAB'}
+
+- name: create MX records
+  cloudflare_dns:
+    zone: unitix.be
+    type: MX
+    priority: "{{ item.priority }}"
+    value: "{{ item.value }}"
+    account_email: cloudflare@frai.se
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - { priority: 1, value: 'aspmx.l.google.com'}
+    - { priority: 5, value: 'alt1.aspmx.l.google.com'}
+    - { priority: 5, value: 'alt2.aspmx.l.google.com'}
+    - { priority: 10, value: 'alt3.aspmx.l.google.com'}
+    - { priority: 10, value: 'alt4.aspmx.l.google.com'}
