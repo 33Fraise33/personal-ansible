@@ -2,7 +2,7 @@
   authorized_key:
     user: "{{ default_user }}"
     state: present
-    key: "{{lookup('file', 'public_keys/{{ default_user }}')}}"
+    key: "https://github.com/33Fraise33.keys"
 
 - name: change ssh configs
   lineinfile:
