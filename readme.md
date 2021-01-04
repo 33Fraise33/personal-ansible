@@ -18,12 +18,12 @@ I have 3 vlans configured on my router,
 - 1 for docker containers - Vlan 333 (macvlan interface with as gateway the router, that way I can port forward and firewall my containers on my router and I don't have to look at the host firewall)
 
 ## Running a playbook
-`eval `ssh-agent``
-`ssh-add <ssh-key here>`
+``eval `ssh-agent` ``   
+`ssh-add <ssh-key here>`      
 `ansible-playbook -i development <playbook>.yaml --ask-vault-pass` (this last part is needed for encrypted passwords)
 
 ## Encrypting passwords
-`ansible-vault encrypt_string`
+`ansible-vault encrypt_string`    
 type in your ansible vault password (I use the same generated vault key for all my variables in this project and store the one password in my password manager.)
 Next enter your variable to encrypt and press ctrl+d twice.
 
