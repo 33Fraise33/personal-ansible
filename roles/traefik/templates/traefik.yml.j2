@@ -24,7 +24,10 @@ certificatesResolvers:
 # Docker configuration backend
 providers:
   docker:
-    defaultRule: "Host(`{{ trimPrefix `/` .Name }}.frai.se`)"
+    defaultRule: "Host(`{{ '{{' }} trimPrefix `/` .Name {{ '}}' }}.frai.se`)"
+  file:
+    filename: /etc/traefik/custom_rules.yml
+    watch: true
 
 # API and dashboard configuration
 api:

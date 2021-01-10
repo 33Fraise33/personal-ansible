@@ -3,11 +3,11 @@
 
 - name: create jackett config directory
   file:
-    path: /data/jackett
+    path: /data/docker/jackett
     state: directory
     mode: 0755
-    owner: root
-    group: data
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
     recurse: yes
 
 - name: setup jackett docker container
@@ -19,12 +19,12 @@
         ipv4_address: "{{ docker_network.jackett }}"
     purge_networks: yes
     volumes:
-      - "/data/jackett/config:/config"
-      - "/data/deluge/watch:/downloads"
+      - "/data/docker/jackett/config:/config"
+      - "/data/docker/deluge/watch:/downloads"
     env:
       TZ: "Europe/Brussels"
-      PUID: "0"
-      PGID: "0"
+      PUID: "65534"
+      PGID: "65534"
       PASSWORD: "{{ jackett_pass }}"
     restart: yes
     restart_policy: always

@@ -1,6 +1,9 @@
 PUID: "1000"
 PGID: "1000"
 default_user: gianni
+nobody:
+  group: "65534"
+  user: "65534"
 
 docker_network:
   traefik: 10.33.0.10

@@ -1,5 +1,5 @@
 - name: setup jackett docker container
-  hosts: compute
+  hosts: storage
   connection: ssh
   become: true
   roles:

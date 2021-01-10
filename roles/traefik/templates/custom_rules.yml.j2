@@ -1,0 +1,21 @@
+http:
+  services:
+    jackett:
+      loadBalancer:
+        servers:
+          - url: "http://{{ docker_network.jackett }}:9117"
+    deluge:
+      loadBalancer:
+        servers:
+          - url: "http://{{ docker_network.deluge }}:8112"
+  routers:
+    jackett:
+      rule: "Host(`jackett.frai.se`)"
+      service: "jackett"
+      tls:
+        certResolver: le
+    deluge:
+      rule: "Host(`deluge.frai.se`)"
+      service: "deluge"
+      tls:
+        certResolver: le
