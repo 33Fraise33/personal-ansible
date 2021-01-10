@@ -1,5 +1,9 @@
 {
   "bip": "192.168.16.1/24",
   "metrics-addr" : "0.0.0.0:9323",
-  "experimental" : true
+  "experimental" : true, 
+  "hosts": [
+    "tcp://0.0.0.0:2375",
+    "unix:///var/run/docker.sock"
+  ]
 }

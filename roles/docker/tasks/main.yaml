@@ -38,36 +38,45 @@
     name: ['pip', 'docker']
     state: latest
 
-- name: setup macvlan on captain
-  block:
-    - name: create docker macvlan333 network
-      docker_network:
-        name: macvlan333
-        driver: macvlan
-        driver_options:
-          parent: "{{ ansible_default_ipv4.interface }}.333"
-        ipam_config:
-          - subnet: '10.33.0.0/24'
-            gateway: '10.33.0.1'
-    - name: create docker macvlan50 network
-      docker_network:
-        name: macvlan50
-        driver: macvlan
-        driver_options:
-          parent: "{{ ansible_default_ipv4.interface }}.50"
-        ipam_config:
-          - subnet: '172.16.50.0/24'
-            gateway: '172.16.50.1'
-            iprange: 172.16.50.64/29
-  when: inventory_hostname == "captain"
+- name: create docker macvlan333 network
+  docker_network:
+    name: macvlan333
+    driver: macvlan
+    driver_options:
+      parent: "{{ ansible_default_ipv4.interface }}.333"
+    ipam_config:
+      - subnet: '10.33.0.0/24'
+        gateway: '10.33.0.1'
 
-- name: change docker vars (including default subnet)
-  copy:
-    src: daemon.json
-    dest: /etc/docker/daemon.json
+- name: create docker macvlan50 network
+  docker_network:
+    name: macvlan50
+    driver: macvlan
+    driver_options:
+      parent: "{{ ansible_default_ipv4.interface }}.50"
+    ipam_config:
+      - subnet: '172.16.50.0/24'
+        gateway: '172.16.50.1'
+        iprange: 172.16.50.64/29
+
+- name: create systemd config directory
+  file:
+    path: /etc/systemd/system/docker.service.d/
+    state: directory
+    mode: 0755
     owner: root
     group: root
-    mode: 0755
+    
+- name: change docker vars (including default subnet)
+  copy:
+    src: "{{ item.file }}"
+    dest: "{{ item.location }}{{ item.file }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - { file: daemon.json, location: /etc/docker/ }
+    - { file: override.conf, location: /etc/systemd/system/docker.service.d/ }
   notify: restart docker
 
 - name: Log into DockerHub
