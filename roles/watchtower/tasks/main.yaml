@@ -7,10 +7,6 @@
     image: containrrr/watchtower:latest
     network_mode: bridge
     command: --cleanup --interval 7200
-    networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker_network.watchtower }}"
-    purge_networks: yes
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     restart: yes
