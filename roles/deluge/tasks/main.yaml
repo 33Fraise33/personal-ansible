@@ -4,8 +4,10 @@
 
 - name: create deluge data directories
   file:
-    path: /data/deluge/{{ item }}
+    path: /data/docker/deluge/{{ item }}
     state: directory
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
     mode: 0775
   with_items:
     - config
@@ -21,13 +23,13 @@
         ipv4_address: "{{ docker_network.deluge }}"
     purge_networks: yes
     volumes:
-      - "/data/deluge/config:/config"
+      - "/data/docker/deluge/config:/config"
       - "/data:/data"
-      - "/data/deluge/watch:/watch"
+      - "/data/docker/deluge/watch:/watch"
     env:
-      PUID: "0"
-      PGID: "0"
-      TZ: "Europe/London"
+      PUID: "{{ nobody.user }}"
+      PGID: "{{ nobody.group }}"
+      TZ: "Etc/UTC"
     state: started
     restart_policy: always
     restart: yes
