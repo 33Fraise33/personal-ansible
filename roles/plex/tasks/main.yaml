@@ -1,30 +1,32 @@
 - name: create plex data directories
   file:
-    path: /data/plex/{{ item }}
+    path: "{{ item }}"
     state: directory
     mode: 0755
   with_items:
-    - config
-    - transcode
-    - media
+    - "{{ docker_config_location }}/plex/config"
+    - "/data/media"
 
 - name: setup plex docker container
   docker_container:
     name: plex
-    image: plexinc/pms-docker:latest
+    image: linuxserver/plex:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.plex}}"
+        ipv4_address: "{{ docker_network.plex }}"
     purge_networks: yes
     volumes:
-      - "/data/plex/config:/config"
-      - "/data/plex/transcode:/transcode"
-      - "/data/plex/media:/data"
+      - "{{ docker_config_location }}/plex/config:/config"
+      - "/data/media/movies:/movies"
+      - "/data/media/series:/series"
     env:
-      TZ: "Europe/Brussels"
-      ADVERTISE_IP: "https://plex.frai.se/"
-      HOSTNAME: "PlexFraise"
-    hostname: "PlexFraise"
+      PUID: "{{ nobody.user }}"
+      PGID: "{{ nobody.group }}"
+      VERSION: "docker"
+      # first time only
+      # PLEX_CLAIM: claim-54d_4BQ93ykS7m7vmg4X
+    devices:
+      - /dev/dri:/dev/dri
     state: started
     restart: yes
     restart_policy: always

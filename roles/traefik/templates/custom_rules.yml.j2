@@ -8,6 +8,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://{{ docker_network.deluge }}:8112"
+    plex:
+      loadBalancer:
+        servers:
+          - url: "http://{{ docker_network.plex }}:32400"
   routers:
     jackett:
       rule: "Host(`jackett.frai.se`)"
@@ -17,5 +21,10 @@ http:
     deluge:
       rule: "Host(`deluge.frai.se`)"
       service: "deluge"
+      tls:
+        certResolver: le
+    plex:
+      rule: "Host(`plex.frai.se`)"
+      service: "plex"
       tls:
         certResolver: le

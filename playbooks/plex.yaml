@@ -1,4 +1,4 @@
-- hosts: compute
+- hosts: storage
   connection: ssh
   become: true
   roles:
