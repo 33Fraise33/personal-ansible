@@ -3,7 +3,7 @@
 
 - name: create jackett config directory
   file:
-    path: /data/docker/jackett
+    path: "{{ docker_config_location }}/jackett"
     state: directory
     mode: 0755
     owner: "{{ nobody.user }}"
@@ -19,8 +19,8 @@
         ipv4_address: "{{ docker_network.jackett }}"
     purge_networks: yes
     volumes:
-      - "/data/docker/jackett/config:/config"
-      - "/data/docker/deluge/watch:/downloads"
+      - "{{ docker_config_location }}/jackett:/config"
+      - "{{ docker_config_location }}/deluge/watch:/downloads"
     env:
       TZ: "Europe/Brussels"
       PUID: "65534"

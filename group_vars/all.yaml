@@ -5,6 +5,9 @@ nobody:
   group: "65534"
   user: "65534"
 
+docker_config_location: /docker
+docker_data_location: /data/docker
+
 docker_network:
   traefik: 10.33.0.10
   plex: 10.33.0.11
