@@ -1,0 +1,43 @@
+# https://hub.docker.com/_/postgres
+
+- name: create postgres data directory
+  file:
+    path: "{{ docker_data_location }}/postgres"
+    state: directory
+    mode: 0755
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    recurse: yes
+
+- name: setup postgres
+  docker_container:
+    name: postgres
+    image: postgres:{{ postgres_major_version }}-alpine
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.postgres }}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_data_location }}/postgres:/var/lib/postgresql/data"
+    user: "{{ nobody.user }}:{{ nobody.group }}"
+    env:
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
+
+- name: install postgres host dependencies
+  pacman:
+    update_cache: yes
+    name: ['postgresql-libs']
+    state: latest
+  when: ansible_os_family == "Archlinux"
+
+- name: install postgres ansible dependencies
+  pip:
+    name: ['pip', 'psycopg2']
+    state: latest
