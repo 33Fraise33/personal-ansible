@@ -24,6 +24,7 @@
     - acserver
     - wordpress
     - accserver
+    - matrix
 
 - name: set non-proxied cname records for ironman_ddns
   cloudflare_dns:

@@ -39,7 +39,5 @@ docker_network:
   acserver: 10.33.0.38
   impostor: 10.33.0.39
   accserver: 10.33.0.40
-  mariadb_invoice: 10.33.0.41
-  invoiceninja: 10.33.0.42
-  caddy: 10.33.0.43
+  synapse: 10.33.0.41
   solaredge_exporter: 10.33.0.44

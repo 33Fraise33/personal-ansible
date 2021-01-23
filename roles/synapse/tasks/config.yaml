@@ -1,0 +1,51 @@
+- name: set config items
+  lineinfile:
+    path: "{{ docker_config_location }}/synapse/homeserver.yaml"
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insert }}"
+  with_items:
+    - { regex: "^public_baseurl" , line: "public_baseurl: https://matrix.frai.se" , insert: "^#public_baseurl" }
+
+- name: add marker to remove block
+  lineinfile:
+    path: "{{ docker_config_location }}/synapse/homeserver.yaml"
+    regexp: "^#BEGIN ANSIBLE REMOVE BLOCK"
+    line: "#BEGIN ANSIBLE REMOVE BLOCK"
+    insertbefore: "^database:"
+
+- name: add marker to remove block
+  lineinfile:
+    path: "{{ docker_config_location }}/synapse/homeserver.yaml"
+    regexp: "^#END ANSIBLE REMOVE BLOCK"
+    line: "#END ANSIBLE REMOVE BLOCK"
+    insertafter: "^    database:"
+
+- name: add marker for new block
+  lineinfile:
+    path: "{{ docker_config_location }}/synapse/homeserver.yaml"
+    regexp: "^#ANSIBLE CREATED DATABASE CONFIG"
+    line: "#ANSIBLE CREATED DATABASE CONFIG"
+    insertafter: "^#END ANSIBLE REMOVE BLOCK"
+
+- name: remove default database settings
+  blockinfile:
+    path: "{{ docker_config_location }}/synapse/homeserver.yaml"
+    marker: "#{mark} ANSIBLE REMOVE BLOCK"
+    state: "absent"
+
+- name: setup database config
+  blockinfile:
+    path: "{{ docker_config_location }}/synapse/homeserver.yaml"
+    insertafter: "^#ANSIBLE CREATED DATABASE CONFIG"
+    block: |
+      database:
+        name: psycopg2
+        args:
+          user: {{ postgres_user }}
+          password: {{ postgres_password }}
+          database: synapse
+          host: {{ docker_network.postgres }}
+          cp_min: 5
+          cp_max: 10
+    state: "present"
