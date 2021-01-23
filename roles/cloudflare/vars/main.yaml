@@ -1,4 +1,4 @@
-ironman_ddns: "783d0843a0fd.sn.mynetname.net"
+ironman_ddns: "b8f60adc0cd2.sn.mynetname.net"
 cloudflare_api_token: !vault |
       $ANSIBLE_VAULT;1.1;AES256
       37303562376564316235313537666163383338316333356631646236363539653738346661356239
