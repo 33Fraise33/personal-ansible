@@ -1,0 +1,104 @@
+# https://github.com/tulir/mautrix-telegram
+
+- name: create bridge directory
+  file:
+    path: "{{ docker_data_location }}/matrix-bridges/mautrix-telegram"
+    state: directory
+    mode: 0755
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    recurse: yes
+
+- name: Start telegram bridge docker container (create config file)
+  docker_container:
+    name: mautrix-telegram
+    image: dock.mau.dev/tulir/mautrix-telegram:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.mautrix_telegram}}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_data_location }}/matrix-bridges/mautrix-telegram:/data"
+    env:
+      UID: "{{ nobody.user }}"
+      GID: "{{ nobody.group }}"
+    state: started
+    restart_policy: no
+    pull: true
+    labels:
+      traefik.enable: "false"
+
+- name: wait for config file to be created
+  pause:
+    seconds: 10
+
+- name: set telegram config items
+  lineinfile:
+    path: "{{ docker_data_location }}/matrix-bridges/mautrix-telegram/config.yaml"
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insert }}"
+  with_items:
+    - regex: "^    address: https://"
+      line: "    address: https://{{ matrix_server_name }}"
+      insert: "^    # The address that this appservice"
+    - regex: "^    domain:"
+      line: "    domain: {{ matrix_server_name }}"
+      insert: "^    # The domain of"
+    - regex: "^    address: http://"
+      line: "    address: http://{{ docker_network.mautrix_telegram }}:29317"
+      insert: "^    # The address that the homeserver can use"
+    - regex: "^        '@33fraise33:matrix.frai.se': admin"
+      line: "        '@33fraise33:matrix.frai.se': admin"
+      insert: "^    permissions:"
+    - regex: "^    api_id:"
+      line: "    api_id: {{ telegram_api_id }}"
+      insert: ""
+    - regex: "^    api_hash:"
+      line: "    api_hash: {{ telegram_api_hash }}"
+      insert: ""
+    - regex: "^    community_id:"
+      line: "    community_id: '+telegram:matrix.frai.se'"
+      insert: ""
+  notify: restart telegram container
+
+- name: set telegram config items
+  lineinfile:
+    path: "{{ docker_data_location }}/matrix-bridges/mautrix-telegram/config.yaml"
+    regexp: "{{ item }}"
+    state: absent
+  with_items:
+    - "^(.*)public.example.com(.*)user"
+    - "^(.*)example.com(.*)full"
+    - "^(.*)@admin:example.com(.*)admin"
+  notify: restart telegram container
+
+- meta: flush_handlers
+
+- name: wait for registration file to be created
+  pause:
+    seconds: 10
+
+- name: set synapse config items
+  lineinfile:
+    path: "{{ docker_config_location }}/synapse/homeserver.yaml"
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insert }}"
+  with_items:
+    - regex: "^app_service_config_files:"
+      line: "app_service_config_files:"
+      insert: "^#  - app_service_2"
+    - regex: "^  - /bridges/mautrix-telegram/registration.yaml"
+      line: "  - /bridges/mautrix-telegram/registration.yaml"
+      insert: "^app_service_config_files:"
+  notify: restart synapse container
+
+- meta: flush_handlers
+
+- name: Start telegram bridge docker container
+  docker_container:
+    name: mautrix-telegram
+    restart_policy: always
+    state: started
+    pull: true

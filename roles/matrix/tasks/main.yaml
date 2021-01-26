@@ -11,6 +11,13 @@
   with_items:
     - "{{ docker_data_location }}/synapse"
     - "{{ docker_config_location }}/synapse"
+    - "{{ docker_data_location }}/matrix-bridges"
+  tags: synapse
+
+- name: Check if synapse config already exists
+  stat:
+    path: "{{ docker_config_location }}/synapse/homeserver.yaml"
+  register: synapse_config
 
 - name: generate synapse config
   docker_container:
@@ -36,11 +43,19 @@
     pull: true
     labels:
       traefik.enable: "false"
+  tags: synapse
+  when: not synapse_config.stat.exists
 
-- pause:
+- name: wait for config to be generated
+  pause:
     seconds: 10
+  when: not synapse_config.stat.exists
 
-- include_tasks: config.yaml
+- include_tasks:
+    file: config.yaml
+    apply:
+      tags: synapse
+  tags: always
 
 - name: Create a new database with name "synapse"
   community.general.postgresql_db:
@@ -52,6 +67,7 @@
     lc_collate: C
     lc_ctype: C
     template: template0
+  tags: synapse
 
 - name: Start synapse docker container
   docker_container:
@@ -64,6 +80,7 @@
     volumes:
       - "{{ docker_config_location }}/synapse:/config"
       - "{{ docker_data_location }}/synapse:/data"
+      - "{{ docker_data_location }}/matrix-bridges:/bridges"
     user: "{{ nobody.user }}:{{ nobody.group }}"
     env:
       SYNAPSE_CONFIG_DIR: "/config"
@@ -79,3 +96,14 @@
       traefik.http.routers.synapse.tls: "true"
       traefik.http.routers.synapse.tls.certresolver: "le"
       traefik.http.services.synapse.loadbalancer.server.port: "8008"
+  tags: synapse
+
+- name: wait for container to be healthy
+  pause:
+    seconds: 70
+
+- name: create admin user
+  command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u {{ synapse_admin }} -p {{ synapse_admin_password }} -a https://{{ matrix_server_name }}"
+
+- import_tasks: telegram.yaml
+  tags: telegram

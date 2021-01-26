@@ -2,4 +2,4 @@
   connection: ssh
   become: true
   roles:
-    - synapse
+    - matrix

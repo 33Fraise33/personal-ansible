@@ -40,4 +40,5 @@ docker_network:
   impostor: 10.33.0.39
   accserver: 10.33.0.40
   synapse: 10.33.0.41
+  mautrix_telegram: 10.33.0.42
   solaredge_exporter: 10.33.0.44
