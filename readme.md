@@ -20,7 +20,7 @@ I have 3 vlans configured on my router,
 ## Running a playbook
 ``eval `ssh-agent` ``   
 `ssh-add <ssh-key here>`      
-`ansible-playbook -i development <playbook>.yaml --ask-vault-pass` (this last part is needed for encrypted passwords)
+`ansible-playbook -i development <playbook>.yaml` (vault pass is asked by default so --ask-vault-pass is not needed)
 
 ## Encrypting passwords
 `ansible-vault encrypt_string`    
