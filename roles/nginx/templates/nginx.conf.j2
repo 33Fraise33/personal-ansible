@@ -3,7 +3,7 @@ events {}
 http {
   server {
     listen         8080 default_server;
-    server_name    frai.se *.frai.se;
+    server_name    frai.se;
 
    location / {
       proxy_pass http://{{ docker_network.homer }}:8080;
@@ -11,11 +11,17 @@ http {
       client_max_body_size 128m;
     }
 
-    location /.well-known/matrix/ {
-      root /var/www/;
-      default_type application/json;
+    location /.well-known/matrix/server {
+    return 200 '{"m.server": "{{ matrix_base_url }}:443"}';
+    default_type application/json;
       add_header Access-Control-Allow-Origin  *;
     }
+
+    location /.well-known/matrix/client {
+    return 200 '{"m.homeserver": {"base_url": "https://{{ matrix_base_url }}"}}';
+    default_type application/json;
+    add_header Access-Control-Allow-Origin *;
+}
   }
   client_body_temp_path /tmp/client_temp;
   proxy_temp_path       /tmp/proxy_temp_path;
