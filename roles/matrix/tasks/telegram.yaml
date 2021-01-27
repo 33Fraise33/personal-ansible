@@ -9,6 +9,11 @@
     group: "{{ nobody.group }}"
     recurse: yes
 
+- name: check if file exists
+  ansible.builtin.stat:
+    path: "{{ docker_data_location }}/matrix-bridges/mautrix-telegram/config.yaml"
+  register: telegram_config
+
 - name: Start telegram bridge docker container (create config file)
   docker_container:
     name: mautrix-telegram
@@ -27,10 +32,12 @@
     pull: true
     labels:
       traefik.enable: "false"
+  when: not telegram_config.stat.exists
 
 - name: wait for config file to be created
   pause:
     seconds: 10
+  when: not telegram_config.stat.exists
 
 - name: set telegram config items
   lineinfile:

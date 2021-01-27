@@ -107,3 +107,6 @@
 
 - import_tasks: telegram.yaml
   tags: telegram
+
+- import_tasks: whatsapp.yaml
+  tags: whatsapp

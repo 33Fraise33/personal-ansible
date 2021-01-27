@@ -9,3 +9,9 @@
     name: mautrix-telegram
     state: started
     restart: yes
+
+- name: restart whatsapp container
+  docker_container:
+    name: mautrix-whatsapp
+    state: started
+    restart: yes
