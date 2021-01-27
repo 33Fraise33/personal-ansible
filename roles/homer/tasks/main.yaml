@@ -3,19 +3,19 @@
 
 - name: create homer config directory
   file:
-    path: /data/homer
+    path: "{{ docker_data_location }}/homer"
     state: directory
     mode: 0755
-    owner: gianni
-    group: data
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
 
 - name: copy config file
   copy:
     src: config.yml
-    dest: /data/homer/config.yml
+    dest: "{{ docker_data_location }}/homer/config.yml"
     mode: 0644
-    owner: gianni
-    group: data
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
   tags: config
 
 - name: setup homer docker container
@@ -27,16 +27,13 @@
         ipv4_address: "{{ docker_network.homer }}"
     purge_networks: yes
     volumes:
-      - "/data/homer:/www/assets"
+      - "{{ docker_data_location }}/homer:/www/assets"
     env:
-      UID: "1000"
-      GID: "1003"
+      UID: "{{ nobody.user }}"
+      GID: "{{ nobody.group }}"
     restart: yes
     restart_policy: always
     state: started
     pull: true
     labels:
-      traefik.http.routers.homer.rule: "Host(`frai.se`)"
-      traefik.http.routers.homer.tls: "true"
-      traefik.http.routers.homer.tls.certresolver: "le"
-      traefik.http.services.homer.loadbalancer.server.port: "8080"
+      traefik.enable: "false"

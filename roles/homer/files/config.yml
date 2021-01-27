@@ -67,6 +67,10 @@ services:
         logo: "https://i.imgur.com/cf7S3Xe.png"
         url: "https://acserver.frai.se"
         subtitle: "AC Server Frontend"
+      - name: "ACCServer"
+        logo: "https://i.imgur.com/cf7S3Xe.png"
+        url: "https://accserver.frai.se"
+        subtitle: "ACC Server Frontend"
   - name: "Media"
     icon: "fas fa-photo-video"
     items:

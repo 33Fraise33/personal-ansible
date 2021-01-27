@@ -1,0 +1,49 @@
+- name: create nginx directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    recurse: yes
+  with_items:
+    - "{{ docker_config_location }}/nginx"
+    - "{{ docker_data_location }}/nginx/.well-known/matrix"
+
+- name: copy nginx config
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+  with_items:
+    - src: nginx.conf.j2
+      dest: "{{ docker_config_location }}/nginx/nginx.conf"
+    - src: server.j2
+      dest: "{{ docker_data_location }}/nginx/.well-known/matrix/server"
+
+- name: Start nginx docker container
+  docker_container:
+    name: nginx
+    image: nginx:alpine
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.nginx }}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+      - "{{ docker_data_location }}/nginx:/var/www"
+    user: "{{ nobody.user }}:{{ nobody.group }}"
+    env:
+      UID: "{{ nobody.user }}"
+      GID: "{{ nobody.group }}"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.nginx.rule: "Host(`frai.se`)"
+      traefik.http.routers.nginx.tls: "true"
+      traefik.http.routers.nginx.tls.certresolver: "le"
+      traefik.http.services.nginx.loadbalancer.server.port: "8080"
