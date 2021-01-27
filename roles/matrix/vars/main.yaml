@@ -1,5 +1,5 @@
-matrix_server_name: matrix.frai.se
-synapse_admin: 33fraise33
+matrix_server_name: frai.se
+synapse_admin: me
 synapse_admin_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           61383435623465663634633536353362613038613463613138616539353433626334316239353435

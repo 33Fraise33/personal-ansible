@@ -5,7 +5,7 @@
     line: "{{ item.line }}"
     insertafter: "{{ item.insert }}"
   with_items:
-    - { regex: "^public_baseurl" , line: "public_baseurl: https://matrix.frai.se" , insert: "^#public_baseurl" }
+    - { regex: "^public_baseurl" , line: "public_baseurl: https://{{ matrix_base_url }}" , insert: "^#public_baseurl" }
 
 - name: add marker to remove block
   lineinfile:

@@ -8,7 +8,6 @@
     recurse: yes
   with_items:
     - "{{ docker_config_location }}/nginx"
-    - "{{ docker_data_location }}/nginx/.well-known/matrix"
 
 - name: copy nginx config
   template:
@@ -20,8 +19,6 @@
   with_items:
     - src: nginx.conf.j2
       dest: "{{ docker_config_location }}/nginx/nginx.conf"
-    - src: server.j2
-      dest: "{{ docker_data_location }}/nginx/.well-known/matrix/server"
 
 - name: Start nginx docker container
   docker_container:
@@ -33,7 +30,6 @@
     purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
-      - "{{ docker_data_location }}/nginx:/var/www"
     user: "{{ nobody.user }}:{{ nobody.group }}"
     env:
       UID: "{{ nobody.user }}"

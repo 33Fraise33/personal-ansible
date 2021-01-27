@@ -17,6 +17,7 @@
 - name: Check if synapse config already exists
   stat:
     path: "{{ docker_config_location }}/synapse/homeserver.yaml"
+  tags: synapse
   register: synapse_config
 
 - name: generate synapse config
@@ -49,13 +50,11 @@
 - name: wait for config to be generated
   pause:
     seconds: 10
+  tags: synapse
   when: not synapse_config.stat.exists
 
-- include_tasks:
-    file: config.yaml
-    apply:
-      tags: synapse
-  tags: always
+- import_tasks: config.yaml
+  tags: synapse
 
 - name: Create a new database with name "synapse"
   community.general.postgresql_db:
@@ -92,7 +91,7 @@
     state: started
     pull: true
     labels:
-      traefik.http.routers.synapse.rule: "Host(`matrix.frai.se`)"
+      traefik.http.routers.synapse.rule: "Host(`{{ matrix_base_url }}`)"
       traefik.http.routers.synapse.tls: "true"
       traefik.http.routers.synapse.tls.certresolver: "le"
       traefik.http.services.synapse.loadbalancer.server.port: "8008"
@@ -101,9 +100,11 @@
 - name: wait for container to be healthy
   pause:
     seconds: 70
+  tags: synapse
 
 - name: create admin user
-  command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u {{ synapse_admin }} -p {{ synapse_admin_password }} -a https://{{ matrix_server_name }}"
+  command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u {{ synapse_admin }} -p {{ synapse_admin_password }} -a https://{{ matrix_base_url }}"
+  tags: synapse
 
 - import_tasks: telegram.yaml
   tags: telegram

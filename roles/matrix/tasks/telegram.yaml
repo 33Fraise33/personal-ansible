@@ -39,6 +39,17 @@
     seconds: 10
   when: not telegram_config.stat.exists
 
+- name: Create a new database with name "whatsapp"
+  community.general.postgresql_db:
+    name: telegram
+    login_host: "{{ docker_network.postgres }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+    encoding: UTF-8
+    lc_collate: C
+    lc_ctype: C
+    template: template0
+
 - name: set telegram config items
   lineinfile:
     path: "{{ docker_data_location }}/matrix-bridges/mautrix-telegram/config.yaml"
@@ -47,7 +58,7 @@
     insertafter: "{{ item.insert }}"
   with_items:
     - regex: "^    address: https://"
-      line: "    address: https://{{ matrix_server_name }}"
+      line: "    address: https://{{ matrix_base_url }}"
       insert: "^    # The address that this appservice"
     - regex: "^    domain:"
       line: "    domain: {{ matrix_server_name }}"
@@ -55,17 +66,21 @@
     - regex: "^    address: http://"
       line: "    address: http://{{ docker_network.mautrix_telegram }}:29317"
       insert: "^    # The address that the homeserver can use"
-    - regex: "^        '@33fraise33:matrix.frai.se': admin"
-      line: "        '@33fraise33:matrix.frai.se': admin"
+    - regex: "^        type:"
+      line: "        type: postgres"
+      insert: ""
+    - regex: "^        uri:"
+      # urlencode does not work on vault items: https://github.com/ansible/ansible/issues/73054
+      line: '        uri: "postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#","%23") }}@{{ docker_network.postgres }}/telegram?sslmode=disable"'
+      insert: ""
+    - regex: "^        '@33fraise33:{{ matrix_server_name }}': admin"
+      line: "        '@33fraise33:{{ matrix_server_name }}': admin"
       insert: "^    permissions:"
     - regex: "^    api_id:"
       line: "    api_id: {{ telegram_api_id }}"
       insert: ""
     - regex: "^    api_hash:"
       line: "    api_hash: {{ telegram_api_hash }}"
-      insert: ""
-    - regex: "^    community_id:"
-      line: "    community_id: '+telegram:matrix.frai.se'"
       insert: ""
   notify: restart telegram container
 
