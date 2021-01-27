@@ -5,7 +5,30 @@
     line: "{{ item.line }}"
     insertafter: "{{ item.insert }}"
   with_items:
-    - { regex: "^public_baseurl" , line: "public_baseurl: https://{{ matrix_base_url }}" , insert: "^#public_baseurl" }
+    - regex: "^public_baseurl"
+      line: "public_baseurl: https://{{ matrix_base_url }}"
+      insert: "^#public_baseurl"
+    - regex: "^(.*)smtp_host:"
+      line: '  smtp_host: "smtp-relay.gmail.com"'
+      insert: ""
+    - regex: "^(.*)smtp_port:"
+      line: '  smtp_port: 587'
+      insert: ""
+    - regex: "^(.*)smtp_user:"
+      line: '  smtp_user: "{{ gsuite_smtp_user }}"'
+      insert: ""
+    - regex: "^(.*)smtp_pass:"
+      line: '  smtp_pass: "{{ gsuite_smtp_pass }}"'
+      insert: ""
+    - regex: "^(.*)require_transport_security:"
+      line: "  require_transport_security: true"
+      insert: ""
+    - regex: "^(.*)notif_from:"
+      line: '  notif_from: "%(app)s Server <matrix@frai.se>"'
+      insert: ""
+    - regex: "^(.*)app_name:"
+      line: '  app_name: "Frai.se Matrix"'
+      insert: ""
 
 - name: add marker to remove block
   lineinfile:
