@@ -73,8 +73,8 @@
       # urlencode does not work on vault items: https://github.com/ansible/ansible/issues/73054
       line: '        uri: "postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#","%23") }}@{{ docker_network.postgres }}/whatsapp?sslmode=disable"'
       insert: ""
-    - regex: "^        '@33fraise33:{{ matrix_server_name }}': admin"
-      line: "        '@33fraise33:{{ matrix_server_name }}': admin"
+    - regex: "^        '@{{ synapse_admin }}:{{ matrix_server_name }}': admin"
+      line: "        '@{{ synapse_admin }}:{{ matrix_server_name }}': admin"
       insert: "^    permissions:"
     - regex: "^    delivery_receipts:"
       line: "    delivery_receipts: true"

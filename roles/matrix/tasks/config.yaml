@@ -1,3 +1,5 @@
+# TODO: https://github.com/matrix-org/synapse/blob/develop/INSTALL.md#url-previews
+
 - name: set config items
   lineinfile:
     path: "{{ docker_config_location }}/synapse/homeserver.yaml"
