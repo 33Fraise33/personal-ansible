@@ -9,20 +9,11 @@
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:
-    - deluge
     - grafana
     - ha
-    - jackett
-    - jellyfin
-    - pihole
-    - plex
-    - portainer
-    - unms
     - syncthing
     - '@'
-    - netbox
     - acserver
-    - wordpress
     - accserver
     - matrix
     - iptv
@@ -39,7 +30,6 @@
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:
-    - impostor
     - ironman
   tags: unproxied
 
