@@ -5,7 +5,7 @@
     record: "{{ item }}"
     value: "{{ ironman_ddns }}"
     proxied: yes
-    account_email: cloudflare@frai.se
+    account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:
@@ -25,6 +25,8 @@
     - wordpress
     - accserver
     - matrix
+    - iptv
+  tags: proxied
 
 - name: set non-proxied cname records for ironman_ddns
   cloudflare_dns:
@@ -33,12 +35,13 @@
     record: "{{ item }}"
     value: "{{ ironman_ddns }}"
     proxied: no
-    account_email: cloudflare@frai.se
+    account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:
     - impostor
     - ironman
+  tags: unproxied
 
 - name: set non-proxied cname records for gsuite
   cloudflare_dns:
@@ -47,7 +50,7 @@
     record: "{{ item }}"
     value: ghs.googlehosted.com
     proxied: no
-    account_email: cloudflare@frai.se
+    account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:
@@ -62,7 +65,7 @@
     record: "{{ item.record }}"
     value: "{{ item.value }}"
     proxied: no
-    account_email: cloudflare@frai.se
+    account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:
@@ -76,7 +79,7 @@
     type: TXT
     record: "{{ item.record }}"
     value: "{{ item.value }}"
-    account_email: cloudflare@frai.se
+    account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:
@@ -90,7 +93,7 @@
     type: MX
     priority: "{{ item.priority }}"
     value: "{{ item.value }}"
-    account_email: cloudflare@frai.se
+    account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:

@@ -18,7 +18,6 @@
     group: root
     mode: 0755
   with_items:
-    - traefik.yml
     - custom_rules.yml
 
 - name: setup traefik docker container
@@ -29,14 +28,43 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.traefik }}"
     purge_networks: yes
+    ports:
+      - "443:443"
+    command:
+      - --entryPoints.web.address=:80
+      - --entryPoints.web.http.redirections.entryPoint.to=web-secure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entryPoints.web-secure.address=:443
+      - --entryPoints.traefik.address=:8080
+      - --api=true
+      - --api.insecure=true
+      - --log=true
+      - --log.level=INFO
+      - --providers.docker=true
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --providers.docker.defaultRule="Host(`{{ '{{' }} .Name {{ '}}' }}.frai.se`)"
+      - --providers.docker.exposedByDefault=true
+      - --providers.docker.swarmMode=false
+      - --providers.file.filename=/etc/traefik/custom_rules.yml
+      - --providers.file.watch=true
+      - --certificatesResolvers.le.acme.email={{ letsencrypt_email }}
+      - --certificatesResolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesResolvers.le.acme.dnsChallenge.provider=cloudflare
+      - --certificatesResolvers.le.acme.dnsChallenge.resolvers=molly.ns.cloudflare.com,rudy.ns.cloudflare.com
     volumes:
       - "/data/traefik/letsencrypt:/letsencrypt"
-      - "/data/traefik/traefik.yml:/etc/traefik/traefik.yml"
       - "/data/traefik/custom_rules.yml:/etc/traefik/custom_rules.yml"
       - "/var/run/docker.sock:/var/run/docker.sock"
+    env:
+      CF_API_EMAIL: "{{ cloudflare_api_email }}"
+      CF_API_KEY: "{{ cloudflare_api_token }}"
     restart: yes
     restart_policy: always
     state: started
     pull: true
     labels:
       traefik.enable: "false"
+      traefik.http.routers.api.rule: Host(`traefik.frai.se`)
+      traefik.http.routers.api.tls: "true"
+      traefik.http.routers.api.tls.certresolver: "le"
+      traefik.http.routers.api.service: "api@internal"

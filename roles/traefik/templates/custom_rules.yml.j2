@@ -12,19 +12,36 @@ http:
       loadBalancer:
         servers:
           - url: "http://{{ docker_network.plex }}:32400"
+    radarr:
+      loadBalancer:
+        servers:
+          - url: "http://{{ docker_network.radarr }}:7878"
   routers:
     jackett:
       rule: "Host(`jackett.frai.se`)"
       service: "jackett"
       tls:
         certResolver: le
+        domains:
+          - main: "*.frai.se"
     deluge:
       rule: "Host(`deluge.frai.se`)"
       service: "deluge"
       tls:
         certResolver: le
+        domains:
+          - main: "*.frai.se"
     plex:
       rule: "Host(`plex.frai.se`)"
       service: "plex"
       tls:
         certResolver: le
+        domains:
+          - main: "*.frai.se"
+    radarr:
+      rule: "Host(`radarr.frai.se`)"
+      service: "radarr"
+      tls:
+        certResolver: le
+        domains:
+          - main: "*.frai.se"
