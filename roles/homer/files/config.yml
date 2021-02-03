@@ -56,6 +56,7 @@ services:
         logo: "https://upload.wikimedia.org/wikipedia/commons/8/83/SyncthingAugustLogo.png"
         url: "https://syncthing.frai.se"
         subtitle: "Config syncing"
+        tag: wireguard
       - name: "Home Assistant"
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Home_Assistant_Logo.svg/1200px-Home_Assistant_Logo.svg.png"
         url: "https://ha.frai.se"
@@ -78,14 +79,23 @@ services:
         logo: "https://www.plex.tv/wp-content/uploads/2018/01/pmp-icon-1.png"
         url: "https://plex.frai.se"
         subtitle: "Self-hosted media player"
+        tag: wireguard
       - name: "Jackett"
         logo: "https://developer.asustor.com/uploadIcons/0020_23588_1445715271_icon.png"
         url: "https://jackett.frai.se"
         subtitle: "Torrent api proxy"
+        tag: wireguard
       - name: "Deluge"
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Deluge-Logo.svg/600px-Deluge-Logo.svg.png"
         url: "https://deluge.frai.se"
         subtitle: "Torrent client"
+        tag: wireguard
+      - name: "Radarr"
+        logo: "https://developer.asustor.com/uploadIcons/0020_999_1571911750_Radarr_256.png"
+        url: "https://radarr.frai.se"
+        subtitle: "Movie Tracker"
+        tag: wireguard
+
   - name: "Networking"
     icon: "fas fa-ethernet"
     items:
@@ -93,6 +103,7 @@ services:
         logo: "https://upload.wikimedia.org/wikipedia/commons/0/00/Pi-hole_Logo.png"
         url: "https://pihole.frai.se"
         subtitle: "Network wide ad-blocker"
+        tag: wireguard
       - name: "Mikrotik"
         logo: "https://pbs.twimg.com/profile_images/479585638560182272/Qa8mmn1I.png"
         url: "https://ironman.frai.se:8443"
@@ -101,15 +112,17 @@ services:
         logo: "https://avatars1.githubusercontent.com/u/22225832"
         url: "https://portainer.frai.se"
         subtitle: "Container orchestrator"
+        tag: wireguard
       - name: "Traefik"
         logo: "https://blog.carroarmato0.be/content/images/2019/02/traefik.logo.bright@3x.svg"
         url: "http://10.33.0.10:8080/"
         subtitle: "Reverse proxy"
-        tag: local
+        tag: wireguard
       - name: "UNMS"
         logo: "https://i.imgur.com/17hyHHu.png"
         url: "https://unms.frai.se"
         subtitle: "Ubiquiti network management"
+        tag: wireguard
   - name: "Monitoring"
     icon: "fab fa-cloudscale"
     items:
@@ -117,8 +130,9 @@ services:
         logo: "https://grafana.com/static/img/logos/grafana_logo_swirl-events.svg"
         subtitle: "Dashboarding instance"
         url: "https://grafana.frai.se"
+        tag: wireguard
       - name: "Prometheus"
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Prometheus_software_logo.svg/1200px-Prometheus_software_logo.svg.png"
         subtitle: "Monitoring metrics database"
-        tag: "local"
+        tag: wireguard
         url: "http://10.33.0.23:9090/"

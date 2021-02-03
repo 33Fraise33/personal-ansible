@@ -1,0 +1,5 @@
+- hosts: storage
+  connection: ssh
+  become: true
+  roles:
+    - radarr

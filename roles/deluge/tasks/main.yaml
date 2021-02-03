@@ -24,7 +24,7 @@
     purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/deluge:/config"
-      - "/data:/data"
+      - "/data/media:/data"
       - "{{ docker_data_location }}/deluge/watch:/watch"
     env:
       PUID: "{{ nobody.user }}"

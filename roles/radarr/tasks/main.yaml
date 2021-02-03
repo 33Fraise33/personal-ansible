@@ -1,0 +1,32 @@
+# install Radarr movie info
+# https://hub.docker.com/r/linuxserver/radarr
+
+- name: create radarr data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0775
+  with_items:
+    - "{{ docker_config_location }}/radarr"
+
+- name: setup radarr docker container
+  docker_container:
+    name: radarr
+    image: linuxserver/radarr:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.radarr }}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/radarr:/config"
+      - "/data/media:/data"
+    env:
+      PUID: "{{ nobody.user }}"
+      PGID: "{{ nobody.group }}"
+      TZ: "Etc/UTC"
+    state: started
+    restart_policy: always
+    restart: yes
+    pull: true
