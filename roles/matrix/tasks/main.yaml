@@ -111,3 +111,6 @@
 
 - import_tasks: whatsapp.yaml
   tags: whatsapp
+
+- import_tasks: slack.yaml
+  tags: slack

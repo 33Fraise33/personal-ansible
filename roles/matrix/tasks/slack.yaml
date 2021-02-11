@@ -1,0 +1,177 @@
+# https://github.com/Sorunome/mx-puppet-slack
+
+- name: create bridge directory
+  file:
+    path: "{{ docker_data_location }}/matrix-bridges/puppet-slack"
+    state: directory
+    mode: 0755
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    recurse: yes
+
+- name: get sample config
+  get_url:
+    url: https://raw.githubusercontent.com/Sorunome/mx-puppet-slack/master/sample.config.yaml
+    dest: "{{ docker_data_location }}/matrix-bridges/puppet-slack/config.yaml"
+    mode: 0644
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+
+- name: set slack config items
+  lineinfile:
+    path: "{{ docker_data_location }}/matrix-bridges/puppet-slack/config.yaml"
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insert }}"
+  with_items:
+    - regex: "^  bindAddress:"
+      line: "  bindAddress: {{ docker_network.puppet_slack }}"
+      insert: ""
+    - regex: "^  domain:"
+      line: "    domain: {{ matrix_server_name }}"
+      insert: ""
+    - regex: "^  homeserverUrl:"
+      line: "  homeserverUrl: https://matrix.frai.se"
+      insert: ""
+    - regex: "^  enabled:"
+      line: "  enabled: true"
+      insert: "^oauth:"
+    - regex: "^  clientId:"
+      line: '  clientId: "{{ slack_client_id }}"'
+      insert: ""
+    - regex: "^  clientSecret:"
+      line: "  clientSecret: {{ slack_secret }}"
+      insert: ""
+    - regex: "^    database:"
+      # urlencode does not work on vault items: https://github.com/ansible/ansible/issues/73054
+      line: '    database: "postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#","%23") }}@{{ docker_network.postgres }}/telegram?sslmode=disable"'
+      insert: ""
+    - regex: "^        '@{{ synapse_admin }}:{{ matrix_server_name }}': admin"
+      line: "        '@{{ synapse_admin }}:{{ matrix_server_name }}': admin"
+      insert: "^    permissions:"
+    - regex: "^    api_id:"
+      line: "    api_id: {{ telegram_api_id }}"
+      insert: ""
+    - regex: "^    api_hash:"
+      line: "    api_hash: {{ telegram_api_hash }}"
+      insert: ""
+
+- name: Create a new database with name "slack"
+  community.general.postgresql_db:
+    name: slack
+    login_host: "{{ docker_network.postgres }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+    encoding: UTF-8
+    lc_collate: C
+    lc_ctype: C
+    template: template0
+
+- name: Start slack bridge docker container (create config file)
+  docker_container:
+    name: puppet-slack
+    image: sorunome/mx-puppet-slack:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.puppet_slack}}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_data_location }}/matrix-bridges/puppet-slack:/data"
+    env:
+      UID: "{{ nobody.user }}"
+      GID: "{{ nobody.group }}"
+    state: started
+    restart_policy: no
+    pull: true
+    labels:
+      traefik.http.routers.slack.tls: "true"
+      traefik.http.routers.slack.tls.certresolver: "le"
+      traefik.http.services.slack.loadbalancer.server.port: "8432"
+
+
+# - name: wait for config file to be created
+#   pause:
+#     seconds: 10
+#   when: not whatsapp_config.stat.exists
+#
+# - name: Create a new database with name "whatsapp"
+#   community.general.postgresql_db:
+#     name: whatsapp
+#     login_host: "{{ docker_network.postgres }}"
+#     login_password: "{{ postgres_password }}"
+#     login_user: "{{ postgres_user }}"
+#     encoding: UTF-8
+#     lc_collate: C
+#     lc_ctype: C
+#     template: template0
+#
+# - name: set whatsapp config items
+#   lineinfile:
+#     path: "{{ docker_data_location }}/matrix-bridges/mautrix-whatsapp/config.yaml"
+#     regexp: "{{ item.regex }}"
+#     line: "{{ item.line }}"
+#     insertafter: "{{ item.insert }}"
+#   with_items:
+#     - regex: "^    address: https://"
+#       line: "    address: https://{{ matrix_base_url }}"
+#       insert: "^    # The address that this appservice"
+#     - regex: "^    domain:"
+#       line: "    domain: {{ matrix_server_name }}"
+#       insert: "^    # The domain of"
+#     - regex: "^    address: http://"
+#       line: "    address: http://{{ docker_network.mautrix_whatsapp }}:29318"
+#       insert: "^    # The address that the homeserver can use"
+#     - regex: "^        type:"
+#       line: "        type: postgres"
+#       insert: ""
+#     - regex: "^        uri:"
+#       # urlencode does not work on vault items: https://github.com/ansible/ansible/issues/73054
+#       line: '        uri: "postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#","%23") }}@{{ docker_network.postgres }}/whatsapp?sslmode=disable"'
+#       insert: ""
+#     - regex: "^        '@{{ synapse_admin }}:{{ matrix_server_name }}': admin"
+#       line: "        '@{{ synapse_admin }}:{{ matrix_server_name }}': admin"
+#       insert: "^    permissions:"
+#     - regex: "^    delivery_receipts:"
+#       line: "    delivery_receipts: true"
+#       insert: ""
+#   notify: restart whatsapp container
+#   when: not whatsapp_config.stat.exists
+#
+# - name: set whatsapp config items
+#   lineinfile:
+#     path: "{{ docker_data_location }}/matrix-bridges/mautrix-whatsapp/config.yaml"
+#     regexp: "{{ item }}"
+#     state: absent
+#   with_items:
+#     - "^(.*)example.com(.*)user"
+#     - "^(.*)@admin:example.com(.*)admin"
+#   notify: restart whatsapp container
+#   when: not whatsapp_config.stat.exists
+#
+# - meta: flush_handlers
+#
+# - name: wait for registration file to be created
+#   pause:
+#     seconds: 10
+#   when: not whatsapp_config.stat.exists
+#
+# - name: set synapse config items
+#   lineinfile:
+#     path: "{{ docker_config_location }}/synapse/homeserver.yaml"
+#     regexp: "{{ item.regex }}"
+#     line: "{{ item.line }}"
+#     insertafter: "{{ item.insert }}"
+#   with_items:
+#     - regex: "^  - /bridges/mautrix-whatsapp/registration.yaml"
+#       line: "  - /bridges/mautrix-whatsapp/registration.yaml"
+#       insert: "^  - /bridges/mautrix-telegram/"
+#   notify: restart synapse container
+#
+# - meta: flush_handlers
+#
+# - name: Start whatsapp bridge docker container
+#   docker_container:
+#     name: mautrix-whatsapp
+#     restart_policy: always
+#     state: started
+#     pull: true
