@@ -67,7 +67,7 @@ docker_network:
   postgres: 10.33.0.34
   nginx: 10.33.0.35
   netbox_worker: 10.33.0.36
-  unbound: 10.33.0.37 # TODO
+  unbound: 10.33.0.37
   acserver: 10.33.0.38
   impostor: 10.33.0.39
   accserver: 10.33.0.40
