@@ -3,7 +3,7 @@
 
 - name: install default packages
   pacman:
-    name: ['wireguard-arch', 'wireguard-tools']
+    name: ['wireguard-tools', 'qrencode']
     state: latest
 
 - name: copy config files
@@ -18,6 +18,8 @@
     - wgPC.conf
     - wgLaptop.conf
     - wgPhone.conf
+    - wgAmelle.conf
+    - wgAmellePhone.conf
 
 - name: start & enable iptables service
   service:
