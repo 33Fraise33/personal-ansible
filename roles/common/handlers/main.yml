@@ -9,3 +9,10 @@
     name: node_exporter
     state: restarted
     enabled: yes
+
+- name: restart cronie
+  systemd:
+    daemon_reload: true
+    name: cronie
+    state: restarted
+    enabled: yes

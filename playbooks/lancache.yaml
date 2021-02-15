@@ -1,0 +1,6 @@
+- name: setup lancache
+  hosts: storage
+  connection: ssh
+  become: true
+  roles:
+    - lancache

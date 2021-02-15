@@ -3,20 +3,54 @@
 
 - name: create pihole config directory
   file:
-    path: /data/pihole/config
+    path: "{{ item }}"
     state: directory
     mode: 0755
     owner: root
     group: root
     recurse: yes
+  with_items:
+    - "{{ docker_config_location }}/pihole"
+    - "{{ docker_data_location }}/pihole/dnsmasq/hosts"
+    - "{{ docker_data_location }}/pihole/dnsmasq.d"
+    - "{{ docker_data_location }}/pihole/lancache"
 
 - name: copy local dns records
   copy:
-    src: custom.list
-    dest: /data/pihole/config/custom.list
-    mode: 0644
+    src: "{{ item }}"
+    dest: "{{ docker_config_location }}/pihole/{{ item }}"
+    mode: "0644"
     owner: root
     group: root
+  with_items:
+    - custom.list
+    - adlists.list
+
+- name: get uklans github repo
+  git:
+    repo: https://github.com/uklans/cache-domains
+    dest: "{{ docker_data_location }}/pihole/lancache/"
+    force: yes
+
+- name: copy template files
+  template:
+    src: "{{ item.name }}.j2"
+    dest: "{{ docker_data_location }}/pihole/lancache/scripts/{{ item.name }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  with_items:
+    - name: config.json
+      mode: "0644"
+    - name: copy-files.sh
+      mode: "0755"
+
+- name: Create new lancache domains at midnight
+  ansible.builtin.cron:
+    name: "update lancache domains"
+    minute: "15"
+    hour: "4"
+    job: " {{ docker_data_location }}/pihole/lancache/scripts/copy-files.sh"
 
 - name: setup pihole docker container
   docker_container:
@@ -27,8 +61,9 @@
         ipv4_address: "{{ docker_network.pihole }}"
     purge_networks: yes
     volumes:
-      - "/data/pihole/config:/etc/pihole"
-      - "/data/pihole/dnsmasq:/etc/dnsmasq.d"
+      - "{{ docker_config_location }}/pihole:/etc/pihole"
+      - "{{ docker_data_location }}/pihole/dnsmasq.d:/etc/dnsmasq.d"
+      - "{{ docker_data_location }}/pihole/dnsmasq:/etc/dnsmasq"
     env:
       TZ: "Europe/Brussels"
       WEBPASSWORD: "{{ pihole_pass }}"
