@@ -1,0 +1,34 @@
+# install calibre, book db
+# https://registry.hub.docker.com/r/linuxserver/calibre
+
+- name: create calibre data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0775
+  with_items:
+    - "{{ docker_config_location }}/calibre"
+
+- name: setup calibre docker container
+  docker_container:
+    name: calibre
+    image: linuxserver/calibre:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.calibre }}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/calibre:/config"
+      - "/data/media:/media"
+    env:
+      PUID: "{{ nobody.user }}"
+      PGID: "{{ nobody.group }}"
+      TZ: "Etc/UTC"
+      GUAC_USER: admin
+      GUAC_PASS: "{{ guac_password }}"
+    state: started
+    restart_policy: always
+    restart: yes
+    pull: true

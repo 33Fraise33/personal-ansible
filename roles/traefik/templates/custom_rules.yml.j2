@@ -16,6 +16,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://{{ docker_network.radarr }}:7878"
+    calibre:
+      loadBalancer:
+        servers:
+          - url: "http://{{ docker_network.calibre }}:8080"
   routers:
     jackett:
       rule: "Host(`jackett.frai.se`)"
@@ -41,6 +45,13 @@ http:
     radarr:
       rule: "Host(`radarr.frai.se`)"
       service: "radarr"
+      tls:
+        certResolver: le
+        domains:
+          - main: "*.frai.se"
+    calibre:
+      rule: "Host(`calibre.frai.se`)"
+      service: "calibre"
       tls:
         certResolver: le
         domains:

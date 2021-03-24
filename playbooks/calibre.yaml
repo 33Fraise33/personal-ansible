@@ -1,0 +1,6 @@
+- name: Setup Calibre
+  hosts: storage
+  connection: ssh
+  become: true
+  roles:
+    - calibre
