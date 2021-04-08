@@ -1,0 +1,33 @@
+# install lazylibrarian
+# https://hub.docker.com/r/linuxserver/lazylibrarian
+
+- name: create lazylibrarian data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0775
+  with_items:
+    - "{{ docker_config_location }}/lazylibrarian"
+
+- name: setup lazylibrarian docker container
+  docker_container:
+    name: lazylibrarian
+    image: linuxserver/lazylibrarian:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.lazylibrarian }}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/lazylibrarian:/config"
+      - "/data/media:/media"
+    env:
+      PUID: "{{ nobody.user }}"
+      PGID: "{{ nobody.group }}"
+      TZ: "Etc/UTC"
+      DOCKER_MODS: "linuxserver/calibre-web:calibre"
+    state: started
+    restart_policy: always
+    restart: yes
+    pull: true
