@@ -10,6 +10,8 @@
     mode: 0775
   with_items:
     - "{{ docker_config_location }}/calibre"
+    - "{{ docker_config_location }}/calibre-web"
+  tags: always
 
 - name: setup calibre docker container
   docker_container:
@@ -32,3 +34,26 @@
     restart_policy: always
     restart: yes
     pull: true
+  tags: calibre-base
+
+- name: setup calibre_web docker container
+  docker_container:
+    name: calibre-web
+    image: linuxserver/calibre-web:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.calibre_web }}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/calibre-web:/config"
+      - "/data/media/books:/books"
+    env:
+      PUID: "{{ nobody.user }}"
+      PGID: "{{ nobody.group }}"
+      TZ: "Etc/UTC"
+      DOCKER_MODS: "linuxserver/calibre-web:calibre"
+    state: started
+    restart_policy: always
+    restart: yes
+    pull: true
+  tags: calibre-web

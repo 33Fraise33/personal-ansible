@@ -1,6 +1,0 @@
-- name: Setup Lazylibrarian
-  hosts: storage
-  connection: ssh
-  become: true
-  roles:
-    - lazylibrarian
