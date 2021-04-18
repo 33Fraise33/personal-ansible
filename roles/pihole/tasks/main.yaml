@@ -68,8 +68,8 @@
       TZ: "Europe/Brussels"
       WEBPASSWORD: "{{ pihole_pass }}"
       VIRTUAL_HOST: pihole.frai.se
-      DNS1: 1.1.1.1
-      DNS2: 1.0.0.1
+      DNS1: 208.67.222.222 #opendns for ecs support
+      DNS2: 208.67.220.220
     restart: yes
     restart_policy: always
     state: started
