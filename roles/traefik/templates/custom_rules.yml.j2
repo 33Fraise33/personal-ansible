@@ -20,6 +20,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://{{ docker_network.calibre }}:8080"
+    calibre-web:
+      loadBalancer:
+        servers:
+          - url: "http://{{ docker_network.calibre_web }}:8083"
   routers:
     jackett:
       rule: "Host(`jackett.frai.se`)"
@@ -52,6 +56,13 @@ http:
     calibre:
       rule: "Host(`calibre.frai.se`)"
       service: "calibre"
+      tls:
+        certResolver: le
+        domains:
+          - main: "*.frai.se"
+    calibre-web:
+      rule: "Host(`books.frai.se`)"
+      service: "calibre-web"
       tls:
         certResolver: le
         domains:
