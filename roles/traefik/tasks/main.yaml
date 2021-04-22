@@ -51,6 +51,7 @@
       - --certificatesResolvers.le.acme.storage=/letsencrypt/acme.json
       - --certificatesResolvers.le.acme.dnsChallenge.provider=cloudflare
       - --certificatesResolvers.le.acme.dnsChallenge.resolvers=molly.ns.cloudflare.com,rudy.ns.cloudflare.com
+      - --serversTransport.insecureSkipVerify=true
     volumes:
       - "/data/traefik/letsencrypt:/letsencrypt"
       - "/data/traefik/custom_rules.yml:/etc/traefik/custom_rules.yml"

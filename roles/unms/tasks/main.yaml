@@ -27,6 +27,7 @@
     state: started
     pull: true
     labels:
-      traefik.tcp.routers.unms.rule: "HostSNI(`unms.frai.se`)"
-      traefik.tcp.routers.unms.tls.passthrough: "true"
-      traefik.tcp.services.portainer.loadbalancer.server.port: "443"
+      traefik.http.routers.unms.tls: "true"
+      traefik.http.routers.unms.tls.certresolver: "le"
+      traefik.http.services.unms.loadbalancer.server.port: "443"
+      traefik.http.services.unms.loadbalancer.server.scheme: "https"
