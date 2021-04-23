@@ -95,6 +95,16 @@ services:
         url: "https://radarr.frai.se"
         subtitle: "Movie Tracker"
         tag: wireguard
+      - name: "Books"
+        logo: "https://daisy.org/wp-content/uploads/2020/07/apple-books-app-icon.png"
+        url: "https://books.frai.se"
+        subtitle: "Calibre Web - Kobo"
+        tag: wireguard
+      - name: "Calibre"
+        logo: "https://upload.wikimedia.org/wikipedia/commons/c/cf/Calibre_logo_3.png"
+        url: "https://calibre.frai.se"
+        subtitle: "Books Archive"
+        tag: wireguard
 
   - name: "Networking"
     icon: "fas fa-ethernet"
