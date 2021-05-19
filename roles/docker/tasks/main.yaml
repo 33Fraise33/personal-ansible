@@ -42,11 +42,14 @@
   docker_network:
     name: macvlan333
     driver: macvlan
+    enable_ipv6: yes
     driver_options:
       parent: "{{ ansible_default_ipv4.interface }}.333"
     ipam_config:
       - subnet: '10.33.0.0/24'
         gateway: '10.33.0.1'
+      - subnet: 2001:470:795c:333::/64
+        gateway: 2001:470:795c:333::1
 
 - name: create docker macvlan50 network
   docker_network:
@@ -66,7 +69,7 @@
     mode: 0755
     owner: root
     group: root
-    
+
 - name: change docker vars (including default subnet)
   copy:
     src: "{{ item.file }}"
