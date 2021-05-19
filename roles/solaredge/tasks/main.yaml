@@ -35,7 +35,7 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.solaredge_exporter }}"
     env:
-      INVERTER_ADDRESS: "172.16.33.100"
+      INVERTER_ADDRESS: "172.16.50.43"
       INVERTER_PORT: "1502"
       EXPORTER_INTERVAL: "15"
     purge_networks: yes
