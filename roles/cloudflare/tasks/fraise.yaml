@@ -25,7 +25,6 @@
     type: CNAME
     record: "{{ item }}"
     value: "{{ ironman_ddns }}"
-    proxied: no
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
@@ -39,7 +38,6 @@
     type: CNAME
     record: "{{ item }}"
     value: ghs.googlehosted.com
-    proxied: no
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
@@ -54,7 +52,6 @@
     type: CNAME
     record: "{{ item.record }}"
     value: "{{ item.value }}"
-    proxied: no
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
@@ -62,6 +59,19 @@
     - { record: 'sil', value: 'b4a00aa9382d.sn.mynetname.net'}
     - { record: 'dad', value: '8a7709c681f5.sn.mynetname.net'}
     - { record: 'mom', value: '8b010aa79be4.sn.mynetname.net'}
+
+- name: set non proxied aaaa records
+  cloudflare_dns:
+    zone: frai.se
+    type: AAAA
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - { record: 'hulk', value: '2001:470:795c:33:dacb:8aff:fe15:c22b'}
+    - { record: 'captain', value: '2001:470:795c:33:20e:c6ff:febc:6cdb'}
 
 - name: create TXT records
   cloudflare_dns:

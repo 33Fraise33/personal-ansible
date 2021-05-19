@@ -10,7 +10,6 @@
     state: present
   with_items:
     - '@'
-    - 'invoiceninja'
 
 - name: set non-proxied cname records for gsuite
   cloudflare_dns:
