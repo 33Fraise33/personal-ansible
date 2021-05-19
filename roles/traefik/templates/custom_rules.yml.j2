@@ -24,6 +24,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://{{ docker_network.calibre_web }}:8083"
+    ironman:
+      loadBalancer:
+        servers:
+          - url: "https://10.33.0.1:8443"
   routers:
     jackett:
       rule: "Host(`jackett.frai.se`)"
@@ -63,6 +67,13 @@ http:
     calibre-web:
       rule: "Host(`books.frai.se`)"
       service: "calibre-web"
+      tls:
+        certResolver: le
+        domains:
+          - main: "*.frai.se"
+    ironman:
+      rule: "Host(`ironman.frai.se`)"
+      service: "ironman"
       tls:
         certResolver: le
         domains:
