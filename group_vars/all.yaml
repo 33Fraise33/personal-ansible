@@ -40,45 +40,50 @@ cloudflare_api_email: !vault |
           3263646334663434390a326338353233343537313361373663663231643666323862323861383037
           35643561613562366534383132626530663937386638356630306637373066623336
 
+
+
 docker_network:
-  traefik: 10.33.0.10
-  plex: 10.33.0.11
-  netbox: 10.33.0.12
-  deluge: 10.33.0.13
-  graylog: 172.16.34.14 # TODO
-  grafana: 10.33.0.15
-  portainer: 10.33.0.16
-  wordpress: 10.33.0.17
-  unms: 10.33.0.18
-  influxdb: 10.33.0.19
-  mariadb: 10.33.0.20
-  watchtower: 10.33.0.21
-  syncthing: 10.33.0.22
-  prometheus: 10.33.0.23
-  prometheus_snmp_exporter: 10.33.0.24
-  prometheus_blackbox: 10.33.0.25
-  prometheus_speedtest: 10.33.0.26
-  homer: 10.33.0.28
-  homeassistant: 10.33.0.29
-  jackett: 10.33.0.30
-  pihole: 10.33.0.31
-  jellyfin: 10.33.0.32
-  redis: 10.33.0.33
-  postgres: 10.33.0.34
-  nginx: 10.33.0.35
-  netbox_worker: 10.33.0.36
-  unbound: 10.33.0.37
-  acserver: 10.33.0.38
-  impostor: 10.33.0.39
-  accserver: 10.33.0.40
-  synapse: 10.33.0.41
-  mautrix_telegram: 10.33.0.42
-  mautrix_whatsapp: 10.33.0.43
-  solaredge_exporter: 10.33.0.44
-  iptvproxy: 10.33.0.45
-  puppet_slack: 10.33.0.46
-  radarr: 10.33.0.47
-  lancache_monolitic: 10.33.0.48
-  calibre: 10.33.0.49
-  calibre_web: 10.33.0.50
-  netboot: 172.16.50.66
+  ipv4_prefix: "10.33.0."
+  ipv6_prefix: "2a0e:b107:1165:333::"
+  hosts:
+    traefik: 10
+    plex: 11
+    netbox: 12
+    deluge: 13
+    graylog: 14 # TODO
+    grafana: 15
+    portainer: 16
+    wordpress: 17
+    unms: 18
+    influxdb: 19
+    mariadb: 20
+    watchtower: 21
+    syncthing: 22
+    prometheus: 23
+    prometheus_snmp_exporter: 24
+    prometheus_blackbox: 25
+    prometheus_speedtest: 26
+    homer: 28
+    homeassistant: 29
+    jackett: 30
+    pihole: 31
+    jellyfin: 32
+    redis: 33
+    postgres: 34
+    nginx: 35
+    netbox_worker: 36
+    unbound: 37
+    acserver: 38
+    impostor: 39
+    accserver: 40
+    synapse: 41
+    mautrix_telegram: 42
+    mautrix_whatsapp: 43
+    solaredge_exporter: 44
+    iptvproxy: 45
+    puppet_slack: 46
+    radarr: 47
+    lancache_monolitic: 48
+    calibre: 49
+    calibre_web: 50
+  #  netboot: 172.16.50.66

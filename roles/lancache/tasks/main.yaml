@@ -15,7 +15,8 @@
     image: lancachenet/monolithic:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.lancache_monolitic }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache_monolitic }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.lancache_monolitic }}"
     env:
       CACHE_DISK_SIZE: "500000m"
       CACHE_MAX_AGE: "365d"

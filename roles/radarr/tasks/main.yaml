@@ -17,7 +17,8 @@
     image: linuxserver/radarr:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.radarr }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.radarr }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.radarr }}"
     purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/radarr:/config"

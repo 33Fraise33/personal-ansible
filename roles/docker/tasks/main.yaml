@@ -48,8 +48,8 @@
     ipam_config:
       - subnet: '10.33.0.0/24'
         gateway: '10.33.0.1'
-      - subnet: 2001:470:795c:333::/64
-        gateway: 2001:470:795c:333::1
+      - subnet: "{{ docker_network.ipv6_prefix }}/64"
+        gateway: "{{ docker_network.ipv6_prefix }}1"
 
 - name: create docker macvlan50 network
   docker_network:

@@ -16,7 +16,8 @@
     image: linuxserver/jackett:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.jackett }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.jackett }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.jackett }}"
     purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/jackett:/config"
