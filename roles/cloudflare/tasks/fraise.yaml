@@ -1,36 +1,15 @@
-- name: set proxied cname records for ironman_ddns
+- name: set non proxied aaaa records
   cloudflare_dns:
     zone: frai.se
-    type: CNAME
-    record: "{{ item }}"
-    value: "{{ ironman_ddns }}"
-    proxied: yes
+    type: AAAA
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:
-    - grafana
-    - ha
-    - syncthing
-    - '@'
-    - acserver
-    - accserver
-    - matrix
-    - iptv
-  tags: proxied
-
-- name: set non-proxied cname records for ironman_ddns
-  cloudflare_dns:
-    zone: frai.se
-    type: CNAME
-    record: "{{ item }}"
-    value: "{{ ironman_ddns }}"
-    account_email: "{{ cloudflare_api_email }}"
-    account_api_token: "{{ cloudflare_api_token }}"
-    state: present
-  with_items:
-    - ironman
-  tags: unproxied
+    - { record: 'hulk', value: '2001:470:795c:33:dacb:8aff:fe15:c22b'}
+    - { record: 'captain', value: '2001:470:795c:33:20e:c6ff:febc:6cdb'}
 
 - name: set non-proxied cname records for gsuite
   cloudflare_dns:
@@ -59,19 +38,6 @@
     - { record: 'sil', value: 'b4a00aa9382d.sn.mynetname.net'}
     - { record: 'dad', value: '8a7709c681f5.sn.mynetname.net'}
     - { record: 'mom', value: '8b010aa79be4.sn.mynetname.net'}
-
-- name: set non proxied aaaa records
-  cloudflare_dns:
-    zone: frai.se
-    type: AAAA
-    record: "{{ item.record }}"
-    value: "{{ item.value }}"
-    account_email: "{{ cloudflare_api_email }}"
-    account_api_token: "{{ cloudflare_api_token }}"
-    state: present
-  with_items:
-    - { record: 'hulk', value: '2001:470:795c:33:dacb:8aff:fe15:c22b'}
-    - { record: 'captain', value: '2001:470:795c:33:20e:c6ff:febc:6cdb'}
 
 - name: create TXT records
   cloudflare_dns:
