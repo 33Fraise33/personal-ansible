@@ -86,4 +86,5 @@ docker_network:
     lancache_monolitic: 48
     calibre: 49
     calibre_web: 50
+    ddclient: 51
   #  netboot: 172.16.50.66

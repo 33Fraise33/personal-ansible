@@ -1,0 +1,6 @@
+- name: Setup ddclient
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - ddclient

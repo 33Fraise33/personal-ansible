@@ -1,0 +1,40 @@
+# install ddclient
+# https://hub.docker.com/r/linuxserver/ddclient
+
+- name: create ddclient config directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0775
+  with_items:
+    - "{{ docker_config_location }}/ddclient"
+
+- name: copy ddclient config
+  template:
+    src: ddclient.conf.j2
+    dest: "{{ docker_config_location }}/ddclient/ddclient.conf"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0664
+
+- name: setup ddclient docker container
+  docker_container:
+    name: ddclient
+    image: linuxserver/ddclient:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.ddclient }}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/ddclient:/config"
+      - "/data/media:/data"
+    env:
+      PUID: "{{ nobody.user }}"
+      PGID: "{{ nobody.group }}"
+      TZ: "Etc/UTC"
+    state: started
+    restart_policy: always
+    restart: yes
+    pull: true

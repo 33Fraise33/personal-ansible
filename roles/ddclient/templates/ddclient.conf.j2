@@ -1,0 +1,28 @@
+# /etc/ddclient/ddclient.conf
+#
+daemon=300
+syslog=yes
+pid=/var/run/ddclient/ddclient.pid
+ssl=yes
+protocol=dyndns2
+use=web
+
+##
+## CloudFlare Frai.se
+##
+protocol=cloudflare,        \
+zone=frai.se,            \
+ttl=1,                      \
+login={{ cloudflare_api_email }},     \
+password={{ cloudflare_api_token }}             \
+*.frai.se,frai.se
+
+##
+## CloudFlare Unitix
+##
+protocol=cloudflare,        \
+zone=unitix.be,            \
+ttl=1,                      \
+login={{ cloudflare_api_email }},     \
+password={{ cloudflare_api_token }}             \
+*.unitix.be,unitix.be
