@@ -21,11 +21,11 @@
     - wgAmelle.conf
     - wgAmellePhone.conf
 
-- name: start & enable iptables service
-  service:
-    name: iptables
-    state: started
-    enabled: yes
+# - name: start & enable iptables service
+#   service:
+#     name: iptables
+#     state: started
+#     enabled: yes
 
 - name: restart wg service
   service:

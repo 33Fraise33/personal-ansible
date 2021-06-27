@@ -57,4 +57,14 @@
     - "{{ default_user }}"
     - http
 
+- name: copy sysctl file to enable ipv4/ipv6 forwarding
+  sysctl:
+    name: "{{ item }}"
+    value: "1"
+    state: present
+  loop:
+    - "net.ipv4.ip_forward"
+    - "net.ipv6.conf.default.forwarding"
+    - "net.ipv6.conf.all.forwarding"
+
 - import_tasks: ssh.yaml
