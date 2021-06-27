@@ -3,17 +3,20 @@
 
 - name: create accserver config directory
   file:
-    path: /data/accserver
+    path: "{{ item }}"
     state: directory
     mode: 0755
     owner: gianni
     group: data
     recurse: yes
+  with_items:
+    - "{{ docker_config_location }}/accweb"
+    - "{{ docker_data_location }}/accweb"
 
 - name: copy server exe to server
   copy:
     src: accServer.exe
-    dest: /data/accserver/accServer.exe
+    dest: "{{ docker_data_location }}/accweb/accServer.exe"
     mode: 0755
     owner: gianni
     group: data
@@ -24,10 +27,12 @@
     image: kugel/accweb:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.accserver }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.accserver }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.accserver }}"
     purge_networks: yes
     volumes:
-      - "/data/accserver:/accserver"
+      - "{{ docker_data_location }}/accweb:/accserver"
+      # - "{{ docker_config_location }}/accweb:/accweb"
     env:
       ACCWEB_HOST: 0.0.0.0:8080
       ACCWEB_ADMIN_PASSWORD: "{{ admin_password }}"

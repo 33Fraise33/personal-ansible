@@ -20,7 +20,8 @@
     image: dock.mau.dev/tulir/mautrix-telegram:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.mautrix_telegram}}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.mautrix_telegram}}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.mautrix_telegram}}"
     purge_networks: yes
     volumes:
       - "{{ docker_data_location }}/matrix-bridges/mautrix-telegram:/data"
@@ -42,7 +43,7 @@
 - name: Create a new database with name "whatsapp"
   community.general.postgresql_db:
     name: telegram
-    login_host: "{{ docker_network.postgres }}"
+    login_host: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
     encoding: UTF-8
@@ -64,11 +65,11 @@
       line: "    domain: {{ matrix_server_name }}"
       insert: "^    # The domain of"
     - regex: "^    address: http://"
-      line: "    address: http://{{ docker_network.mautrix_telegram }}:29317"
+      line: "    address: http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.mautrix_telegram }}:29317"
       insert: "^    # The address that the homeserver can use"
     - regex: "^    database:"
       # urlencode does not work on vault items: https://github.com/ansible/ansible/issues/73054
-      line: '    database: "postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#","%23") }}@{{ docker_network.postgres }}/telegram?sslmode=disable"'
+      line: '    database: "postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#","%23") }}@{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}/telegram?sslmode=disable"'
       insert: ""
     - regex: "^        '@{{ synapse_admin }}:{{ matrix_server_name }}': admin"
       line: "        '@{{ synapse_admin }}:{{ matrix_server_name }}': admin"

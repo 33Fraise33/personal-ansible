@@ -70,7 +70,7 @@
           user: {{ postgres_user }}
           password: {{ postgres_password }}
           database: synapse
-          host: {{ docker_network.postgres }}
+          host: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.postgres }}
           cp_min: 5
           cp_max: 10
     state: "present"

@@ -24,7 +24,8 @@
     image: seejy/assetto-server-manager:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.acserver }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.acserver }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.acserver }}"
     purge_networks: yes
     volumes:
       - "/data/acserver/server:/home/assetto/server-manager/assetto"

@@ -33,7 +33,8 @@
     image: "{{ (image_info.images | first).Id}}"
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.solaredge_exporter }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.solaredge_exporter }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.solaredge_exporter }}"
     env:
       INVERTER_ADDRESS: "172.16.50.43"
       INVERTER_PORT: "1502"

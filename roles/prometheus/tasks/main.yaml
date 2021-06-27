@@ -31,7 +31,8 @@
     image: prom/blackbox-exporter:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.prometheus_blackbox}}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_blackbox}}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_blackbox}}"
     purge_networks: yes
     volumes:
       - "/data/prometheus/blackbox:/config"
@@ -62,7 +63,8 @@
     image: prom/snmp-exporter:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.prometheus_snmp_exporter }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}"
     purge_networks: yes
     volumes:
       - "/data/prometheus/snmp_exporter:/config"
@@ -83,7 +85,8 @@
     image: jraviles/prometheus_speedtest:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.prometheus_speedtest }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_speedtest }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_speedtest }}"
     purge_networks: yes
     restart: yes
     restart_policy: always
@@ -118,7 +121,8 @@
     image: prom/prometheus:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.prometheus}}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus}}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus}}"
     purge_networks: yes
     ports:
       - 9090:9090/tcp

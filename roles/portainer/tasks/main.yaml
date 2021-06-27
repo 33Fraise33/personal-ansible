@@ -16,7 +16,8 @@
     image: portainer/portainer-ce:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.portainer }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.portainer }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.portainer }}"
     purge_networks: yes
     volumes:
       - "/data/portainer:/data"

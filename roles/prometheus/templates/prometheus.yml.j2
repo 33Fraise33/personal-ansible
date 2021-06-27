@@ -42,7 +42,7 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: {{ docker_network.prometheus_blackbox }}:9115  # This is your blackbox exporter.
+        replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_blackbox }}]:9115"  # This is your blackbox exporter.
 
   - job_name: 'blackbox_http'
     scrape_interval: 5m
@@ -58,7 +58,7 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: {{ docker_network.prometheus_blackbox }}:9115  # This is your blackbox exporter.
+        replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_blackbox }}]:9115"  # This is your blackbox exporter.
 
   - job_name: 'node_exporter'
     scrape_interval: 15s
@@ -78,14 +78,14 @@ scrape_configs:
     scrape_timeout: 2m
     static_configs:
     - targets:
-      - {{ docker_network.prometheus_speedtest }}:9516
+      - "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_speedtest }}]:9516"
 
   - job_name: 'solaredge'
     metrics_path: /metrics
     scrape_interval: 15s
     static_configs:
     - targets:
-      - {{ docker_network.solaredge_exporter}}:2112
+      - "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.solaredge_exporter}}]:2112"
 
   - job_name: 'mikrotik-snmp'
     scrape_interval: 15s
@@ -103,7 +103,7 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: {{ docker_network.prometheus_snmp_exporter }}:9116  # The SNMP exporter's real hostname:port.
+        replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}]:9116"  # The SNMP exporter's real hostname:port.
 
   - job_name: 'ubiquiti-snmp'
     scrape_interval: 15s
@@ -121,7 +121,7 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: {{ docker_network.prometheus_snmp_exporter }}:9116  # The SNMP exporter's real hostname:port.
+        replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}]:9116"  # The SNMP exporter's real hostname:port.
 
   - job_name: 'ruckus-snmp'
     scrape_interval: 15s
@@ -139,7 +139,7 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: {{ docker_network.prometheus_snmp_exporter }}:9116  # The SNMP exporter's real hostname:port.
+        replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}]:9116"  # The SNMP exporter's real hostname:port.
 
   - job_name: 'docker'
     scrape_interval: 2m

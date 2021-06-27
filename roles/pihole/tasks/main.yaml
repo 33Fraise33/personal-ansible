@@ -58,7 +58,8 @@
     image: pihole/pihole:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.pihole }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.pihole }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.pihole }}"
     purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/pihole:/etc/pihole"
@@ -68,8 +69,9 @@
       TZ: "Europe/Brussels"
       WEBPASSWORD: "{{ pihole_pass }}"
       VIRTUAL_HOST: pihole.frai.se
-      DNS1: 208.67.222.222 #opendns for ecs support
-      DNS2: 208.67.220.220
+      PIHOLE_DNS_: 208.67.222.222;208.67.220.220;2620:119:35::35;2620:119:53::53 #opendns for ecs support
+      ServerIP: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.pihole }}"
+      ServerIPv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.pihole }}"
     restart: yes
     restart_policy: always
     state: started

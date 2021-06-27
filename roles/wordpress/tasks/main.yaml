@@ -26,7 +26,8 @@
     image: mariadb:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.mariadb }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.mariadb }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.mariadb }}"
     purge_networks: yes
     volumes:
       - "/data/wordpress/mysql:/var/lib/mysql"
@@ -48,10 +49,11 @@
     image: wordpress:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.wordpress }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.wordpress }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.wordpress }}"
     purge_networks: yes
     env:
-      WORDPRESS_DB_HOST: "{{ docker_network.mariadb }}"
+      WORDPRESS_DB_HOST: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.mariadb }}"
       WORDPRESS_DB_NAME: wordpress
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: "{{ mysql_user_password }}"

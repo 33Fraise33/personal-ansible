@@ -27,7 +27,8 @@
     command: generate
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.synapse}}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.synapse}}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.synapse}}"
     purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/synapse:/config"
@@ -54,12 +55,12 @@
   when: not synapse_config.stat.exists
 
 - import_tasks: config.yaml
-  tags: synapse
+  tags: synapse, config
 
 - name: Create a new database with name "synapse"
   community.general.postgresql_db:
     name: synapse
-    login_host: "{{ docker_network.postgres }}"
+    login_host: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.postgres }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
     encoding: UTF-8
@@ -74,7 +75,8 @@
     image: matrixdotorg/synapse:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.synapse}}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.synapse}}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.synapse}}"
     purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/synapse:/config"
@@ -112,5 +114,5 @@
 - import_tasks: whatsapp.yaml
   tags: whatsapp
 
-- import_tasks: slack.yaml
-  tags: slack
+# - import_tasks: slack.yaml
+#   tags: slack

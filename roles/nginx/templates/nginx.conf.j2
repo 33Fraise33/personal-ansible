@@ -6,7 +6,7 @@ http {
     server_name    frai.se;
 
    location / {
-      proxy_pass http://{{ docker_network.homer }}:8080;
+      proxy_pass http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.homer }}:8080;
       proxy_set_header X-Forwarded-For $remote_addr;
       client_max_body_size 128m;
     }
@@ -22,12 +22,6 @@ http {
     default_type application/json;
     add_header Access-Control-Allow-Origin *;
     }
-
-    location /slack/oauth {
-       proxy_pass http://{{ docker_network.puppet_slack }}:8432;
-       proxy_set_header X-Forwarded-For $remote_addr;
-       client_max_body_size 128m;
-     }
   }
   client_body_temp_path /tmp/client_temp;
   proxy_temp_path       /tmp/proxy_temp_path;

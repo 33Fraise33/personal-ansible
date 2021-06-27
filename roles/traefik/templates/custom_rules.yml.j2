@@ -3,31 +3,38 @@ http:
     jackett:
       loadBalancer:
         servers:
-          - url: "http://{{ docker_network.jackett }}:9117"
+          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.jackett }}:9117"
+          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.jackett }}:9117"
     deluge:
       loadBalancer:
         servers:
-          - url: "http://{{ docker_network.deluge }}:8112"
+          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.deluge }}:8112"
+          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.deluge }}:8112"
     plex:
       loadBalancer:
         servers:
-          - url: "http://{{ docker_network.plex }}:32400"
+          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.plex }}:32400"
+          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.plex }}:32400"
     radarr:
       loadBalancer:
         servers:
-          - url: "http://{{ docker_network.radarr }}:7878"
+          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.radarr }}:7878"
+          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.radarr }}:7878"
     calibre:
       loadBalancer:
         servers:
-          - url: "http://{{ docker_network.calibre }}:8080"
+          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.calibre }}:8080"
+          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.calibre }}:8080"
     calibre-web:
       loadBalancer:
         servers:
-          - url: "http://{{ docker_network.calibre_web }}:8083"
+          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.calibre_web }}:8083"
+          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.calibre_web }}:8083"
     ironman:
       loadBalancer:
         servers:
           - url: "https://10.33.0.1:8443"
+          - url: "https://[2a0e:b107:1165:1::1]:8443"
   routers:
     jackett:
       rule: "Host(`jackett.frai.se`)"

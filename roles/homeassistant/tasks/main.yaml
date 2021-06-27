@@ -18,7 +18,8 @@
       - name: macvlan50
         ipv4_address: 172.16.50.65
       - name: macvlan333
-        ipv4_address: "{{ docker_network.homeassistant }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.homeassistant }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.homeassistant }}"
     purge_networks: yes
     volumes:
       - "/data/homeassistant/config:/config"
