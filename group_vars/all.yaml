@@ -87,4 +87,6 @@ docker_network:
     calibre: 49
     calibre_web: 50
     ddclient: 51
+    guacd: 52
+    guacamole: 53
   #  netboot: 172.16.50.66
