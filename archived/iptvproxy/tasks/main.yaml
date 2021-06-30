@@ -4,7 +4,7 @@
     image: pierro777/iptv-proxy:v2.0.5
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.iptvproxy }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.iptvproxy }}"
     purge_networks: yes
     user: "{{ nobody.user }}:{{ nobody.group }}"
     env:

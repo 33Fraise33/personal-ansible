@@ -7,7 +7,7 @@
     image: mvance/unbound:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.unbound }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.unbound }}"
     purge_networks: yes
     restart: yes
     restart_policy: always
