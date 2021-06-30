@@ -1,3 +1,37 @@
+- name: set proxied a records
+  cloudflare_dns:
+    zone: frai.se
+    type: A
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    proxied: yes
+    state: present
+  with_items:
+    - { record: '@', value: '94.105.110.240'}
+    - { record: 'acserver', value: '94.105.110.240'}
+    - { record: 'accserver', value: '94.105.110.240'}
+    - { record: 'ha', value: '94.105.110.240'}
+    - { record: 'ironman', value: '94.105.110.240'}
+
+- name: set proxied aaaa records
+  cloudflare_dns:
+    zone: frai.se
+    type: AAAA
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    proxied: yes
+    state: present
+  with_items:
+    - { record: '@', value: '2a0e:b107:1165:333::10'}
+    - { record: 'acserver', value: '2a0e:b107:1165:333::10'}
+    - { record: 'accserver', value: '2a0e:b107:1165:333::10'}
+    - { record: 'ha', value: '2a0e:b107:1165:333::10'}
+    - { record: 'ironman', value: '2a0e:b107:1165:333::10'}
+
 - name: set non proxied aaaa records
   cloudflare_dns:
     zone: frai.se
@@ -8,8 +42,7 @@
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:
-    - { record: 'hulk', value: '2001:470:795c:33:dacb:8aff:fe15:c22b'}
-    - { record: 'captain', value: '2001:470:795c:33:20e:c6ff:febc:6cdb'}
+    - { record: 'wireguard', value: '2a0e:b107:1165:35::1'}
 
 - name: set non-proxied cname records for gsuite
   cloudflare_dns:

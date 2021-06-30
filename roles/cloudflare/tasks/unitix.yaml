@@ -1,3 +1,16 @@
+- name: set proxied aaaa records
+  cloudflare_dns:
+    zone: unitix.be
+    type: AAAA
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    proxied: yes
+    state: present
+  with_items:
+    - { record: '@', value: '2a0e:b107:1165:333::10'}
+
 - name: set non-proxied cname records for gsuite
   cloudflare_dns:
     zone: unitix.be
