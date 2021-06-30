@@ -32,6 +32,18 @@
     - { record: 'ha', value: '2a0e:b107:1165:333::10'}
     - { record: 'ironman', value: '2a0e:b107:1165:333::10'}
 
+- name: set non proxied a records
+  cloudflare_dns:
+    zone: frai.se
+    type: A
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - { record: 'wireguard', value: '94.105.110.240'}
+
 - name: set non proxied aaaa records
   cloudflare_dns:
     zone: frai.se
