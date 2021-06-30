@@ -23,7 +23,6 @@
     owner: root
     group: root
   with_items:
-    - custom.list
     - adlists.list
 
 - name: get uklans github repo
@@ -32,7 +31,7 @@
     dest: "{{ docker_data_location }}/pihole/lancache/"
     force: yes
 
-- name: copy template files
+- name: copy lancache template files
   template:
     src: "{{ item.name }}.j2"
     dest: "{{ docker_data_location }}/pihole/lancache/scripts/{{ item.name }}"
@@ -44,6 +43,14 @@
       mode: "0644"
     - name: copy-files.sh
       mode: "0755"
+
+- name: copy custom domains template file
+  template:
+    src: 30-custom-domains.conf
+    dest: "{{ docker_data_location }}/pihole/dnsmasq.d/30-custom-domains.conf"
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Create new lancache domains at midnight
   ansible.builtin.cron:
