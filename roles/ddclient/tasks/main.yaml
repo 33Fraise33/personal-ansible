@@ -39,3 +39,5 @@
     restart_policy: always
     restart: yes
     pull: true
+    labels:
+      traefik.enable: "false"

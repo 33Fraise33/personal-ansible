@@ -14,6 +14,8 @@
     restart_policy: always
     restart: yes
     pull: true
+    labels:
+      traefik.enable: "false"
 
 - name: Create a new database with name "guacamole_db"
   community.general.postgresql_db:
