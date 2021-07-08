@@ -9,12 +9,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.deluge }}:8112"
-          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.deluge }}:8112"
     plex:
       loadBalancer:
         servers:
           - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.plex }}:32400"
-          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.plex }}:32400"
     radarr:
       loadBalancer:
         servers:
