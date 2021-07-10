@@ -1,3 +1,16 @@
+- name: set proxied a records
+  cloudflare_dns:
+    zone: unitix.be
+    type: A
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    proxied: yes
+    state: present
+  with_items:
+    - { record: '@', value: '94.105.111.112'}
+
 - name: set proxied aaaa records
   cloudflare_dns:
     zone: unitix.be

@@ -9,12 +9,12 @@
     proxied: yes
     state: present
   with_items:
-    - { record: '@', value: '94.105.110.240'}
-    - { record: 'acserver', value: '94.105.110.240'}
-    - { record: 'accserver', value: '94.105.110.240'}
-    - { record: 'ha', value: '94.105.110.240'}
-    - { record: 'ironman', value: '94.105.110.240'}
-    - { record: 'matrix', value: '94.105.110.240'}
+    - { record: '@', value: '94.105.111.112'}
+    - { record: 'acserver', value: '94.105.111.112'}
+    - { record: 'accserver', value: '94.105.111.112'}
+    - { record: 'ha', value: '94.105.111.112'}
+    - { record: 'ironman', value: '94.105.111.112'}
+    - { record: 'matrix', value: '94.105.111.112'}
 
 - name: set proxied aaaa records
   cloudflare_dns:
@@ -44,7 +44,8 @@
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
   with_items:
-    - { record: 'wireguard', value: '94.105.110.240'}
+    - { record: 'wireguard', value: '94.105.111.112'}
+    - { record: 'roadwarrior', value: '94.105.111.112'}
 
 - name: set non proxied aaaa records
   cloudflare_dns:
@@ -57,6 +58,7 @@
     state: present
   with_items:
     - { record: 'wireguard', value: '2a0e:b107:1165:35::1'}
+    - { record: 'roadwarrior', value: '2a0e:b107:1165:1::1'}
 
 - name: set non-proxied cname records for gsuite
   cloudflare_dns:
