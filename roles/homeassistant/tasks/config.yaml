@@ -1,0 +1,23 @@
+- name: copy configuration files to directory
+  copy:
+    src: "{{ item }}"
+    dest: /data/homeassistant/config/
+    owner: root
+    group: root
+    mode: 0755
+  loop:
+    - automations.yaml
+    - customize.yaml
+  notify: restart homeassistant
+
+- name: copy configuration templates to directory
+  template:
+    src: "{{ item }}.j2"
+    dest: /data/homeassistant/config/{{ item }}
+    owner: root
+    group: root
+    mode: 0755
+  loop:
+    - configuration.yaml
+    - service_account.json
+  notify: restart homeassistant

@@ -1,0 +1,61 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}"
+    - "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}"
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+homeassistant:
+  customize: !include customize.yaml
+frontend:
+  themes: !include_dir_merge_named themes
+
+sensor:
+  - platform: afvalbeheer
+    wastecollector: RecycleApp
+    resources:
+      - restafval
+      - gft
+      - papier
+      - pmd
+    postcode: 8490
+    streetname: Eernegemweg
+    streetnumber: 96
+  - platform: template
+    sensors:
+      garage_status:
+        friendly_name: "Garage Status"
+        value_template: >- {% raw %}          
+          {% if is_state('binary_sensor.shelly_garagedoor_input', 'off') %}
+            open
+          {% else %}
+            closed
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.shelly_garagedoor_input', 'off') %}
+            mdi:garage-open
+          {% else %}
+            mdi:garage
+          {% endif %}
+          {% endraw %}
+
+shopping_list:
+
+google_assistant:
+  project_id: ha-assistant-57f43
+  service_account: !include service_account.json
+  report_state: true
+
+google:
+  client_id: "952331592172-5oqlke7d2apl5s5740tk41lpph865fod.apps.googleusercontent.com"
+  client_secret: "{{ ha.google_client_secret }}"

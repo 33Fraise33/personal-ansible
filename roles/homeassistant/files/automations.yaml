@@ -1,0 +1,100 @@
+- id: '1578943797763'
+  alias: Send Garbage Notification
+  description: ''
+  trigger:
+  - at: '18:45:00'
+    platform: time
+  condition:
+  - condition: or
+    conditions:
+    - condition: numeric_state
+      attribute: Days-until
+      below: '2'
+      above: '0'
+      entity_id: sensor.recycleapp_restafval
+    - condition: numeric_state
+      attribute: Days-until
+      below: '2'
+      above: '0'
+      entity_id: sensor.recycleapp_pmd
+    - condition: numeric_state
+      below: '2'
+      attribute: Days-until
+      above: '0'
+      entity_id: sensor.recycleapp_papier
+  action:
+  - service: notify.mobile_app_amelle
+    data:
+      title: AFVAL
+      message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days-until'',
+        1) %} Restafval {% endif %} {% if is_state_attr(''sensor.recycleapp_pmd'',
+        ''Days-until'', 1) %} PMD {% endif %} {% if is_state_attr(''sensor.recycleapp_papier'',
+        ''Days-until'', 1) %} Papier {% endif %}
+
+        '
+      data:
+        url: /lovelace/default_view
+        attachment:
+          url: https://i.pinimg.com/originals/86/d9/27/86d92784a2c535e3bd783aec01bd1475.png
+          content-type: png
+          hide-thumbnail: false
+  - service: notify.mobile_app_giannipe11
+    data:
+      title: AFVAL
+      message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days-until'',
+        1) %} Restafval {% endif %} {% if is_state_attr(''sensor.recycleapp_pmd'',
+        ''Days-until'', 1) %} PMD {% endif %} {% if is_state_attr(''sensor.recycleapp_papier'',
+        ''Days-until'', 1) %} Papier {% endif %}
+
+        '
+      data:
+        actions:
+        - action: URI
+          title: Show Calendar
+          uri: /lovelace/default_view
+        icon_url: https://i.pinimg.com/originals/86/d9/27/86d92784a2c535e3bd783aec01bd1475.png
+  mode: single
+- id: '1617014339885'
+  alias: Garage Open Timer
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.garage_status
+    to: open
+    for: 00:05:00
+  condition: []
+  action:
+  - service: notify.mobile_app_giannipe11
+    data:
+      title: Garage Open
+      message: Garage has been open for more then 5 minutes!
+      data:
+        actions:
+        - action: garage_close
+          title: Close Garage
+        icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
+  - service: notify.mobile_app_amelle
+    data:
+      message: Garage has been open for more then 5 minutes!
+      title: Garage Open
+      data:
+        url: /lovelace/default_view
+        attachment:
+          url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
+          content-type: png
+          hide-thumbnail: false
+  mode: single
+- id: '1617016680980'
+  alias: garage_close
+  description: ''
+  trigger:
+  - platform: event
+    event_type: mobile_app_notification_action
+    event_data:
+      action: garage_close
+  condition: []
+  action:
+  - service: switch.toggle
+    target:
+      device_id: 8ebff199f4bbefc898a58590609909d2
+  mode: single
