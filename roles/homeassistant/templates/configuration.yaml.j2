@@ -35,7 +35,7 @@ sensor:
     sensors:
       garage_status:
         friendly_name: "Garage Status"
-        value_template: >- {% raw %}          
+        value_template: >- {% raw %}
           {% if is_state('binary_sensor.shelly_garagedoor_input', 'off') %}
             open
           {% else %}
@@ -50,6 +50,14 @@ sensor:
           {% endraw %}
 
 shopping_list:
+
+prometheus:
+  namespace: "homeassistant"
+  filter:
+    include_entities:
+      - sensor.garage_status
+      - sensor.homewizard_p1_active_power
+      - sensor.homewizard_p1_total_gas
 
 google_assistant:
   project_id: ha-assistant-57f43

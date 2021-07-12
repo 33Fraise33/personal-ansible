@@ -145,3 +145,11 @@ scrape_configs:
     scrape_interval: 2m
     static_configs:
       - targets: ['172.16.33.5:9323']
+
+  - job_name: "hass"
+    scrape_interval: 10s
+    metrics_path: /api/prometheus
+    bearer_token: "{{ home_assistant_access_token }}"
+    scheme: https
+    static_configs:
+      - targets: ['ha.frai.se']
