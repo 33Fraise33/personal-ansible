@@ -20,6 +20,8 @@ homeassistant:
 frontend:
   themes: !include_dir_merge_named themes
 
+shopping_list:
+
 sensor:
   - platform: afvalbeheer
     wastecollector: RecycleApp
@@ -49,7 +51,12 @@ sensor:
           {% endif %}
           {% endraw %}
 
-shopping_list:
+binary_sensor:
+  - platform: ping
+    host: 172.16.50.10
+    name: "PC_FRAISE"
+    count: 1
+    scan_interval: 30
 
 prometheus:
   namespace: "homeassistant"
