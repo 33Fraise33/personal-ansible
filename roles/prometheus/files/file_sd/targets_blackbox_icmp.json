@@ -46,20 +46,20 @@
       "job": "blackbox_icmp",
       "node_name": "dad"
     },
-    "targets": ["dad.frai.se"]
+    "targets": ["8a7709c681f5.sn.mynetname.net"]
   },
   {
     "labels": {
       "job": "blackbox_icmp",
       "node_name": "mom"
     },
-    "targets": ["mom.frai.se"]
+    "targets": ["8b010aa79be4.sn.mynetname.net"]
   },
   {
     "labels": {
       "job": "blackbox_icmp",
       "node_name": "sil"
     },
-    "targets": ["sil.frai.se"]
+    "targets": ["b4a00aa9382d.sn.mynetname.net"]
   }
 ]
