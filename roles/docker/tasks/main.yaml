@@ -86,6 +86,7 @@
   docker_login:
     username: 33fraise33
     password: "{{ docker_pass }}"
+  tags: docker_login
 
 - name: add default_user to docker group
   user:
