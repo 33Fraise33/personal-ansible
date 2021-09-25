@@ -1,0 +1,30 @@
+- name: Get public ip once
+  hosts: compute,localhost
+  gather_facts: false
+  tasks:
+    - community.general.ipify_facts: # generates "ipify_public_ip" var with public ipv4 inside
+  tags: always
+
+- name: Set Cloudflare DNS Records
+  hosts: localhost
+  connection: ssh
+  become: true
+  roles:
+    - cloudflare
+  tags: cloudflare
+
+- name: Setup ddclient
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - ddclient
+  tags: ddclient
+
+- name: Setup pihole
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - pihole
+  tags: pihole

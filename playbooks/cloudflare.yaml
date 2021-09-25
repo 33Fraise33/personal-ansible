@@ -1,6 +1,0 @@
-- name: Set Cloudflare DNS Records
-  hosts: localhost
-  connection: ssh
-  become: true
-  roles:
-    - cloudflare

@@ -40,7 +40,28 @@ cloudflare_api_email: !vault |
           3263646334663434390a326338353233343537313361373663663231643666323862323861383037
           35643561613562366534383132626530663937386638356630306637373066623336
 
-
+domains:
+  ipv6_proxy: "2a0e:b107:1165:333::10"
+  fraise:
+    proxy:
+      - name: acserver
+      - name: accserver
+      - name: ha
+      - name: ironman
+      - name: matrix
+      - name: "@"
+      - name: unms
+    direct:
+      - name: roadwarrior
+        ipv6: 2a0e:b107:1165:1::1
+      - name: wireguard
+        ipv6: 2a0e:b107:1165:35::1
+    local: []
+  unitix:
+    proxy:
+      - name: "@"
+    direct: []
+    local: []
 
 docker_network:
   ipv4_prefix: "10.33.0."

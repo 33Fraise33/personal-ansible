@@ -2,63 +2,47 @@
   cloudflare_dns:
     zone: frai.se
     type: A
-    record: "{{ item.record }}"
-    value: "{{ item.value }}"
+    record: "{{ item.name }}"
+    value: "{{ ipify_public_ip }}"
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     proxied: yes
     state: present
-  with_items:
-    - { record: '@', value: '94.105.111.112'}
-    - { record: 'acserver', value: '94.105.111.112'}
-    - { record: 'accserver', value: '94.105.111.112'}
-    - { record: 'ha', value: '94.105.111.112'}
-    - { record: 'ironman', value: '94.105.111.112'}
-    - { record: 'matrix', value: '94.105.111.112'}
+  loop: "{{ domains.fraise.proxy }}"
 
 - name: set proxied aaaa records
   cloudflare_dns:
     zone: frai.se
     type: AAAA
-    record: "{{ item.record }}"
-    value: "{{ item.value }}"
+    record: "{{ item.name }}"
+    value: "{{ domains.ipv6_proxy}}"
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     proxied: yes
     state: present
-  with_items:
-    - { record: '@', value: '2a0e:b107:1165:333::10'}
-    - { record: 'acserver', value: '2a0e:b107:1165:333::10'}
-    - { record: 'accserver', value: '2a0e:b107:1165:333::10'}
-    - { record: 'ha', value: '2a0e:b107:1165:333::10'}
-    - { record: 'ironman', value: '2a0e:b107:1165:333::10'}
-    - { record: 'matrix', value: '2a0e:b107:1165:333::10'}
+  loop: "{{ domains.fraise.proxy }}"
 
 - name: set non proxied a records
   cloudflare_dns:
     zone: frai.se
     type: A
-    record: "{{ item.record }}"
-    value: "{{ item.value }}"
+    record: "{{ item.name }}"
+    value: "{{ item.ipv4 | default(ipify_public_ip) }}"
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
-  with_items:
-    - { record: 'wireguard', value: '94.105.111.112'}
-    - { record: 'roadwarrior', value: '94.105.111.112'}
+  loop: "{{ domains.fraise.direct }}"
 
 - name: set non proxied aaaa records
   cloudflare_dns:
     zone: frai.se
     type: AAAA
-    record: "{{ item.record }}"
-    value: "{{ item.value }}"
+    record: "{{ item.name }}"
+    value: "{{ item.ipv6 }}"
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
-  with_items:
-    - { record: 'wireguard', value: '2a0e:b107:1165:35::1'}
-    - { record: 'roadwarrior', value: '2a0e:b107:1165:1::1'}
+  loop: "{{ domains.fraise.direct }}"
 
 - name: set non-proxied cname records for gsuite
   cloudflare_dns:

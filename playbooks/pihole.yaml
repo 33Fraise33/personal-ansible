@@ -1,6 +1,0 @@
-- name: setup pihole docker container
-  hosts: compute
-  connection: ssh
-  become: true
-  roles:
-    - pihole
