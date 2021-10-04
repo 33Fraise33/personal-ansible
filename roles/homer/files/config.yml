@@ -44,6 +44,9 @@ links:
   - name: "Reddit"
     icon: "fab fa-reddit-alien"
     url: "https://reddit.com/"
+  - name: "Frai.se Mail"
+    icon: "fab fa-google"
+    url: "https://mail.google.com/a/unitix.be"
 
 # Services
 # First level array represent a group.
@@ -132,7 +135,6 @@ services:
         logo: "https://i.imgur.com/17hyHHu.png"
         url: "https://unms.frai.se"
         subtitle: "Ubiquiti network management"
-        tag: wireguard
   - name: "Monitoring"
     icon: "fab fa-cloudscale"
     items:
