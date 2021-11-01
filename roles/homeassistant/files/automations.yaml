@@ -98,3 +98,55 @@
     target:
       device_id: 8ebff199f4bbefc898a58590609909d2
   mode: single
+- id: '1629316694097'
+  alias: Turn off ledstrip when pc goes off
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.pc_fraise
+    from: 'on'
+    to: 'off'
+  - platform: state
+    entity_id: binary_sensor.pc_amelle
+    from: 'on'
+    to: 'off'
+  condition:
+  - condition: device
+    type: is_on
+    device_id: fc0ccf3780e821bbae16cdb570b91f99
+    entity_id: light.iot_shelly_bureau
+    domain: light
+  - condition: state
+    entity_id: binary_sensor.pc_fraise
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.pc_amelle
+    state: 'off'
+  action:
+  - service: light.turn_off
+    target:
+      entity_id: light.iot_shelly_bureau
+  mode: single
+- id: '1635756544900'
+  alias: Turn on ledstrip when pc goes on
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.pc_fraise
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.pc_amelle
+    from: 'off'
+    to: 'on'
+  condition:
+  - condition: device
+    type: is_off
+    device_id: fc0ccf3780e821bbae16cdb570b91f99
+    entity_id: light.iot_shelly_bureau
+    domain: light
+  action:
+  - service: light.turn_on
+    target:
+      device_id: fc0ccf3780e821bbae16cdb570b91f99
+  mode: single

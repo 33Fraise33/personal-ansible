@@ -57,7 +57,12 @@ binary_sensor:
     name: "PC_FRAISE"
     count: 1
     scan_interval: 30
-
+  - platform: ping
+    host: 172.16.50.11
+    name: "PC_AMELLE"
+    count: 1
+    scan_interval: 30
+    
 prometheus:
   namespace: "homeassistant"
   filter:
