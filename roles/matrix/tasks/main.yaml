@@ -39,8 +39,6 @@
       SYNAPSE_REPORT_STATS: "no"
       SYNAPSE_CONFIG_DIR: "/config"
       SYNAPSE_DATA_DIR: "/data"
-      UID: "{{ nobody.user }}"
-      GID: "{{ nobody.group }}"
     state: started
     pull: true
     labels:
@@ -85,8 +83,6 @@
     user: "{{ nobody.user }}:{{ nobody.group }}"
     env:
       SYNAPSE_CONFIG_DIR: "/config"
-      UID: "{{ nobody.user }}"
-      GID: "{{ nobody.group }}"
       TZ: "Europe/Brussels"
     restart: yes
     restart_policy: always
