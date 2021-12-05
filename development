@@ -1,5 +1,0 @@
-[compute]
-captain ansible_python_interpreter=/usr/bin/python3
-
-[storage]
-hulk ansible_python_interpreter=/usr/bin/python3

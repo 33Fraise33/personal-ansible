@@ -1,0 +1,19 @@
+all:
+  children:
+    servers:
+      children:
+        compute:
+          hosts:
+            captain:
+              ansible_python_interpreter: /usr/bin/python3
+        storage:
+          hosts:
+            hulk:
+              ansible_python_interpreter: /usr/bin/python3
+    routers:
+      children:
+        mikrotik:
+          hosts:
+            ironman:
+              ansible_python_interpreter: /usr/bin/python3
+              ansible_host: 172.16.33.1
