@@ -1,34 +1,35 @@
-# setup wireguard with a docker container
-# container from: https://github.com/activeeos/wireguard-docker
-
-- name: install default packages
-  pacman:
-    name: ['wireguard-tools', 'qrencode']
-    state: latest
-
-- name: copy config files
-  template:
-    src: "{{ item }}.j2"
-    dest: /etc/wireguard/{{ item }}
-    owner: root
-    group: root
-    mode: 0755
-  with_items:
-    - wg0.conf
-    - wgPC.conf
-    - wgLaptop.conf
-    - wgPhone.conf
-    - wgAmelle.conf
-    - wgAmellePhone.conf
-
-# - name: start & enable iptables service
+##### WIREGUARD ON LINUX
+# - name: install default packages
+#   pacman:
+#     name: ['wireguard-tools', 'qrencode']
+#     state: latest
+#
+# - name: copy config files
+#   template:
+#     src: "{{ item }}.j2"
+#     dest: /etc/wireguard/{{ item }}
+#     owner: root
+#     group: root
+#     mode: 0755
+#   with_items:
+#     - wg0.conf
+#     - wgPC.conf
+#     - wgLaptop.conf
+#     - wgPhone.conf
+#     - wgAmelle.conf
+#     - wgAmellePhone.conf
+#
+# - name: restart wg service
 #   service:
-#     name: iptables
-#     state: started
+#     name: "wg-quick@wg0"
+#     state: restarted
 #     enabled: yes
 
-- name: restart wg service
-  service:
-    name: "wg-quick@wg0"
-    state: restarted
-    enabled: yes
+##### WIREGUARD ON MIKROTIK
+## GENERIC DASHBOARDS
+- include_tasks:
+    file: wg_interfaces.yaml
+  loop: "{{ wg_interfaces }}"
+  loop_control:
+    loop_var: wg_interface
+    label: wg_interface.name

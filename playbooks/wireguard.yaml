@@ -1,6 +1,4 @@
 - name: Common Tasks
-  hosts: compute
-  connection: ssh
-  become: true
+  hosts: ironman
   roles:
     - wireguard

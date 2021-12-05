@@ -1,0 +1,28 @@
+- name: Check if peer exists
+  community.routeros.api:
+    hostname: "{{ ansible_host }}"
+    password: "{{ ansible_password }}"
+    username: "{{ ansible_user }}"
+    tls: true
+    validate_certs: false
+    validate_cert_hostname: false
+    path: "/interface/wireguard/peers"
+    query: 'comment WHERE comment == {{ wg_peer.name }}'
+  register: peer_exists
+
+- name: Add wireguard peer if doesn't exist
+  community.routeros.api:
+    hostname: "{{ ansible_host }}"
+    password: "{{ ansible_password }}"
+    username: "{{ ansible_user }}"
+    tls: true
+    validate_certs: false
+    validate_cert_hostname: false
+    path: "/interface/wireguard/peers"
+    add: >-
+      comment={{ wg_peer.name }}
+      allowed-address="{{ wg_interface.ip.v4.prefix }}.{{ wg_peer.id }}/32,
+      {{ wg_interface.ip.v6.prefix }}::{{ wg_peer.id }}/128"
+      interface={{ wg_interface.name }}
+      public-key="{{ wg_peer.public_key }}"
+  when: '"no results" in peer_exists.msg.0'
