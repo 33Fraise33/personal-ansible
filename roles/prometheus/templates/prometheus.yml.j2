@@ -78,7 +78,7 @@ scrape_configs:
     scrape_timeout: 2m
     static_configs:
     - targets:
-      - "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_speedtest }}]:9516"
+      - "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_speedtest }}:9516"
 
   - job_name: 'solaredge'
     metrics_path: /metrics
