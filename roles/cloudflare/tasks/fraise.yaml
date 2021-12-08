@@ -44,21 +44,23 @@
     state: present
   loop: "{{ domains.fraise.direct }}"
 
-- name: set non-proxied cname records for gsuite
+- name: set proxied cname records
   cloudflare_dns:
     zone: frai.se
     type: CNAME
-    record: "{{ item }}"
-    value: ghs.googlehosted.com
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
+    proxied: yes
     state: present
   with_items:
-    - calendar
-    - drive
-    - mail
+    - { record: 'calendar', value: 'ghs.googlehosted.com'}
+    - { record: 'drive', value: 'ghs.googlehosted.com'}
+    - { record: 'mail', value: 'ghs.googlehosted.com'}
+    - { record: 'status', value: '33fraise33.github.io'}
 
-- name: set non proxied cname records for managed networks
+- name: set non proxied cname records
   cloudflare_dns:
     zone: frai.se
     type: CNAME

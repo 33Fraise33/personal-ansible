@@ -33,6 +33,14 @@ http:
         servers:
           - url: "https://10.33.0.1:8443"
           - url: "https://[2a0e:b107:1165:1::1]:8443"
+    status:
+      loadBalancer:
+        servers:
+          - url: "https://33fraise33.github.io"
+    googlehosted:
+      loadBalancer:
+        servers:
+          - url: "https://ghs.googlehosted.com"
   routers:
     jackett:
       rule: "Host(`jackett.frai.se`)"
@@ -79,6 +87,34 @@ http:
     ironman:
       rule: "Host(`ironman.frai.se`)"
       service: "ironman"
+      tls:
+        certResolver: le
+        domains:
+          - main: "*.frai.se"
+    status:
+      rule: "Host(`status.frai.se`)"
+      service: "status"
+      tls:
+        certResolver: le
+        domains:
+          - main: "*.frai.se"
+    calendar:
+      rule: "Host(`calendar.frai.se`)"
+      service: "googlehosted"
+      tls:
+        certResolver: le
+        domains:
+          - main: "*.frai.se"
+    mail:
+      rule: "Host(`mail.frai.se`)"
+      service: "googlehosted"
+      tls:
+        certResolver: le
+        domains:
+          - main: "*.frai.se"
+    drive:
+      rule: "Host(`drive.frai.se`)"
+      service: "googlehosted"
       tls:
         certResolver: le
         domains:
