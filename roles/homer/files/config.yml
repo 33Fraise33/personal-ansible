@@ -148,3 +148,7 @@ services:
         subtitle: "Monitoring metrics database"
         tag: wireguard
         url: "http://10.33.0.23:9090/"
+      - name: "Upptime"
+        subtitle: "Github Pages powered Monitoring"
+        logo: "https://upptime.js.org/img/icon.svg"
+        url: "https://status.frai.se"
