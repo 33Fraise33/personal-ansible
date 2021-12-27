@@ -9,12 +9,27 @@
     group: "{{ nobody.group }}"
     recurse: yes
 
-- name: check if file exists
-  ansible.builtin.stat:
-    path: "{{ docker_data_location }}/matrix-bridges/mautrix-whatsapp/config.yaml"
-  register: whatsapp_config
+- name: Copy whatsapp config template to server
+  template:
+    src: whatsapp.yaml.j2
+    dest: "{{ docker_data_location }}/matrix-bridges/mautrix-whatsapp/config.yaml"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0755
+  tags: config
 
-- name: Start whatsapp bridge docker container (create config file)
+- name: Create a new database with name "whatsapp"
+  community.general.postgresql_db:
+    name: whatsapp
+    login_host: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+    encoding: UTF-8
+    lc_collate: C
+    lc_ctype: C
+    template: template0
+
+- name: Start whatsapp bridge docker container
   docker_container:
     name: mautrix-whatsapp
     image: dock.mau.dev/mautrix/whatsapp:latest
@@ -29,95 +44,8 @@
       UID: "{{ nobody.user }}"
       GID: "{{ nobody.group }}"
     state: started
-    restart_policy: no
+    restart: yes
+    restart_policy: always
     pull: true
     labels:
       traefik.enable: "false"
-  when: not whatsapp_config.stat.exists
-
-- name: wait for config file to be created
-  pause:
-    seconds: 10
-  when: not whatsapp_config.stat.exists
-
-- name: Create a new database with name "whatsapp"
-  community.general.postgresql_db:
-    name: whatsapp
-    login_host: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
-    login_password: "{{ postgres_password }}"
-    login_user: "{{ postgres_user }}"
-    encoding: UTF-8
-    lc_collate: C
-    lc_ctype: C
-    template: template0
-
-- name: set whatsapp config items
-  lineinfile:
-    path: "{{ docker_data_location }}/matrix-bridges/mautrix-whatsapp/config.yaml"
-    regexp: "{{ item.regex }}"
-    line: "{{ item.line }}"
-    insertafter: "{{ item.insert }}"
-  with_items:
-    - regex: "^    address: https://"
-      line: "    address: https://{{ matrix_base_url }}"
-      insert: "^    # The address that this appservice"
-    - regex: "^    domain:"
-      line: "    domain: {{ matrix_server_name }}"
-      insert: "^    # The domain of"
-    - regex: "^    address: http://"
-      line: "    address: http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.mautrix_whatsapp }}:29318"
-      insert: "^    # The address that the homeserver can use"
-    - regex: "^        type:"
-      line: "        type: postgres"
-      insert: ""
-    - regex: "^        uri:"
-      # urlencode does not work on vault items: https://github.com/ansible/ansible/issues/73054
-      line: '        uri: "postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#","%23") }}@{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}/whatsapp?sslmode=disable"'
-      insert: ""
-    - regex: "^        '@{{ synapse_admin }}:{{ matrix_server_name }}': admin"
-      line: "        '@{{ synapse_admin }}:{{ matrix_server_name }}': admin"
-      insert: "^    permissions:"
-    - regex: "^    delivery_receipts:"
-      line: "    delivery_receipts: true"
-      insert: ""
-  notify: restart whatsapp container
-  when: not whatsapp_config.stat.exists
-
-- name: set whatsapp config items
-  lineinfile:
-    path: "{{ docker_data_location }}/matrix-bridges/mautrix-whatsapp/config.yaml"
-    regexp: "{{ item }}"
-    state: absent
-  with_items:
-    - "^(.*)example.com(.*)user"
-    - "^(.*)@admin:example.com(.*)admin"
-  notify: restart whatsapp container
-  when: not whatsapp_config.stat.exists
-
-- meta: flush_handlers
-
-- name: wait for registration file to be created
-  pause:
-    seconds: 10
-  when: not whatsapp_config.stat.exists
-
-- name: set synapse config items
-  lineinfile:
-    path: "{{ docker_config_location }}/synapse/homeserver.yaml"
-    regexp: "{{ item.regex }}"
-    line: "{{ item.line }}"
-    insertafter: "{{ item.insert }}"
-  with_items:
-    - regex: "^  - /bridges/mautrix-whatsapp/registration.yaml"
-      line: "  - /bridges/mautrix-whatsapp/registration.yaml"
-      insert: "^  - /bridges/mautrix-telegram/"
-  notify: restart synapse container
-
-- meta: flush_handlers
-
-- name: Start whatsapp bridge docker container
-  docker_container:
-    name: mautrix-whatsapp
-    restart_policy: always
-    state: started
-    pull: true

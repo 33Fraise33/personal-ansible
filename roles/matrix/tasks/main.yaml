@@ -88,5 +88,5 @@
 # - import_tasks: telegram.yaml
 #   tags: telegram,bridges
 #
-# - import_tasks: whatsapp.yaml
-#   tags: whatsapp,bridges
+- import_tasks: whatsapp.yaml
+  tags: whatsapp,bridges
