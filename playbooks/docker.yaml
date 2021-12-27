@@ -1,5 +1,5 @@
-- name: Setup Grafana
-  hosts: all
+- name: Setup Docker
+  hosts: servers
   connection: ssh
   become: true
   roles:

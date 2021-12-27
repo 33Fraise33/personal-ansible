@@ -1,5 +1,5 @@
 - name: setup  filesharing
-  hosts: all
+  hosts: servers
   connection: ssh
   become: true
   roles:
