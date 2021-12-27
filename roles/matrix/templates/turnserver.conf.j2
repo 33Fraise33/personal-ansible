@@ -1,0 +1,18 @@
+use-auth-secret
+static-auth-secret={{ coturn_auth_secret }}
+realm=coturn.{{ matrix_server_name }}
+
+min-port=49152
+max-port=49172
+
+log-file=stdout
+pidfile=/var/tmp/turnserver.pid
+userdb=/var/tmp/turnserver.db
+
+no-cli
+
+no-tls
+no-dtls
+
+prod
+no-tcp-relay
