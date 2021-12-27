@@ -54,6 +54,8 @@ domains:
     direct:
       - name: roadwarrior
         ipv6: 2a0e:b107:1165:1::1
+      - name: coturn
+        ipv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.coturn}}"
       - name: wireguard
         ipv6: 2a0e:b107:1165:35::1
     local: []
@@ -111,3 +113,4 @@ docker_network:
     guacd: 52
     guacamole: 53
     netboot: 54
+    coturn: 55
