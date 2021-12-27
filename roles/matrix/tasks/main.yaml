@@ -14,51 +14,28 @@
     - "{{ docker_data_location }}/matrix-bridges"
   tags: synapse
 
-- name: Check if synapse config already exists
-  stat:
-    path: "{{ docker_config_location }}/synapse/homeserver.yaml"
-  tags: synapse
-  register: synapse_config
+- name: Copy config template to server
+  template:
+    src: homeserver.yaml.j2
+    dest: "{{ docker_config_location }}/synapse/homeserver.yaml"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0755
+  tags: synapse, config
 
-- name: generate synapse config
-  docker_container:
-    name: synapse
-    image: matrixdotorg/synapse:latest
-    command: generate
-    networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.synapse}}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.synapse}}"
-    purge_networks: yes
-    volumes:
-      - "{{ docker_config_location }}/synapse:/config"
-      - "{{ docker_data_location }}/synapse:/data"
-    user: "{{ nobody.user }}:{{ nobody.group }}"
-    env:
-      SYNAPSE_SERVER_NAME: "{{ matrix_server_name }}"
-      SYNAPSE_REPORT_STATS: "no"
-      SYNAPSE_CONFIG_DIR: "/config"
-      SYNAPSE_DATA_DIR: "/data"
-    state: started
-    pull: true
-    labels:
-      traefik.enable: "false"
-  tags: synapse
-  when: not synapse_config.stat.exists
-
-- name: wait for config to be generated
-  pause:
-    seconds: 10
-  tags: synapse
-  when: not synapse_config.stat.exists
-
-- import_tasks: config.yaml
+- name: Copy logging config to server
+  copy:
+    src: frai.se.log.config
+    dest: "{{ docker_config_location }}/synapse/frai.se.log.config"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0755
   tags: synapse, config
 
 - name: Create a new database with name "synapse"
   community.general.postgresql_db:
     name: synapse
-    login_host: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.postgres }}"
+    login_host: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
     encoding: UTF-8
@@ -93,7 +70,7 @@
       traefik.http.routers.synapse.tls: "true"
       traefik.http.routers.synapse.tls.certresolver: "le"
       traefik.http.services.synapse.loadbalancer.server.port: "8008"
-  tags: synapse
+  tags: synapse,config
 
 - name: wait for container to be healthy
   pause:
@@ -104,11 +81,12 @@
   command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u {{ synapse_admin }} -p {{ synapse_admin_password }} -a https://{{ matrix_base_url }}"
   tags: synapse
 
-- import_tasks: telegram.yaml
-  tags: telegram
+# Doesn't work behind nat.
+- import_tasks: coturn.yaml
+  tags: coturn
 
-- import_tasks: whatsapp.yaml
-  tags: whatsapp
-
-# - import_tasks: slack.yaml
-#   tags: slack
+# - import_tasks: telegram.yaml
+#   tags: telegram,bridges
+#
+# - import_tasks: whatsapp.yaml
+#   tags: whatsapp,bridges
