@@ -37,6 +37,7 @@
   pip:
     name: ['pip', 'docker']
     state: latest
+  tags: pip
 
 - name: create docker macvlan333 network
   docker_network:

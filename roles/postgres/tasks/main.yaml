@@ -42,3 +42,4 @@
   pip:
     name: ['pip', 'psycopg2']
     state: latest
+  tags: pip
