@@ -16,7 +16,7 @@
     image: jellyfin/jellyfin:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.jellyfin}}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.jellyfin}}"
     purge_networks: yes
     volumes:
       - "/data/jellyfin/config:/config"
