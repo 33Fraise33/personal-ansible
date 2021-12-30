@@ -48,6 +48,10 @@
     restart: yes
     restart_policy: always
     pull: true
+    labels:
+      traefik.http.routers.maubot.tls: "true"
+      traefik.http.routers.maubot.tls.certresolver: "le"
+      traefik.http.services.maubot.loadbalancer.server.port: "29316"
 
 - name: create admin user
   command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u maubot -p {{ maubot_password }} -a https://{{ matrix_base_url }}"

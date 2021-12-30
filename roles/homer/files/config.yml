@@ -64,6 +64,11 @@ services:
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Home_Assistant_Logo.svg/1200px-Home_Assistant_Logo.svg.png"
         url: "https://ha.frai.se"
         subtitle: "Home automation platform"
+      - name: "Maubot Matrix"
+        logo: "https://i.imgur.com/pVCBwJo.png"
+        url: "https://maubot.frai.se/_matrix/maubot"
+        subtitle: "Matrix Assistant Bot"
+        tag: wireguard
   - name: "Gaming"
     icon: "fas fa-gamepad"
     items:
