@@ -85,6 +85,9 @@
 - import_tasks: coturn.yaml
   tags: coturn
 
+- import_tasks: maubot.yaml
+  tags: maubot
+
 # - import_tasks: telegram.yaml
 #   tags: telegram,bridges
 #

@@ -1,0 +1,54 @@
+# Docker Image from: https://mau.dev/maubot/maubot/container_registry
+
+- name: create maubot directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: 1337
+    group: 1337
+    recurse: yes
+  with_items:
+    - "{{ docker_config_location }}/maubot"
+    - "{{ docker_data_location }}/maubot"
+
+- name: Create a new database with name "maubot"
+  community.general.postgresql_db:
+    name: maubot
+    login_host: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+    encoding: UTF-8
+    lc_collate: C
+    lc_ctype: C
+    template: template0
+
+- name: copy maubot config
+  template:
+    src: maubot.yaml.j2
+    dest: "{{ docker_config_location }}/maubot/config.yaml"
+    owner: 1337
+    group: 1337
+    mode: 0600
+  tags: config
+
+- name: Start maubot docker container to generate items
+  docker_container:
+    name: maubot
+    image: dock.mau.dev/maubot/maubot:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.maubot}}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.maubot}}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_data_location }}/maubot/:/data"
+      - "{{ docker_config_location }}/maubot/config.yaml:/data/config.yaml"
+    state: started
+    restart: yes
+    restart_policy: always
+    pull: true
+
+- name: create admin user
+  command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u maubot -p {{ maubot_password }} -a https://{{ matrix_base_url }}"
+  tags: maubot_user

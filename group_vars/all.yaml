@@ -114,3 +114,4 @@ docker_network:
     guacamole: 53
     netboot: 54
     coturn: 55
+    maubot: 56
