@@ -56,3 +56,4 @@
 - name: create admin user
   command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u maubot -p {{ maubot_password }} -a https://{{ matrix_base_url }}"
   tags: maubot_user
+  ignore_errors: true
