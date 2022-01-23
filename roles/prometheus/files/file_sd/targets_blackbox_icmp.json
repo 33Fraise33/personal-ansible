@@ -44,21 +44,24 @@
   {
     "labels": {
       "job": "blackbox_icmp",
-      "node_name": "dad"
+      "node_name": "dad",
+      "tenant": "DAD"
     },
     "targets": ["8a7709c681f5.sn.mynetname.net"]
   },
   {
     "labels": {
       "job": "blackbox_icmp",
-      "node_name": "mom"
+      "node_name": "mom",
+      "tenant": "MOM"
     },
     "targets": ["8b010aa79be4.sn.mynetname.net"]
   },
   {
     "labels": {
       "job": "blackbox_icmp",
-      "node_name": "sil"
+      "node_name": "sil",
+      "tenant": "SIL"
     },
     "targets": ["b4a00aa9382d.sn.mynetname.net"]
   }
