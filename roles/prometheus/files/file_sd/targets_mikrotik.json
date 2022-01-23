@@ -2,7 +2,7 @@
   {
     "labels": {
       "job": "mikrotik-snmp",
-      "tenant": "HOME",
+      "tenant": "ASGARD",
       "node_name": "CR_IRONMAN"
     },
     "targets": ["172.16.33.1"]
@@ -13,7 +13,7 @@
       "tenant": "DAD",
       "node_name": "CR_DAD"
     },
-    "targets": ["172.17.33.6"]
+    "targets": ["172.16.10.33"]
   },
   {
     "labels": {
@@ -29,7 +29,7 @@
       "tenant": "MOM",
       "node_name": "CR_MOM"
     },
-    "targets": ["172.17.33.4"]
+    "targets": ["172.16.10.1"]
   },
   {
     "labels": {
