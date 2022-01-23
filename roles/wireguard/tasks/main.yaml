@@ -33,3 +33,11 @@
   loop_control:
     loop_var: wg_interface
     label: wg_interface.name
+  tags: always
+
+# create MTK endpoint config: 
+# /interface/wireguard/peers/add allowed-address=172.16.34.0/24 end
+# point-address=wireguard.frai.se endpoint-port=2035 comment=ASGARD_CR interface=ASG
+# ARD persistent-keepalive=25 public-key="/sO1umhA2iBteRSYY8+xtoI8SHRbdsG3/KblUw5yrX
+# k="
+# add address to interface

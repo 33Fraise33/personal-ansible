@@ -56,7 +56,11 @@
 
 - include_tasks:
     file: wg_peers.yaml
+    apply: 
+      tags: peers
   loop: "{{ wg_interface.peers }}"
   loop_control:
     loop_var: wg_peer
     label: wg_peer.name
+  tags: always
+  

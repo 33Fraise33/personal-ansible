@@ -1,4 +1,4 @@
-- name: Check if peer exists
+- name: Check if peer "{{ wg_peer.name }}" exists
   community.routeros.api:
     hostname: "{{ ansible_host }}"
     password: "{{ ansible_password }}"
@@ -10,7 +10,7 @@
     query: 'comment WHERE comment == {{ wg_peer.name }}'
   register: peer_exists
 
-- name: Add wireguard peer if doesn't exist
+- name: Add wireguard peer "{{ wg_peer.name }}" if doesn't exist
   community.routeros.api:
     hostname: "{{ ansible_host }}"
     password: "{{ ansible_password }}"
