@@ -38,13 +38,5 @@
       "node_name": "SW_MOM"
     },
     "targets": ["172.16.10.2"]
-  },
-  {
-    "labels": {
-      "job": "mikrotik-snmp",
-      "tenant": "SIL",
-      "node_name": "CR_SIL"
-    },
-    "targets": ["172.17.33.5"]
   }
 ]

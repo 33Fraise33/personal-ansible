@@ -60,9 +60,9 @@
   {
     "labels": {
       "job": "blackbox_icmp",
-      "node_name": "sil",
-      "tenant": "SIL"
+      "node_name": "kingpin",
+      "tenant": "VORMIR"
     },
-    "targets": ["b4a00aa9382d.sn.mynetname.net"]
+    "targets": ["193.148.249.106"]
   }
 ]

@@ -14,5 +14,13 @@
       "node_name": "HULK"
     },
     "targets": ["172.16.33.6:9100"]
+  },
+  {
+    "labels": {
+      "job": "node_exporter",
+      "tenant": "VORMIR",
+      "node_name": "kingpin"
+    },
+    "targets": ["193.148.249.106:9100"]
   }
 ]
