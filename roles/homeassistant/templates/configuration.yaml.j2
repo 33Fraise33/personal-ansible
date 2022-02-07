@@ -68,8 +68,13 @@ prometheus:
   filter:
     include_entities:
       - sensor.garage_status
-      - sensor.homewizard_p1_active_power
-      - sensor.homewizard_p1_total_gas
+      - sensor.dryer_energy_2
+      - sensor.p1_meter_3c39e7250142_active_power
+      - sensor.p1_meter_3c39e7250142_total_gas
+      - sensor.p1_meter_3c39e7250142_total_power_export_t1
+      - sensor.p1_meter_3c39e7250142_total_power_export_t2
+      - sensor.p1_meter_3c39e7250142_total_power_import_t1
+      - sensor.p1_meter_3c39e7250142_total_power_import_t2
 
 google_assistant:
   project_id: ha-assistant-57f43
@@ -79,3 +84,7 @@ google_assistant:
 google:
   client_id: "952331592172-5oqlke7d2apl5s5740tk41lpph865fod.apps.googleusercontent.com"
   client_secret: "{{ ha.google_client_secret }}"
+
+spotify:
+  client_id: 22f9a2399a0f4a989d4197114a676df7
+  client_secret: "{{ ha.spotify_secret }}"

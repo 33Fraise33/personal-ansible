@@ -8,28 +8,28 @@
   - condition: or
     conditions:
     - condition: numeric_state
-      attribute: Days-until
+      attribute: Days_until
       below: '2'
       above: '0'
       entity_id: sensor.recycleapp_restafval
     - condition: numeric_state
-      attribute: Days-until
+      attribute: Days_until
       below: '2'
       above: '0'
       entity_id: sensor.recycleapp_pmd
     - condition: numeric_state
       below: '2'
-      attribute: Days-until
+      attribute: Days_until
       above: '0'
       entity_id: sensor.recycleapp_papier
   action:
   - service: notify.mobile_app_amelle
     data:
       title: AFVAL
-      message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days-until'',
+      message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days_until'',
         1) %} Restafval {% endif %} {% if is_state_attr(''sensor.recycleapp_pmd'',
-        ''Days-until'', 1) %} PMD {% endif %} {% if is_state_attr(''sensor.recycleapp_papier'',
-        ''Days-until'', 1) %} Papier {% endif %}
+        ''Days_until'', 1) %} PMD {% endif %} {% if is_state_attr(''sensor.recycleapp_papier'',
+        ''Days_until'', 1) %} Papier {% endif %}
 
         '
       data:
@@ -38,13 +38,13 @@
           url: https://i.pinimg.com/originals/86/d9/27/86d92784a2c535e3bd783aec01bd1475.png
           content-type: png
           hide-thumbnail: false
-  - service: notify.mobile_app_giannipe11
+  - service: notify.mobile_app_pixel6_gianni
     data:
       title: AFVAL
-      message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days-until'',
+      message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days_until'',
         1) %} Restafval {% endif %} {% if is_state_attr(''sensor.recycleapp_pmd'',
-        ''Days-until'', 1) %} PMD {% endif %} {% if is_state_attr(''sensor.recycleapp_papier'',
-        ''Days-until'', 1) %} Papier {% endif %}
+        ''Days_until'', 1) %} PMD {% endif %} {% if is_state_attr(''sensor.recycleapp_papier'',
+        ''Days_until'', 1) %} Papier {% endif %}
 
         '
       data:
