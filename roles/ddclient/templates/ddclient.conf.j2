@@ -18,7 +18,7 @@ password={{ cloudflare_api_token }}             \
 {% for pub_domain in (domains.fraise.proxy + domains.fraise.direct) -%}
 {%- if pub_domain.name == "@" -%}
 frai.se
-{%- else -%}
+{%- elif pub_domain.ipv4 is not defined -%}
 {{ pub_domain.name }}.frai.se
 {%- endif -%}
 {%- if not loop.last %},{% endif -%}

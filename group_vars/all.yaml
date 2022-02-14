@@ -51,7 +51,10 @@ domains:
       - name: matrix
       - name: "@"
       - name: unms
-    direct:
+    direct: #specific ipv4 at the front, no ipv4 = ddclient
+      - name: kingpin
+        ipv6: "2a0e:b107:1165:1034::1"
+        ipv4: "193.148.249.106"
       - name: roadwarrior
         ipv6: 2a0e:b107:1165:1::1
       - name: coturn
@@ -60,9 +63,6 @@ domains:
         ipv6: 2a0e:b107:1165:35::1
       - name: syncthing
         ipv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.syncthing }}"
-      - name: kingpin
-        ipv6: "2a0e:b107:1165:1034::1"
-        ipv4: "193.148.249.106"
     local: []
   unitix:
     proxy:

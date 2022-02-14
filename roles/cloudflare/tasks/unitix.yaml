@@ -8,6 +8,7 @@
     account_api_token: "{{ cloudflare_api_token }}"
     proxied: yes
     state: present
+    solo: true
   loop: "{{ domains.unitix.proxy }}"
 
 
@@ -21,6 +22,7 @@
     account_api_token: "{{ cloudflare_api_token }}"
     proxied: yes
     state: present
+    solo: true
   loop: "{{ domains.unitix.proxy }}"
 
 - name: set non-proxied cname records for gsuite
@@ -33,6 +35,7 @@
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
+    solo: true
   with_items:
     - calendar
     - drive

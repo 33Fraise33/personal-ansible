@@ -8,6 +8,7 @@
     account_api_token: "{{ cloudflare_api_token }}"
     proxied: yes
     state: present
+    solo: true
   loop: "{{ domains.fraise.proxy }}"
 
 - name: set proxied aaaa records
@@ -20,6 +21,7 @@
     account_api_token: "{{ cloudflare_api_token }}"
     proxied: yes
     state: present
+    solo: true
   loop: "{{ domains.fraise.proxy }}"
 
 - name: set non proxied a records
@@ -31,6 +33,7 @@
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
+    solo: true
   loop: "{{ domains.fraise.direct }}"
 
 - name: set non proxied aaaa records
@@ -42,6 +45,7 @@
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
+    solo: true
   loop: "{{ domains.fraise.direct }}"
 
 - name: set proxied cname records
@@ -54,6 +58,7 @@
     account_api_token: "{{ cloudflare_api_token }}"
     proxied: yes
     state: present
+    solo: true
   with_items:
     - { record: 'calendar', value: 'ghs.googlehosted.com'}
     - { record: 'drive', value: 'ghs.googlehosted.com'}
@@ -69,6 +74,7 @@
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
     state: present
+    solo: true
   with_items:
     - { record: 'sil', value: 'b4a00aa9382d.sn.mynetname.net'}
     - { record: 'dad', value: '8a7709c681f5.sn.mynetname.net'}
