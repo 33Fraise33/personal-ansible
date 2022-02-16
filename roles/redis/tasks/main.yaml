@@ -1,0 +1,21 @@
+# redis from: https://hub.docker.com/_/redis
+
+- name: Start redis docker container
+  docker_container:
+    name: redis
+    image: redis:alpine
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.redis }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.redis }}"
+    purge_networks: yes
+    user: "{{ nobody.user }}:{{ nobody.group }}"
+    env:
+      SYNAPSE_CONFIG_DIR: "/config"
+      TZ: "Europe/Brussels"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

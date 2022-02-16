@@ -99,7 +99,6 @@ docker_network:
     redis: 33
     postgres: 34
     nginx: 35
-    netbox_worker: 36
     unbound: 37
     acserver: 38
     impostor: 39

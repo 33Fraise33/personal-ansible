@@ -1,0 +1,15 @@
+- name: Setup redis
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - redis
+  tags: redis
+
+- name: Setup netbox
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - netbox
+  tags: netbox
