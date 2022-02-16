@@ -140,6 +140,11 @@ services:
         logo: "https://i.imgur.com/17hyHHu.png"
         url: "https://unms.frai.se"
         subtitle: "Ubiquiti network management"
+      - name: "Netbox"
+        logo: "https://raw.githubusercontent.com/netbox-community/netbox/develop/docs/netbox_logo.svg"
+        url: "https://netbox.frai.se"
+        subtitle: "IPAM Tool"
+        tag: wireguard
   - name: "Monitoring"
     icon: "fab fa-cloudscale"
     items:
