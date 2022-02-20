@@ -1,5 +1,12 @@
 # redis from: https://hub.docker.com/_/redis
 
+- name: set overcommit_memory to 1 for redis
+  ansible.posix.sysctl:
+    name: vm.overcommit_memory
+    value: '1'
+    state: present
+    reload: yes
+
 - name: Start redis docker container
   docker_container:
     name: redis
@@ -9,7 +16,6 @@
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.redis }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.redis }}"
     purge_networks: yes
-    user: "{{ nobody.user }}:{{ nobody.group }}"
     env:
       SYNAPSE_CONFIG_DIR: "/config"
       TZ: "Europe/Brussels"
