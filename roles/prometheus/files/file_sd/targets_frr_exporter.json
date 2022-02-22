@@ -1,0 +1,11 @@
+[
+    {
+      "labels": {
+        "job": "frr_exporter",
+        "tenant": "VORMIR",
+        "node_name": "KINGPIN"
+      },
+      "targets": ["[2a0e:b107:1941::1]:9342"]
+    }
+  ]
+  

@@ -66,6 +66,12 @@ scrape_configs:
     - files:
       - '/config/file_sd/targets_node_exporter*.json'
 
+  - job_name: 'frr_exporter'
+    scrape_interval: 15s
+    file_sd_configs:
+    - files:
+      - '/config/file_sd/targets_frr_exporter*.json'
+
   - job_name: 'windows_exporter'
     scrape_interval: 15s
     file_sd_configs:
