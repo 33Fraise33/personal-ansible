@@ -5,7 +5,7 @@
         "tenant": "VORMIR",
         "node_name": "KINGPIN"
       },
-      "targets": ["[2a0e:b107:1941::1]:9342"]
+      "targets": ["[2a12:4946:4001::1]:9342"]
     }
   ]
   

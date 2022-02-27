@@ -41,7 +41,7 @@ cloudflare_api_email: !vault |
           35643561613562366534383132626530663937386638356630306637373066623336
 
 domains:
-  ipv6_proxy: "2a0e:b107:1165:333::10"
+  ipv6_proxy: "2a12:4946:4000:333::10"
   fraise:
     proxy:
       - name: acserver
@@ -53,14 +53,14 @@ domains:
       - name: unms
     direct: #specific ipv4 at the front, no ipv4 = ddclient
       - name: kingpin
-        ipv6: "2a0e:b107:1165:1034::1"
+        ipv6: "2a12:4946:4001::1"
         ipv4: "193.148.249.106"
       - name: roadwarrior
-        ipv6: 2a0e:b107:1165:1::1
+        ipv6: "2a12:4946:4000::1"
       - name: coturn
         ipv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.coturn }}"
       - name: wireguard
-        ipv6: 2a0e:b107:1165:35::1
+        ipv6: 2a12:4946:4000:35::1
       - name: syncthing
         ipv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.syncthing }}"
     local: []
@@ -72,7 +72,7 @@ domains:
 
 docker_network:
   ipv4_prefix: "10.33.0."
-  ipv6_prefix: "2a0e:b107:1940:333::"
+  ipv6_prefix: "2a12:4946:4000:333::"
   hosts:
     traefik: 10
     plex: 11
