@@ -119,3 +119,4 @@ docker_network:
     netboot: 54
     coturn: 55
     maubot: 56
+    flaresolverr: 57

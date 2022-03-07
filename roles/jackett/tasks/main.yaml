@@ -35,3 +35,20 @@
       traefik.http.routers.jackett.tls: "true"
       traefik.http.routers.jackett.tls.certresolver: "le"
       traefik.http.services.jackett.loadbalancer.server.port: "9117"
+
+- name: setup flaresolverr docker container
+  docker_container:
+    name: flaresolverr
+    image: flaresolverr/flaresolverr:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.flaresolverr }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.flaresolverr }}"
+    purge_networks: yes
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
+
