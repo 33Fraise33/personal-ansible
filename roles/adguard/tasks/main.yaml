@@ -1,0 +1,43 @@
+# container from: https://hub.docker.com/r/adguard/adguardhome
+
+- name: create adguard directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  with_items:
+    - "{{ docker_config_location }}/adguard"
+    - "{{ docker_data_location }}/adguard"
+
+- name: setup adguard docker container
+  docker_container:
+    name: adguard
+    image: adguard/adguardhome:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.adguard }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.adguard }}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_data_location }}/adguard:/opt/adguardhome/work"
+      - "{{ docker_config_location }}/adguard:/opt/adguardhome/conf"
+    restart: yes
+    restart_policy: always
+    state: started
+    labels:
+      traefik.http.routers.adguard.tls: "true"
+      traefik.http.routers.adguard.tls.certresolver: "le"
+      traefik.http.services.adguard.loadbalancer.server.port: "80"
+
+- name: copy config file
+  template: 
+    src: AdGuardHome.yaml.j2
+    dest: "{{ docker_config_location }}/adguard/AdGuardHome.yaml"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart adguard
+  tags: config
+

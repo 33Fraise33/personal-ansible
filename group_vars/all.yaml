@@ -120,3 +120,5 @@ docker_network:
     coturn: 55
     maubot: 56
     flaresolverr: 57
+    adguard: 60
+

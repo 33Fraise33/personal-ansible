@@ -28,3 +28,11 @@
   roles:
     - pihole
   tags: pihole
+
+- name: Setup adguard
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - adguard
+  tags: adguard

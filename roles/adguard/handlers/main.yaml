@@ -1,0 +1,4 @@
+- name: restart adguard
+  docker_container:
+    name: adguard
+    restart: yes
