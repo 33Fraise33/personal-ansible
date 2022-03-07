@@ -25,24 +25,24 @@
   with_items:
     - adlists.list
 
-- name: get uklans github repo
-  git:
-    repo: https://github.com/uklans/cache-domains
-    dest: "{{ docker_data_location }}/pihole/lancache/"
-    force: yes
+# - name: get uklans github repo
+#   git:
+#     repo: https://github.com/uklans/cache-domains
+#     dest: "{{ docker_data_location }}/pihole/lancache/"
+#     force: yes
 
-- name: copy lancache template files
-  template:
-    src: "{{ item.name }}.j2"
-    dest: "{{ docker_data_location }}/pihole/lancache/scripts/{{ item.name }}"
-    owner: root
-    group: root
-    mode: "{{ item.mode }}"
-  with_items:
-    - name: config.json
-      mode: "0644"
-    - name: copy-files.sh
-      mode: "0755"
+# - name: copy lancache template files
+#   template:
+#     src: "{{ item.name }}.j2"
+#     dest: "{{ docker_data_location }}/pihole/lancache/scripts/{{ item.name }}"
+#     owner: root
+#     group: root
+#     mode: "{{ item.mode }}"
+#   with_items:
+#     - name: config.json
+#       mode: "0644"
+#     - name: copy-files.sh
+#       mode: "0755"
 
 - name: copy custom domains template file
   template:
@@ -52,12 +52,12 @@
     group: root
     mode: 0644
 
-- name: Create new lancache domains at midnight
-  ansible.builtin.cron:
-    name: "update lancache domains"
-    minute: "15"
-    hour: "4"
-    job: " {{ docker_data_location }}/pihole/lancache/scripts/copy-files.sh"
+# - name: Create new lancache domains at midnight
+#   ansible.builtin.cron:
+#     name: "update lancache domains"
+#     minute: "15"
+#     hour: "4"
+#     job: " {{ docker_data_location }}/pihole/lancache/scripts/copy-files.sh"
 
 - name: setup pihole docker container
   docker_container:
