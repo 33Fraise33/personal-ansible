@@ -80,16 +80,16 @@
 - name: create admin user
   command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u {{ synapse_admin }} -p {{ synapse_admin_password }} -a https://{{ matrix_base_url }}"
   tags: synapse
+  ignore_errors: true
 
-# Doesn't work behind nat.
 - import_tasks: coturn.yaml
   tags: coturn
 
 - import_tasks: maubot.yaml
   tags: maubot
 
-# - import_tasks: telegram.yaml
-#   tags: telegram,bridges
-#
+- import_tasks: telegram.yaml
+  tags: telegram,bridges
+
 - import_tasks: whatsapp.yaml
   tags: whatsapp,bridges
