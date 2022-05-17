@@ -29,6 +29,7 @@
     purge_networks: yes
     volumes:
       - "{{ docker_data_location }}/homer:/www/assets"
+    user: "{{ nobody.user }}:{{ nobody.group }}"
     env:
       UID: "{{ nobody.user }}"
       GID: "{{ nobody.group }}"

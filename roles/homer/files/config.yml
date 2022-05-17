@@ -1,42 +1,13 @@
 ---
-# Homepage configuration
-# See https://fontawesome.com/icons for icons options
-
 title: "frai.se"
 subtitle: "Welcome"
 logo: "https://i.imgur.com/UgSg9YM.png"
-# icon: "fas fa-skull-crossbones" # Optional icon
 
 header: true
 footer: '<p>Created with <a href="https://bulma.io/">bulma</a>, <a href="https://vuejs.org/">vuejs</a> & <a href="https://fontawesome.com/">font awesome</a> // Fork me on <a href="https://github.com/bastienwirtz/homer"><i class="fab fa-github-alt"></i></a></p>' # set false if you want to hide it.
 
 connectivityCheck: true
 
-# Optionnal theme customization
-theme: default
-colors:
-  light:
-    highlight-secondary: "#009688"
-    highlight-primary: "#00796B"
-    highlight-hover: "#B2DFDB"
-    background: "#131313"
-    card-background: "#2b2b2b"
-    text: "#eaeaea"
-    text-header: "#ffffff"
-    text-title: "#fafafa"
-    text-subtitle: "#f5f5f5"
-    card-shadow: rgba(0, 0, 0, 0.4)
-    link-hover: "#ffdd57"
-
-# Optional message
-#message:
-  #url: https://b4bz.io
-  #style: "is-dark" # See https://bulma.io/documentation/components/message/#colors for styling options.
-  #title: "👋 Demo !"
-  #content: "This is a dummy homepage demo. <br /> Find more information on <a href='https://github.com/bastienwirtz/homer'>github.com/bastienwirtz/homer</a>"
-
-# Optional navbar
-# links: [] # Allows for navbar (dark mode, layout, and search) without any links
 links:
   - name: "Tweakers"
     icon: "fas fa-newspaper"
@@ -48,10 +19,16 @@ links:
     icon: "fab fa-google"
     url: "https://mail.google.com/a/unitix.be"
 
-# Services
-# First level array represent a group.
-# Leave only a "items" key if not using group (group name, icon & tagstyle are optional, section separation will not be displayed).
 services:
+  - name: "General"
+    items: 
+      - name: "Weather"
+        location: "Snellegem" # your location.
+        locationId: "2800931" # Optional: Specify OpenWeatherMap city ID for better accuracy
+        apikey: "764e8e14f29b99d46879c300dc142113" # insert your own API key here. Request one from https://openweathermap.org/api.
+        units: "metric" # units to display temperature. Can be one of: metric, imperial, kelvin. Defaults to kelvin.
+        background: "square" # choose which type of background you want behind the image. Can be one of: square, cicle, none. Defaults to none.
+        type: "OpenWeather"
   - name: "Services"
     icon: "fas fa-layer-group"
     items:
@@ -69,17 +46,6 @@ services:
         url: "https://maubot.frai.se/_matrix/maubot"
         subtitle: "Matrix Assistant Bot"
         tag: wireguard
-  - name: "Gaming"
-    icon: "fas fa-gamepad"
-    items:
-      - name: "ACServer"
-        logo: "https://i.imgur.com/cf7S3Xe.png"
-        url: "https://acserver.frai.se"
-        subtitle: "AC Server Frontend"
-      - name: "ACCServer"
-        logo: "https://i.imgur.com/cf7S3Xe.png"
-        url: "https://accserver.frai.se"
-        subtitle: "ACC Server Frontend"
   - name: "Media"
     icon: "fas fa-photo-video"
     items:
@@ -117,19 +83,22 @@ services:
   - name: "Networking"
     icon: "fas fa-ethernet"
     items:
-      - name: "Pi-Hole"
-        logo: "https://upload.wikimedia.org/wikipedia/commons/0/00/Pi-hole_Logo.png"
-        url: "https://pihole.frai.se"
+      - name: "Adguard Home"
+        logo: "https://upload.wikimedia.org/wikipedia/commons/4/48/AdGuard_Logo.png"
+        url: "https://adguard.frai.se"
         subtitle: "Network wide ad-blocker"
+        type: "AdGuardHome"
         tag: wireguard
       - name: "Mikrotik"
-        logo: "https://pbs.twimg.com/profile_images/479585638560182272/Qa8mmn1I.png"
-        url: "https://ironman.frai.se:8443"
+        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/MikroTik_Logo_%282022%29.svg/1024px-MikroTik_Logo_%282022%29.svg.png"
+        url: "https://ironman.frai.se"
         subtitle: "Web management router"
       - name: "Portainer"
         logo: "https://avatars1.githubusercontent.com/u/22225832"
         url: "https://portainer.frai.se"
         subtitle: "Container orchestrator"
+        type: "Portainer"
+        apikey: "ptr_R/HGcMbUAnR57SoAbwkOMNEYufDrfAeAGkrS0ffRTMY="
         tag: wireguard
       - name: "Traefik"
         logo: "https://blog.carroarmato0.be/content/images/2019/02/traefik.logo.bright@3x.svg"
@@ -158,6 +127,7 @@ services:
         subtitle: "Monitoring metrics database"
         tag: wireguard
         url: "http://10.33.0.23:9090/"
+        type: "Prometheus"
       - name: "Upptime"
         subtitle: "Github Pages powered Monitoring"
         logo: "https://upptime.js.org/img/icon.svg"
