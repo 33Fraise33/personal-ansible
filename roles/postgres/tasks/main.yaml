@@ -1,4 +1,7 @@
 # https://hub.docker.com/_/postgres
+# update: do pg_dumpall -U user -W -f /backupfilename.sql
+# restore: docker exec -it postgres /bin/bash
+# psql -U db_admin < /backup/backupfile.sql
 
 - name: create postgres data directory
   file:
@@ -20,7 +23,6 @@
     purge_networks: yes
     volumes:
       - "{{ docker_data_location }}/postgres:/var/lib/postgresql/data"
-    user: "{{ nobody.user }}:{{ nobody.group }}"
     env:
       POSTGRES_USER: "{{ postgres_user }}"
       POSTGRES_PASSWORD: "{{ postgres_password }}"
