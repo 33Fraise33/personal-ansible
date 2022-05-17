@@ -77,22 +77,27 @@ dns:
   parental_cache_size: 1048576
   cache_time: 30
   rewrites:
-  - domain: 'wireguard.frai.se'
+  - domain: wireguard.frai.se
     answer: 172.16.33.1
-  - domain: 'wireguard.frai.se'
+  - domain: wireguard.frai.se
     answer: 2a12:4946:4000:35::1
-  - domain: 'coturn.frai.se'
+  - domain: coturn.frai.se
     answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.coturn }}
-  - domain: 'coturn.frai.se'
+  - domain: coturn.frai.se
     answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.coturn }}
   - domain: '*.frai.se'
     answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
   - domain: '*.frai.se'
     answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
+  - domain: frai.se
+    answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
+  - domain: frai.se
+    answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
   - domain: '*.unitix.be'
     answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
   - domain: '*.unitix.be'
     answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
+
   blocked_services: []
   upstream_timeout: 10s
   local_domain_name: lan

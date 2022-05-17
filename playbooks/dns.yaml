@@ -3,7 +3,7 @@
   gather_facts: false
   tasks:
     - community.general.ipify_facts: # generates "ipify_public_ip" var with public ipv4 inside
-  tags: always
+  tags: always,ipify
 
 - name: Set Cloudflare DNS Records
   hosts: localhost
