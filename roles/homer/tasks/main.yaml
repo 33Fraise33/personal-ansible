@@ -10,8 +10,8 @@
     group: "{{ nobody.group }}"
 
 - name: copy config file
-  copy:
-    src: config.yml
+  template:
+    src: config.yml.j2
     dest: "{{ docker_data_location }}/homer/config.yml"
     mode: 0644
     owner: "{{ nobody.user }}"
