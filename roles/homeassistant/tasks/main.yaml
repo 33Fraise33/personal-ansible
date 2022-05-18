@@ -3,12 +3,15 @@
 
 - name: create homeassistant config directory
   file:
-    path: /data/homeassistant
+    path: /data/homeassistant/{{ item }}
     state: directory
     mode: 0755
     owner: root
     group: root
     recurse: yes
+  loop:
+    - config
+    - media
 
 - name: setup homeassistant docker container
   docker_container:
@@ -23,6 +26,7 @@
     purge_networks: yes
     volumes:
       - "/data/homeassistant/config:/config"
+      - "/data/homeassistant/media:/media"
     env:
       TZ: "Europe/Brussels"
     restart: yes

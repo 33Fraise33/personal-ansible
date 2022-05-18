@@ -23,7 +23,7 @@
       above: '0'
       entity_id: sensor.recycleapp_papier
   action:
-  - service: notify.mobile_app_amelle
+  - service: notify.mobile_app_pixel6_gianni
     data:
       title: AFVAL
       message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days_until'',
@@ -33,12 +33,12 @@
 
         '
       data:
-        url: /lovelace/default_view
-        attachment:
-          url: https://i.pinimg.com/originals/86/d9/27/86d92784a2c535e3bd783aec01bd1475.png
-          content-type: png
-          hide-thumbnail: false
-  - service: notify.mobile_app_pixel6_gianni
+        actions:
+        - action: URI
+          title: Show Calendar
+          uri: /lovelace/default_view
+        icon_url: https://i.pinimg.com/originals/86/d9/27/86d92784a2c535e3bd783aec01bd1475.png
+  - service: notify.mobile_app_sm_s901b
     data:
       title: AFVAL
       message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days_until'',
@@ -64,39 +64,15 @@
     for: 00:05:00
   condition: []
   action:
-  - service: notify.mobile_app_giannipe11
-    data:
-      title: Garage Open
-      message: Garage has been open for more then 5 minutes!
-      data:
-        actions:
-        - action: garage_close
-          title: Close Garage
-        icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
-  - service: notify.mobile_app_amelle
+  - service: notify.mobile_app_pixel6_gianni
     data:
       message: Garage has been open for more then 5 minutes!
       title: Garage Open
       data:
         url: /lovelace/default_view
-        attachment:
-          url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
-          content-type: png
-          hide-thumbnail: false
-  mode: single
-- id: '1617016680980'
-  alias: garage_close
-  description: ''
-  trigger:
-  - platform: event
-    event_type: mobile_app_notification_action
-    event_data:
-      action: garage_close
-  condition: []
-  action:
-  - service: switch.toggle
-    target:
-      device_id: 8ebff199f4bbefc898a58590609909d2
+        icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
+  - service: notify.mobile_app_sm_s901b
+    data: {}
   mode: single
 - id: '1629316694097'
   alias: Turn off ledstrip when pc goes off
@@ -171,16 +147,16 @@
         ttl: 0
         priority: high
         channel: alarm_stream
-  - service: notify.mobile_app_amelle
+  - service: notify.mobile_app_sm_s901b
     data:
-      message: Someone at the door
       title: DING DONG
+      message: TTS
       data:
-        push:
-          sound:
-            name: US-EN-Morgan-Freeman-Someone-Is-Arriving.wav
-            critical: 1
-            volume: 0.8
+        importance: high
+        vibrationPattern: 100, 1000, 100, 1000, 100
+        ttl: 0
+        priority: high
+        channel: alarm_stream
   - service: media_player.volume_set
     data:
       volume_level: 0.5
@@ -248,4 +224,3 @@
       - 1efdce172f583ce2f3228a207375c615
       - c1325734b3404d4d8390c4d1ad656a06
   mode: single
-
