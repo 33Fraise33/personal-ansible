@@ -23,9 +23,9 @@
   {
     "labels": {
       "job": "blackbox_http",
-      "node_name": "pihole"
+      "node_name": "adguard"
     },
-    "targets": ["https://pihole.frai.se/admin/index.php"]
+    "targets": ["https://adguard.frai.se/login.html"]
   },
   {
     "labels": {
@@ -72,8 +72,22 @@
   {
     "labels": {
       "job": "blackbox_http",
-      "node_name": "acserver"
+      "node_name": "status"
     },
-    "targets": ["https://acserver.frai.se"]
+    "targets": ["https://status.frai.se"]
+  },
+  {
+    "labels": {
+      "job": "blackbox_http",
+      "node_name": "netbox"
+    },
+    "targets": ["https://netbox.frai.se"]
+  },
+  {
+    "labels": {
+      "job": "blackbox_http",
+      "node_name": "matrix"
+    },
+    "targets": ["https://matrix.frai.se/_matrix/static/"]
   }
 ]
