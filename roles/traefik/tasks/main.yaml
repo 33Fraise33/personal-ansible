@@ -37,7 +37,7 @@
       - --entryPoints.web.http.redirections.entryPoint.to=web-secure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entryPoints.web-secure.address=:443
-      - --entryPoints.web-secure.http.middlewares=mywhitelist@file
+      # - --entryPoints.web-secure.http.middlewares=mywhitelist@file
       - --entryPoints.traefik.address=:8080
       - --api=true
       - --api.insecure=true
