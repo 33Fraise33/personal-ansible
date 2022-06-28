@@ -1,14 +1,10 @@
 # setup watchtower with a docker container
 # container from: https://www.portainer.io/installation/
 
-- name: setup watchtower on captain
+- name: setup watchtower
   docker_container:
     name: watchtower
     image: containrrr/watchtower:latest
-    networks:
-      - name: macvlan50
-        ipv4_address: "172.16.50.67"
-    purge_networks: yes
     command: --cleanup --interval 7200
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -18,23 +14,3 @@
     pull: true
     labels:
       traefik.enable: "false"
-  when: ansible_hostname == "captain"
-
-- name: setup watchtower on hulk
-  docker_container:
-    name: watchtower
-    image: containrrr/watchtower:latest
-    networks:
-      - name: macvlan50
-        ipv4_address: "172.16.50.68"
-    purge_networks: yes
-    command: --cleanup --interval 7200
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    restart: yes
-    state: started
-    restart_policy: always
-    pull: true
-    labels:
-      traefik.enable: "false"
-  when: inventory_hostname == "hulk"
