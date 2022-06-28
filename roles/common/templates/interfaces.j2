@@ -1,0 +1,30 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# Description: the loopback network interface
+auto lo
+iface lo inet loopback
+
+{% for intf in interfaces %}
+{%  if intf.description is defined %}
+### Description: {{ intf.description }}
+{%  endif%}
+auto {{ intf.name }}
+iface {{ intf.name }} inet {{ intf.mode }}
+{%  if intf.mode == "static" %}
+	address {{ intf.ip }}
+	gateway {{ intf.gateway }}
+{%    if intf.dns is defined %}
+	dns-nameservers {{ intf.dns }}
+{%    endif%}
+{%    if intf.metric is defined %}
+	metric {{ intf.metric }}
+{%    endif%}
+{%    if intf.mac is defined %}
+	hw-address {{ intf.mac }}
+{%    endif%}
+{%  endif%}
+
+{% endfor %}

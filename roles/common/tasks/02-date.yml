@@ -1,0 +1,13 @@
+- name: DATE - Set timezone to UTC
+  timezone:
+    name: "Etc/UTC"
+
+- name: DATE - Install ntp package
+  apt:
+    name: ntp
+
+- name: DATE - Enable & start ntp
+  systemd:
+    name: ntp
+    state: started
+    enabled: yes

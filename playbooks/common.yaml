@@ -1,8 +1,15 @@
 # for initial run don't forget --ask-become-pass and --ask-pass
 
-- hosts: all
+- name: Run common role
+  hosts: all
+  gather_facts: false
   connection: ssh
   become: true
-  # become_method: su # initial run
+  vars_prompt:
+    - name: initial_setup
+      prompt: Is this the initial setup [yes/no]
+      private: false
+      default: "no"
   roles:
     - common
+

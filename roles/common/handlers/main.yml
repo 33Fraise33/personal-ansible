@@ -1,18 +1,19 @@
-- name: restart sshd
-  service:
-    name: sshd
-    state: restarted
-
 - name: restart node_exporter
   systemd:
     daemon_reload: true
     name: node_exporter
     state: restarted
     enabled: yes
+  become: true
 
-- name: restart cronie
+- name: restart sshd
   systemd:
-    daemon_reload: true
-    name: cronie
+    name: sshd
     state: restarted
     enabled: yes
+  become: true
+
+- name: restart networking
+  systemd:
+    name: networking
+    state: restarted

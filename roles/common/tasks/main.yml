@@ -1,0 +1,34 @@
+
+- name: Initial Setup tasks for clean host
+  include_tasks:
+    file: 00-setup.yml
+    apply:
+      tags:
+        - setup
+  vars:
+    ansible_port: 22
+  when: initial_setup == "yes"
+
+- name: gather host facts
+  ansible.builtin.setup:
+
+- import_tasks: 01-hostname.yml
+  tags: hostname
+
+- import_tasks: 02-date.yml
+  tags: date
+
+- import_tasks: 03-users.yml
+  tags: users
+
+- import_tasks: 04-packages.yml
+  tags: packages
+
+- import_tasks: 05-dns.yml
+  tags: dns
+
+- import_tasks: 06-node_exporter.yml
+  tags: dns
+
+- import_tasks: 07-networking.yml
+  tags: networking

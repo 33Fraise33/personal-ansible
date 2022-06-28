@@ -1,0 +1,44 @@
+
+- name: USER - Add to host
+  user:
+    name: "{{ item.user }}"
+    comment: "{{ item.name }}"
+    groups: sudo
+    shell: /bin/bash
+    append: yes
+  loop: "{{ admin_users }}"
+  loop_control:
+    label: "{{ item.user }}"
+
+- name: USER - Set authorized key taken from file
+  authorized_key:
+    user: "{{ item.user }}"
+    state: present
+    key: "{{ item.ssh_key }}"
+  loop: "{{ admin_users }}"
+  loop_control:
+    label: "{{ item.user }}"
+
+- name: USER - Allow sudo user group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+
+- name: USER - Change ssh configs
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^(# *)?PermitRootLogin', line: 'PermitRootLogin no'}
+    - { regexp: '^(# *)?UsePAM ', line: 'UsePAM yes'}
+    - { regexp: '^(# *)?PasswordAuthentication ', line: 'PasswordAuthentication no'}
+  notify: restart sshd
+
+- name: USER - delete debian user from host
+  user:
+    name: "debian"
+    state: absent
+  when: ansible_user is not defined or ansible_user != "debian"
