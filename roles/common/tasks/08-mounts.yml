@@ -1,0 +1,42 @@
+- name: make data mountpoint
+  file:
+    state: directory
+    path: /data
+    owner: nobody
+    group: nogroup
+    mode: 0775
+
+- name: Read device information (always use unit when probing)
+  community.general.parted: device=/dev/{{ item }}
+  register: item_info
+  loop:
+    - vda
+
+- name: Partition harddrives if needed
+  community.general.parted:
+    device: /dev/{{ item }}
+    number: 1
+    state: present
+  when: item_info.results[item_index].partitions|length<=0
+  loop:
+    - vda
+  loop_control:
+    index_var: item_index
+
+- name: initiate filesystem on partitions if needed
+  filesystem:
+     fstype: ext4
+     dev: /dev/{{ item }}
+     force: yes
+  when: item_info.results[item_index].partitions|length<=0
+  loop:
+    - vda1
+  loop_control:
+    index_var: item_index
+
+- name: mount data drive
+  mount:
+    name: /data
+    src: /dev/vda1
+    fstype: ext4
+    state: mounted

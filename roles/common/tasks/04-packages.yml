@@ -19,6 +19,7 @@
           - nmap
           - ntp   
           - mtr
+          - parted
           - python3-pip
           - traceroute
           - tcpdump
