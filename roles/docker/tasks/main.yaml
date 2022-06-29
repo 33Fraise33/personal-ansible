@@ -27,8 +27,30 @@
         state: latest
   when: ansible_os_family == "Archlinux"
 
+- name: create systemd config directory
+  file:
+    path: /etc/systemd/system/docker.service.d/
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: change docker startup command
+  template:
+    src: "{{ item.file }}.j2"
+    dest: "{{ item.location }}{{ item.file }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - { file: override.conf, location: /etc/systemd/system/docker.service.d/ }
+  notify: restart docker
+
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
+
 - name: enable docker service
-  service:
+  systemd:
     name: docker
     state: started
     enabled: yes
@@ -63,14 +85,6 @@
         gateway: '172.16.50.1'
         iprange: 172.16.50.64/29
 
-- name: create systemd config directory
-  file:
-    path: /etc/systemd/system/docker.service.d/
-    state: directory
-    mode: 0755
-    owner: root
-    group: root
-
 - name: change docker vars (including default subnet)
   copy:
     src: "{{ item.file }}"
@@ -80,7 +94,6 @@
     mode: 0644
   with_items:
     - { file: daemon.json, location: /etc/docker/ }
-    - { file: override.conf, location: /etc/systemd/system/docker.service.d/ }
   notify: restart docker
 
 - name: Log into DockerHub
