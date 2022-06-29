@@ -21,13 +21,13 @@
     - ddclient
   tags: ddclient
 
-- name: Setup pihole
-  hosts: compute
+- name: Setup unbound
+  hosts: all
   connection: ssh
   become: true
   roles:
-    - pihole
-  tags: pihole
+    - unbound
+  tags: unbound
 
 - name: Setup adguard
   hosts: compute

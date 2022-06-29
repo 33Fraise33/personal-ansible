@@ -1,14 +1,9 @@
 # install lancache from: http://lancache.net/docs/containers/monolithic/
 
-- name: create lancache directory
-  file:
-    path: "{{ docker_data_location }}/lancache/cache"
-    state: directory
-    mode: 0755
-    owner: "{{ nobody.user }}"
-    group: "{{ nobody.group }}"
-    recurse: yes
-
+- name: Create a volume for lancache
+  docker_volume:
+    name: lancache_volume
+    
 - name: setup lancache docker container
   docker_container:
     name: lancache
@@ -22,7 +17,7 @@
       CACHE_MAX_AGE: "365d"
     purge_networks: yes
     volumes:
-      - "{{ docker_data_location }}/lancache/cache:/data/cache"
+      - "lancache_volume:/data/cache"
     restart: yes
     restart_policy: always
     state: started

@@ -1,0 +1,30 @@
+- name: get uklans github repo
+  git:
+    repo: https://github.com/uklans/cache-domains
+    dest: "{{ docker_config_location }}/unbound/lancache/"
+    force: yes
+
+- name: Install jq package for cache domain script
+  apt:
+    name: 
+      - jq
+
+- name: copy lancache template files
+  template:
+    src: "{{ item.name }}.j2"
+    dest: "{{ docker_config_location }}/unbound/lancache/scripts/{{ item.name }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  with_items:
+    - name: config.json
+      mode: "0644"
+    - name: copy-files.sh
+      mode: "0755"
+
+- name: Create new lancache domains at midnight
+  ansible.builtin.cron:
+    name: "update lancache domains"
+    minute: "15"
+    hour: "4"
+    job: " {{ docker_config_location }}/unbound/lancache/scripts/copy-files.sh"

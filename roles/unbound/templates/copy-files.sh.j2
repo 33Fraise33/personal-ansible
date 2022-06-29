@@ -1,0 +1,6 @@
+#!/bin/bash
+cd {{ docker_config_location }}/unbound/lancache/
+git pull
+cd {{ docker_config_location }}/unbound/lancache/scripts
+./create-unbound.sh
+docker restart unbound

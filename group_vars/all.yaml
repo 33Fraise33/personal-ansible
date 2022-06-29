@@ -5,7 +5,7 @@ nobody:
   group: "65534"
   user: "65534"
 
-docker_config_location: /docker
+docker_config_location: /data/docker-config
 docker_data_location: /data/docker
 matrix_base_url: matrix.frai.se
 
