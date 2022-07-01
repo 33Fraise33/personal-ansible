@@ -1,42 +1,55 @@
-- name: make data mountpoint
+- name: make mountpoints
   file:
     state: directory
-    path: /data
+    path: /{{ item }}
     owner: nobody
     group: nogroup
     mode: 0775
+  loop: 
+    - data
+    - lancache
 
 - name: Read device information (always use unit when probing)
-  community.general.parted: device=/dev/{{ item }}
+  community.general.parted: device=/dev/disk/by-id/{{ item }}
   register: item_info
   loop:
-    - vda
+    - scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
+    - scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
 
 - name: Partition harddrives if needed
   community.general.parted:
-    device: /dev/{{ item }}
+    device: /dev/disk/by-id/{{ item }}
     number: 1
     state: present
   when: item_info.results[item_index].partitions|length<=0
   loop:
-    - vda
+    - scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
+    - scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
   loop_control:
     index_var: item_index
 
 - name: initiate filesystem on partitions if needed
   filesystem:
      fstype: ext4
-     dev: /dev/{{ item }}
+     dev: /dev/disk/by-id/{{ item }}
      force: yes
   when: item_info.results[item_index].partitions|length<=0
   loop:
-    - vda1
+    - scsi-0QEMU_QEMU_HARDDISK_drive-scsi1-part1
+    - scsi-0QEMU_QEMU_HARDDISK_drive-scsi2-part1
   loop_control:
     index_var: item_index
+
+- name: mount lancache drive
+  mount:
+    name: /lancache
+    src: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2-part1
+    fstype: ext4
+    state: mounted
 
 - name: mount data drive
   mount:
     name: /data
-    src: /dev/vda1
+    src: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1-part1
     fstype: ext4
     state: mounted

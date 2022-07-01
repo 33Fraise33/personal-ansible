@@ -1,8 +1,4 @@
 # install lancache from: http://lancache.net/docs/containers/monolithic/
-
-- name: Create a volume for lancache
-  docker_volume:
-    name: lancache_volume
     
 - name: setup lancache docker container
   docker_container:
@@ -17,7 +13,7 @@
       CACHE_MAX_AGE: "365d"
     purge_networks: yes
     volumes:
-      - "lancache_volume:/data/cache"
+      - "/lancache:/data/cache"
     restart: yes
     restart_policy: always
     state: started
