@@ -1,11 +1,6 @@
-- name: create plex data directories
-  file:
-    path: "{{ item }}"
-    state: directory
-    mode: 0755
-  with_items:
-    - "{{ docker_config_location }}/plex/config"
-    - "/data/media"
+- name: Create a volume for plex config
+  docker_volume:
+    name: config_plex
 
 - name: setup plex docker container
   docker_container:
@@ -17,7 +12,7 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.plex }}"
     purge_networks: yes
     volumes:
-      - "{{ docker_config_location }}/plex/config:/config"
+      - "config_plex:/config"
       - "/data/media/movies:/movies"
       - "/data/media/series:/series"
     env:

@@ -1,17 +1,12 @@
 # install calibre, book db
 # https://registry.hub.docker.com/r/linuxserver/calibre
 
-- name: create calibre data directories
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ nobody.user }}"
-    group: "{{ nobody.group }}"
-    mode: 0775
-  with_items:
-    - "{{ docker_config_location }}/calibre"
-    - "{{ docker_config_location }}/calibre-web"
-  tags: always
+- name: Create a volume for calibre config
+  docker_volume:
+    name: "{{ item }}"
+  loop:
+    - config_calibre
+    - config_calibre-web
 
 - name: setup calibre docker container
   docker_container:
@@ -23,7 +18,7 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.calibre }}"
     purge_networks: yes
     volumes:
-      - "{{ docker_config_location }}/calibre:/config"
+      - "config_calibre:/config"
       - "/data/media:/media"
     env:
       PUID: "{{ nobody.user }}"
@@ -47,7 +42,7 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.calibre_web }}"
     purge_networks: yes
     volumes:
-      - "{{ docker_config_location }}/calibre-web:/config"
+      - "config_calibre-web:/config"
       - "/data/media/books:/books"
     env:
       PUID: "{{ nobody.user }}"

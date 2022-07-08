@@ -1,5 +1,5 @@
 - name: Setup Deluge
-  hosts: storage
+  hosts: all
   connection: ssh
   become: true
   roles:

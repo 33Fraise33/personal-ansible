@@ -1,6 +1,9 @@
 # install Deluge torrent client
 # https://hub.docker.com/r/linuxserver/deluge
 
+- name: Create a volume for deluge config
+  docker_volume:
+    name: config_deluge
 
 - name: create deluge data directories
   file:
@@ -10,8 +13,6 @@
     group: "{{ nobody.group }}"
     mode: 0775
   with_items:
-    - "{{ docker_config_location }}/deluge"
-    - "{{ docker_data_location }}/deluge/downloads"
     - "{{ docker_data_location }}/deluge/watch"
 
 - name: setup Deluge docker container
@@ -24,7 +25,7 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.deluge }}"
     purge_networks: yes
     volumes:
-      - "{{ docker_config_location }}/deluge:/config"
+      - "config_deluge:/config"
       - "/data/media:/data"
       - "{{ docker_data_location }}/deluge/watch:/watch"
     env:

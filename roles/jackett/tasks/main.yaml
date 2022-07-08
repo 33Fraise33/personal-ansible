@@ -1,14 +1,9 @@
 # setup jackett with a docker container
 # container from: https://hub.docker.com/r/linuxserver/jackett/
 
-- name: create jackett config directory
-  file:
-    path: "{{ docker_config_location }}/jackett"
-    state: directory
-    mode: 0755
-    owner: "{{ nobody.user }}"
-    group: "{{ nobody.group }}"
-    recurse: yes
+- name: Create a volume for jackett config
+  docker_volume:
+    name: config_jackett
 
 - name: setup jackett docker container
   docker_container:
@@ -20,7 +15,7 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.jackett }}"
     purge_networks: yes
     volumes:
-      - "{{ docker_config_location }}/jackett:/config"
+      - "config_jackett:/config"
       - "{{ docker_data_location }}/deluge/watch:/downloads"
     env:
       TZ: "Europe/Brussels"
