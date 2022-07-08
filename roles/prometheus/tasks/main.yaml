@@ -1,118 +1,59 @@
 # setup prometheus with a docker container
 # container from: https://prometheus.io/docs/prometheus/latest/installation/
 
-- name: create prometheus config directories
+- import_tasks: blackbox_exporter.yml
+  tags: blackbox
+
+- import_tasks: snmp_exporter.yml
+  tags: snmp
+
+- import_tasks: solaredge_exporter.yml
+  tags: solaredge
+  
+- import_tasks: speedtest_exporter.yml
+  tags: speedtest
+
+- name: Create a volume for prometheus data
+  docker_volume:
+    name: data_prometheus
+  tags: 
+    - prometheus
+
+- name: create prometheus config directory
   file:
-    path: /data/prometheus/{{ item }}
+    path: "{{ item }}"
     state: directory
     mode: 0755
-    owner: root
-    group: data
+    owner: "{{ nobody.group }}"
+    group: "{{ nobody.group }}"
+    recurse: yes
   with_items:
-    - main
-    - blackbox
-    - snmp_exporter
-    - data
-
-- name: copy blackbox config
-  copy:
-    src: blackbox.yml
-    dest: /data/prometheus/blackbox/blackbox.yml
-    owner: root
-    group: data
-    mode: 0755
-  tags:
-    - blackbox
-
-# port = 9115
-- name: setup prometheus blackbox exporter
-  docker_container:
-    name: prometheus-blackbox
-    image: prom/blackbox-exporter:latest
-    networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_blackbox}}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_blackbox}}"
-    purge_networks: yes
-    volumes:
-      - "/data/prometheus/blackbox:/config"
-    command: "--config.file=/config/blackbox.yml"
-    restart: yes
-    restart_policy: always
-    state: started
-    pull: true
-    labels:
-      traefik.enable: "false"
-  tags:
-    - blackbox
-
-- name: copy snmp config
-  copy:
-    src: snmp.yml
-    dest: /data/prometheus/snmp_exporter/snmp.yml
-    owner: root
-    group: data
-    mode: 0755
-  tags:
-    - snmp
-
-# port = 9116
-- name: setup prometheus snmp exporter
-  docker_container:
-    name: prometheus-snmp
-    image: prom/snmp-exporter:latest
-    networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}"
-    purge_networks: yes
-    volumes:
-      - "/data/prometheus/snmp_exporter:/config"
-    command: "--config.file=/config/snmp.yml"
-    restart: yes
-    restart_policy: always
-    state: started
-    pull: true
-    labels:
-      traefik.enable: "false"
-  tags:
-    - snmp
-
-# port = 9516
-- name: setup prometheus speedtest exporter
-  docker_container:
-    name: prometheus-speedtest
-    image: jraviles/prometheus_speedtest:latest
-    networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_speedtest }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_speedtest }}"
-    purge_networks: yes
-    restart: yes
-    restart_policy: always
-    state: started
-    pull: true
-    labels:
-      traefik.enable: "false"
+    - "{{ docker_config_location }}/prometheus"
+  tags: 
+    - prometheus
+    - config
 
 - name: copy prometheus config
   template:
     src: prometheus.yml.j2
-    dest: /data/prometheus/main/prometheus.yml
-    owner: root
-    group: data
+    dest: "{{ docker_config_location }}/prometheus/prometheus.yml"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
     mode: 0755
-  tags:
+  tags: 
+    - prometheus
     - config
 
 - name: copy prometheus files
   copy:
     src: file_sd/
-    dest: /data/prometheus/main/file_sd/
-    owner: root
-    group: data
+    dest: "{{ docker_config_location }}/prometheus/file_sd/"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
     mode: 0755
   tags:
+    - prometheus
+    - config
     - targets
 
 - name: setup prometheus docker container
@@ -124,20 +65,17 @@
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus}}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus}}"
     purge_networks: yes
-    ports:
-      - 9090:9090/tcp
     volumes:
-      - "/data/prometheus/main:/config"
-      - "/data/prometheus/data:/prometheus"
+      - "{{ docker_config_location }}/prometheus:/config:ro"
+      - "data_prometheus:/prometheus"
     command: [ "--config.file=/config/prometheus.yml", "--storage.tsdb.retention.time=150d", "--web.enable-admin-api" ]
     restart: yes
     restart_policy: always
     state: started
     pull: true
-    user: 0:1003
     labels:
       traefik.http.routers.prometheus.tls: "true"
       traefik.http.routers.prometheus.tls.certresolver: "le"
       traefik.http.services.prometheus.loadbalancer.server.port: "9090"
   tags:
-    - config
+    - prometheus

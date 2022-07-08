@@ -1,35 +1,20 @@
-# my global config
 global:
-  scrape_interval:     2m # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
-  #scrape_timeout: 30s # scrape_timeout is set to the global default (10s).
+  scrape_interval:     15s 
+  evaluation_interval: 15s
+  scrape_timeout:      10s 
 
-# Alertmanager configuration
 alerting:
   alertmanagers:
   - static_configs:
     - targets:
       # - alertmanager:9093
 
-# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
-rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
-
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: 'prometheus'
-
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
     static_configs:
     - targets: ['localhost:9090']
 
   - job_name: 'blackbox_icmp'
-    scrape_interval: 30s
     metrics_path: /probe
     params:
       module: [icmp]
@@ -61,19 +46,16 @@ scrape_configs:
         replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_blackbox }}]:9115"  # This is your blackbox exporter.
 
   - job_name: 'node_exporter'
-    scrape_interval: 15s
     file_sd_configs:
     - files:
       - '/config/file_sd/targets_node_exporter*.json'
 
   - job_name: 'frr_exporter'
-    scrape_interval: 15s
     file_sd_configs:
     - files:
       - '/config/file_sd/targets_frr_exporter*.json'
 
   - job_name: 'windows_exporter'
-    scrape_interval: 15s
     file_sd_configs:
     - files:
       - '/config/file_sd/targets_windows*.json'
@@ -88,14 +70,11 @@ scrape_configs:
 
   - job_name: 'solaredge'
     metrics_path: /metrics
-    scrape_interval: 15s
     static_configs:
     - targets:
       - "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.solaredge_exporter}}]:2112"
 
   - job_name: 'mikrotik-snmp'
-    scrape_interval: 15s
-    scrape_timeout: 10s
     file_sd_configs:
     - files:
       - '/config/file_sd/targets_mikrotik*.json'
@@ -112,8 +91,6 @@ scrape_configs:
         replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}]:9116"  # The SNMP exporter's real hostname:port.
 
   - job_name: 'ubiquiti-snmp'
-    scrape_interval: 15s
-    scrape_timeout: 10s
     file_sd_configs:
     - files:
       - '/config/file_sd/targets_ubiquiti_edgemax*.json'
@@ -130,8 +107,6 @@ scrape_configs:
         replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}]:9116"  # The SNMP exporter's real hostname:port.
 
   - job_name: 'ruckus-snmp'
-    scrape_interval: 15s
-    scrape_timeout: 10s
     file_sd_configs:
     - files:
       - '/config/file_sd/targets_ruckus*.json'
@@ -153,7 +128,6 @@ scrape_configs:
       - targets: ['172.16.33.5:9323']
 
   - job_name: "hass"
-    scrape_interval: 10s
     metrics_path: /api/prometheus
     bearer_token: "{{ home_assistant_access_token }}"
     scheme: https

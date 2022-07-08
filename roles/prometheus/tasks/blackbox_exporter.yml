@@ -1,0 +1,39 @@
+
+- name: create blackbox config directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ nobody.group }}"
+    group: "{{ nobody.group }}"
+    recurse: yes
+  with_items:
+    - "{{ docker_config_location }}/prometheus_blackbox"
+
+- name: copy blackbox config
+  copy:
+    src: blackbox.yml
+    dest: "{{ docker_config_location }}/prometheus_blackbox/blackbox.yml"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0755
+
+# port = 9115
+- name: setup prometheus blackbox exporter
+  docker_container:
+    name: prometheus-blackbox
+    image: prom/blackbox-exporter:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_blackbox}}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_blackbox}}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/prometheus_blackbox/blackbox.yml:/blackbox.yml:ro"
+    command: "--config.file=/blackbox.yml"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

@@ -1,0 +1,37 @@
+- name: create snmp config directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ nobody.group }}"
+    group: "{{ nobody.group }}"
+    recurse: yes
+  with_items:
+    - "{{ docker_config_location }}/prometheus_snmp"
+
+- name: copy snmp config
+  copy:
+    src: snmp.yml
+    dest: "{{ docker_config_location }}/prometheus_snmp/snmp.yml"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0755
+
+- name: setup prometheus snmp exporter
+  docker_container:
+    name: prometheus-snmp
+    image: prom/snmp-exporter:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/prometheus_snmp/snmp.yml:/snmp.yml:ro"
+    command: "--config.file=/snmp.yml"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

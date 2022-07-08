@@ -1,0 +1,15 @@
+- name: setup prometheus speedtest exporter
+  docker_container:
+    name: prometheus-speedtest
+    image: jraviles/prometheus_speedtest:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_speedtest }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_speedtest }}"
+    purge_networks: yes
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
