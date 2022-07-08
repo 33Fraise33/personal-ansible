@@ -16,9 +16,6 @@
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.redis }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.redis }}"
     purge_networks: yes
-    env:
-      SYNAPSE_CONFIG_DIR: "/config"
-      TZ: "Europe/Brussels"
     restart: yes
     restart_policy: always
     state: started

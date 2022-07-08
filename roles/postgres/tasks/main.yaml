@@ -1,16 +1,11 @@
 # https://hub.docker.com/_/postgres
-# update: do pg_dumpall -U user -W -f /backupfilename.sql
+# update: do pg_dumpall -U db_admin -W -f /backupfilename.sql
 # restore: docker exec -it postgres /bin/bash
 # psql -U db_admin < /backup/backupfile.sql
 
-- name: create postgres data directory
-  file:
-    path: "{{ docker_data_location }}/postgres"
-    state: directory
-    mode: 0755
-    owner: "{{ nobody.user }}"
-    group: "{{ nobody.group }}"
-    recurse: yes
+- name: Create a volume for postgres data
+  docker_volume:
+    name: data_postgres
 
 - name: setup postgres
   docker_container:
@@ -22,7 +17,7 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.postgres }}"
     purge_networks: yes
     volumes:
-      - "{{ docker_data_location }}/postgres:/var/lib/postgresql/data"
+      - "data_postgres:/var/lib/postgresql/data"
     env:
       POSTGRES_USER: "{{ postgres_user }}"
       POSTGRES_PASSWORD: "{{ postgres_password }}"
@@ -42,6 +37,6 @@
 
 - name: install postgres ansible dependencies
   pip:
-    name: ['pip', 'psycopg2']
+    name: ['pip', 'psycopg2-binary']
     state: latest
   tags: pip
