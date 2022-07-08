@@ -30,7 +30,6 @@
     purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/ddclient:/config"
-      - "/data/media:/data"
     env:
       PUID: "{{ nobody.user }}"
       PGID: "{{ nobody.group }}"

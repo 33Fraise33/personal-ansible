@@ -22,7 +22,7 @@
   tags: ddclient
 
 - name: Setup unbound
-  hosts: all
+  hosts: compute
   connection: ssh
   become: true
   roles:

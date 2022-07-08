@@ -15,7 +15,7 @@ zone=frai.se,            \
 ttl=1,                      \
 login={{ cloudflare_api_email }},     \
 password={{ cloudflare_api_token }}             \
-{% for pub_domain in (domains.fraise.proxy + domains.fraise.direct) -%}
+{% for pub_domain in ([] + domains.fraise.direct) -%}
 {%- if pub_domain.name == "@" -%}
 frai.se
 {%- if not loop.last %},{% endif -%}
@@ -23,22 +23,4 @@ frai.se
 {{ pub_domain.name }}.frai.se
 {%- if not loop.last %},{% endif -%}
 {%- endif -%}
-{% endfor %}
-
-
-##
-## CloudFlare Unitix
-##
-protocol=cloudflare,        \
-zone=unitix.be,            \
-ttl=1,                      \
-login={{ cloudflare_api_email }},     \
-password={{ cloudflare_api_token }}             \
-{% for pub_domain in (domains.unitix.direct + domains.unitix.proxy) -%}
-{% if pub_domain.name == "@" -%}
-unitix.be
-{% else -%}
-{{ pub_domain.name }}.unitix.be
-{%- endif %}
-{%- if not loop.last %},{% endif -%}
 {% endfor %}
