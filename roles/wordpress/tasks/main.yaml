@@ -1,47 +1,28 @@
 # setup wordpress with a docker container
 # container from: https://hub.docker.com/_/wordpress
 
+- import_tasks: mariadb.yml
+  tags: mariadb
+
+- name: Create a volume for wordpress content
+  docker_volume:
+    name: data_wordpress
+
 - name: create wordpress config directory
   file:
-    path: /data/wordpress/{{ item.item }}
+    path: "{{ docker_config_location }}/wordpress"
     state: directory
     mode: 0755
-    owner: "{{ item.user }}"
-    group: "{{ item.group }}"
-  with_items:
-    - { item: mysql, user: mysql, group: data}
-    - { item: wp-content, user: http, group: data }
+    owner: root
+    group: root
 
 - name: copy uploads file
   copy:
     src: uploads.ini
-    dest: /data/wordpress/uploads.ini
-    mode: 0755
+    dest: "{{ docker_config_location }}/wordpress/uploads.ini"
+    mode: 0644
     owner: root
-    group: data
-
-- name: setup mariadb docker container
-  docker_container:
-    name: mariadb
-    image: mariadb:latest
-    networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.mariadb }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.mariadb }}"
-    purge_networks: yes
-    volumes:
-      - "/data/wordpress/mysql:/var/lib/mysql"
-    env:
-      MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: "{{ mysql_user_password }}"
-    restart: yes
-    restart_policy: always
-    state: started
-    pull: true
-    labels:
-      traefik.enable: "false"
+    group: root
 
 - name: setup wordpress docker container
   docker_container:
@@ -58,8 +39,8 @@
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: "{{ mysql_user_password }}"
     volumes:
-      - "/data/wordpress/wp-content:/var/www/html/wp-content"
-      - "/data/wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini"
+      - "data_wordpress:/var/www/html/wp-content"
+      - "{{ docker_config_location }}/wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro"
     restart: yes
     restart_policy: always
     state: started

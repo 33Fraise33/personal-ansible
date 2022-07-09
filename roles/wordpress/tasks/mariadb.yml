@@ -1,0 +1,32 @@
+
+# backup and restore: 
+# sudo docker exec -it mariadb /bin/bash
+# mysqldump -uroot -p --all-databases > mariadbbackup.sql
+# mysql -uroot -p < mariadbbackup.sql
+
+- name: Create a volume for mariadb data
+  docker_volume:
+    name: data_mariadb
+
+- name: setup mariadb docker container
+  docker_container:
+    name: mariadb
+    image: mariadb:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.mariadb }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.mariadb }}"
+    purge_networks: yes
+    volumes:
+      - "data_mariadb:/var/lib/mysql"
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: "{{ mysql_user_password }}"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
