@@ -27,14 +27,14 @@
 - name: setup unbound docker container
   docker_container:
     name: unbound
-    image: klutchell/unbound:latest
+    image: mvance/unbound:latest
     networks:
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.unbound }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.unbound }}"
     volumes: 
-      - "{{ docker_config_location }}/unbound/lancache/scripts/output/unbound/:/etc/unbound/custom.conf.d/:ro"
-      - "{{ docker_config_location }}/unbound/unbound.conf:/etc/unbound/unbound.conf"
+      - "{{ docker_config_location }}/unbound/lancache/scripts/output/unbound/:/opt/unbound/etc/unbound/custom.conf.d/:ro"
+      - "{{ docker_config_location }}/unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro"
     purge_networks: yes
     restart: yes
     restart_policy: always
