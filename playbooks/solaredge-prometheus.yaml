@@ -1,6 +1,0 @@
-- name: Setup Solaredge Exporter
-  hosts: compute
-  connection: ssh
-  become: true
-  roles:
-    - solaredge
