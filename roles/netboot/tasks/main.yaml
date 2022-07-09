@@ -1,17 +1,12 @@
 # install netboot https://blog.linuxserver.io/2019/12/16/netboot-xyz-docker-network-boot-server-pxe/
 # https://hub.docker.com/r/linuxserver/netbootxyz https://netboot.xyz/
 
-- name: create netboot directory
-  file:
-    path: "{{ item }}/netboot"
-    state: directory
-    mode: 0755
-    owner: "{{ nobody.user }}"
-    group: "{{ nobody.group }}"
-    recurse: yes
-  with_items:
-    - "{{ docker_config_location }}"
-    - "{{ docker_data_location }}"
+- name: Create a volume for netboot 
+  docker_volume:
+    name: "{{ item }}"
+  loop: 
+    - config_netboot
+    - data_netboot
 
 - name: setup netboot docker container
   docker_container:
@@ -26,8 +21,8 @@
       GID: "{{ nobody.group }}"
     purge_networks: yes
     volumes:
-      - "{{ docker_data_location }}/netboot:/assets"
-      - "{{ docker_config_location }}/netboot:/config"
+      - "data_netboot:/assets"
+      - "config_netboot:/config"
     restart: yes
     restart_policy: always
     state: started
