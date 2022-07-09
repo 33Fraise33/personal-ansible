@@ -3,17 +3,17 @@
 
 - name: Create a volume for deluge config
   docker_volume:
-    name: config_deluge
+    name: "{{ item }}"
+  loop: 
+    - config_deluge
+    - data_deluge_watch
 
-- name: create deluge data directories
+- name: set permissions on docker volume
   file:
-    path: "{{ item }}"
-    state: directory
+    path: /data/docker/docker/volumes/data_deluge_watch/_data
+    mode: 0755
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
-    mode: 0775
-  with_items:
-    - "{{ docker_data_location }}/deluge/watch"
 
 - name: setup Deluge docker container
   docker_container:
@@ -27,7 +27,7 @@
     volumes:
       - "config_deluge:/config"
       - "/data/media:/data"
-      - "{{ docker_data_location }}/deluge/watch:/watch"
+      - "data_deluge_watch:/watch"
     env:
       PUID: "{{ nobody.user }}"
       PGID: "{{ nobody.group }}"

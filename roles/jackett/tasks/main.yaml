@@ -16,7 +16,7 @@
     purge_networks: yes
     volumes:
       - "config_jackett:/config"
-      - "{{ docker_data_location }}/deluge/watch:/downloads"
+      - "data_deluge_watch:/downloads"
     env:
       TZ: "Europe/Brussels"
       PUID: "65534"
