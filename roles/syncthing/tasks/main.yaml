@@ -1,11 +1,9 @@
 # install syncthing docker container
 # https://hub.docker.com/r/syncthing/syncthing
 
-- name: create syncthing
-  file:
-    path: /data/syncthing
-    state: directory
-    mode: 0775
+- name: Create a volume for syncthing content
+  docker_volume:
+    name: data_syncthing
 
 - name: setup Syncthing docker container
   docker_container:
@@ -17,7 +15,10 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.syncthing }}"
     purge_networks: yes
     volumes:
-      - "/data/syncthing:/var/syncthing"
+      - "data_syncthing:/var/syncthing"
+    env: 
+      PGID: "1001"
+      PUID: "1001"
     state: started
     restart_policy: always
     restart: yes
