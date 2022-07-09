@@ -1,14 +1,9 @@
 # setup openvpn with a docker container
 # container from: http://docs.grafana.org/installation/docker/
 
-- name: create grafana config directory
-  file:
-    path: /data/grafana/plugins
-    state: directory
-    mode: 0755
-    owner: root
-    group: data
-    recurse: yes
+- name: Create a volume for grafana content
+  docker_volume:
+    name: data_grafana
 
 - name: setup grafana docker container
   docker_container:
@@ -20,11 +15,10 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.grafana }}"
     purge_networks: yes
     volumes:
-      - "/data/grafana:/var/lib/grafana"
+      - "data_grafana:/var/lib/grafana"
     env:
       GF_SERVER_ROOT_URL: "https://grafana.frai.se"
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
-      GF_INSTALL_PLUGINS: "raintank-worldping-app"
     restart: yes
     state: started
     restart_policy: always
