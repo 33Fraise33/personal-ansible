@@ -1,7 +1,7 @@
 - name: copy configuration files to directory
   copy:
     src: "{{ item }}"
-    dest: /data/homeassistant/config/
+    dest: "{{ docker_config_location }}/homeassistant/{{ item }}"
     owner: root
     group: root
     mode: 0644
@@ -13,7 +13,7 @@
 - name: copy configuration templates to directory
   template:
     src: "{{ item }}.j2"
-    dest: /data/homeassistant/config/{{ item }}
+    dest: "{{ docker_config_location }}/homeassistant/{{ item }}"
     owner: root
     group: root
     mode: 0644

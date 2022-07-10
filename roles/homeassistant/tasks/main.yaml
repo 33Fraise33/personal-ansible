@@ -3,20 +3,20 @@
 
 - name: create homeassistant config directory
   file:
-    path: /data/homeassistant/{{ item }}
+    path: "{{ docker_config_location }}/homeassistant"
     state: directory
     mode: 0755
     owner: root
     group: root
-    recurse: yes
-  loop:
-    - config
-    - media
+
+- name: Create a volume for homassistant media content
+  docker_volume:
+    name: data_homeassistant_media
 
 - name: setup homeassistant docker container
   docker_container:
     name: homeassistant
-    image: homeassistant/home-assistant:latest
+    image: ghcr.io/home-assistant/home-assistant:stable
     networks:
       - name: macvlan50
         ipv4_address: 172.16.50.65
@@ -25,8 +25,9 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.homeassistant }}"
     purge_networks: yes
     volumes:
-      - "/data/homeassistant/config:/config"
-      - "/data/homeassistant/media:/media"
+      - "{{ docker_config_location }}/homeassistant:/config"
+      - "data_homeassistant_media:/media"
+      - /etc/localtime:/etc/localtime:ro
     env:
       TZ: "Europe/Brussels"
     restart: yes
