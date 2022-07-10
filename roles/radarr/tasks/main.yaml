@@ -25,3 +25,7 @@
     restart_policy: always
     restart: yes
     pull: true
+    labels:
+      traefik.http.routers.radarr.tls: "true"
+      traefik.http.routers.radarr.tls.certresolver: "le"
+      traefik.http.services.radarr.loadbalancer.server.port: "7878"

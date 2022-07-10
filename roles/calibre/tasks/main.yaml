@@ -30,6 +30,10 @@
     restart_policy: always
     restart: yes
     pull: true
+    labels:
+      traefik.http.routers.calibre.tls: "true"
+      traefik.http.routers.calibre.tls.certresolver: "le"
+      traefik.http.services.calibre.loadbalancer.server.port: "8080"
   tags: calibre-base
 
 - name: setup calibre_web docker container
@@ -53,4 +57,9 @@
     restart_policy: always
     restart: yes
     pull: true
+    labels:
+      traefik.http.routers.books.rule: "Host(`books.frai.se`)"
+      traefik.http.routers.books.tls: "true"
+      traefik.http.routers.books.tls.certresolver: "le"
+      traefik.http.services.books.loadbalancer.server.port: "8083"
   tags: calibre-web
