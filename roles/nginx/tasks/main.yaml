@@ -1,24 +1,18 @@
 - name: create nginx directories
   file:
-    path: "{{ item }}"
+    path: "{{ docker_config_location }}/nginx"
     state: directory
     mode: 0755
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
-    recurse: yes
-  with_items:
-    - "{{ docker_config_location }}/nginx"
 
 - name: copy nginx config
   template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: nginx.conf.j2
+    dest: "{{ docker_config_location }}/nginx/nginx.conf"
     mode: 0644
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
-  with_items:
-    - src: nginx.conf.j2
-      dest: "{{ docker_config_location }}/nginx/nginx.conf"
 
 - name: Start nginx docker container
   docker_container:

@@ -1,14 +1,9 @@
 # setup portainer with a docker container
 # container from: https://www.portainer.io/installation/
 
-- name: create portainer config directory
-  file:
-    path: /data/portainer
-    state: directory
-    mode: 0755
-    owner: root
-    group: root
-    recurse: yes
+- name: Create a volume for portainer config
+  docker_volume:
+    name: config_portainer
 
 - name: setup portainer docker container
   docker_container:
@@ -20,7 +15,7 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.portainer }}"
     purge_networks: yes
     volumes:
-      - "/data/portainer:/data"
+      - "config_portainer:/data"
       - "/var/run/docker.sock:/var/run/docker.sock"
     restart: yes
     restart_policy: always

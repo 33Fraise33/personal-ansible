@@ -3,7 +3,7 @@
 
 - name: create homer config directory
   file:
-    path: "{{ docker_data_location }}/homer"
+    path: "{{ docker_config_location }}/homer"
     state: directory
     mode: 0755
     owner: "{{ nobody.user }}"
@@ -12,7 +12,7 @@
 - name: copy config file
   template:
     src: config.yml.j2
-    dest: "{{ docker_data_location }}/homer/config.yml"
+    dest: "{{ docker_config_location }}/homer/config.yml"
     mode: 0644
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
@@ -28,7 +28,7 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.homer }}"
     purge_networks: yes
     volumes:
-      - "{{ docker_data_location }}/homer:/www/assets"
+      - "{{ docker_config_location }}/homer:/www/assets"
     user: "{{ nobody.user }}:{{ nobody.group }}"
     env:
       UID: "{{ nobody.user }}"

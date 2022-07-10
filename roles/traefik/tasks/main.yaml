@@ -3,22 +3,25 @@
 
 - name: create traefik config directory
   file:
-    path: /data/traefik/letsencrypt
+    path: "{{ docker_config_location }}/traefik"
     state: directory
     mode: 0600
     owner: root
     group: root
-    recurse: yes
 
 - name: copy Traefik config
   template:
     src: "{{ item }}.j2"
-    dest: /data/traefik/{{ item }}
+    dest: "{{ docker_config_location }}/traefik/{{ item }}"
     owner: root
     group: root
     mode: 0755
-  with_items:
+  loop:
     - custom_rules.yml
+
+- name: Create a volume for letsencrypt
+  docker_volume:
+    name: data_traefik_letsencrypt
 
 - name: setup traefik docker container
   docker_container:
@@ -56,8 +59,8 @@
       - --certificatesResolvers.le.acme.dnsChallenge.resolvers=molly.ns.cloudflare.com,rudy.ns.cloudflare.com
       - --serversTransport.insecureSkipVerify=true
     volumes:
-      - "/data/traefik/letsencrypt:/letsencrypt"
-      - "/data/traefik/custom_rules.yml:/etc/traefik/custom_rules.yml"
+      - "data_traefik_letsencrypt:/letsencrypt"
+      - "{{ docker_config_location }}/traefik/custom_rules.yml:/etc/traefik/custom_rules.yml:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
     env:
       CF_API_EMAIL: "{{ cloudflare_api_email }}"

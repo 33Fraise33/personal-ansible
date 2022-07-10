@@ -1,33 +1,5 @@
 http:
   services:
-    jackett:
-      loadBalancer:
-        servers:
-          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.jackett }}:9117"
-          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.jackett }}:9117"
-    deluge:
-      loadBalancer:
-        servers:
-          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.deluge }}:8112"
-    plex:
-      loadBalancer:
-        servers:
-          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.plex }}:32400"
-    radarr:
-      loadBalancer:
-        servers:
-          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.radarr }}:7878"
-          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.radarr }}:7878"
-    calibre:
-      loadBalancer:
-        servers:
-          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.calibre }}:8080"
-          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.calibre }}:8080"
-    calibre-web:
-      loadBalancer:
-        servers:
-          - url: "http://{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.calibre_web }}:8083"
-          - url: "http://{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.calibre_web }}:8083"
     ironman:
       loadBalancer:
         servers:
@@ -42,48 +14,6 @@ http:
         servers:
           - url: "https://ghs.googlehosted.com"
   routers:
-    jackett:
-      rule: "Host(`jackett.frai.se`)"
-      service: "jackett"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    deluge:
-      rule: "Host(`deluge.frai.se`)"
-      service: "deluge"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    plex:
-      rule: "Host(`plex.frai.se`)"
-      service: "plex"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    radarr:
-      rule: "Host(`radarr.frai.se`)"
-      service: "radarr"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    calibre:
-      rule: "Host(`calibre.frai.se`)"
-      service: "calibre"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    calibre-web:
-      rule: "Host(`books.frai.se`)"
-      service: "calibre-web"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
     ironman:
       rule: "Host(`ironman.frai.se`)"
       service: "ironman"
