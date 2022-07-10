@@ -1,14 +1,9 @@
 # setup unms with a docker container
 # container from: https://hub.docker.com/r/nico640/docker-unms
 
-- name: create unms config directory
-  file:
-    path: /data/unms
-    state: directory
-    mode: 0755
-    owner: root
-    group: root
-    recurse: yes
+- name: Create a volume for unms content
+  docker_volume:
+    name: data_unms
 
 - name: setup unms docker container
   docker_container:
@@ -20,7 +15,7 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.unms }}"
     purge_networks: yes
     volumes:
-      - "/data/unms:/config"
+      - "data_unms:/config"
     env:
       TZ: Europe/Brussels
     restart: yes
