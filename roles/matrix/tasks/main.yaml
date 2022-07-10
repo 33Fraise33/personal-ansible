@@ -1,6 +1,6 @@
 # https://hub.docker.com/r/matrixdotorg/synapse
 
-- name: create matrix directories
+- name: create matrix config directories
   file:
     path: "{{ item }}"
     state: directory
@@ -8,10 +8,9 @@
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
     recurse: yes
-  with_items:
-    - "{{ docker_data_location }}/synapse"
+  loop:
     - "{{ docker_config_location }}/synapse"
-    - "{{ docker_data_location }}/matrix-bridges"
+    - "{{ docker_config_location }}/matrix-bridges"
   tags: synapse
 
 - name: Copy config template to server
@@ -44,6 +43,10 @@
     template: template0
   tags: synapse
 
+- name: Create a volume for synapse content
+  docker_volume:
+    name: data_synapse
+
 - name: Start synapse docker container
   docker_container:
     name: synapse
@@ -55,8 +58,8 @@
     purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/synapse:/config"
-      - "{{ docker_data_location }}/synapse:/data"
-      - "{{ docker_data_location }}/matrix-bridges:/bridges"
+      - "data_synapse:/data"
+      - "{{ docker_config_location }}/matrix-bridges:/bridges"
     user: "{{ nobody.user }}:{{ nobody.group }}"
     env:
       SYNAPSE_CONFIG_DIR: "/config"

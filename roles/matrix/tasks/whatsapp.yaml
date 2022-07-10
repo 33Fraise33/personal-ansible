@@ -2,7 +2,7 @@
 
 - name: create bridge directory
   file:
-    path: "{{ docker_data_location }}/matrix-bridges/mautrix-whatsapp"
+    path: "{{ docker_config_location }}/matrix-bridges/mautrix-whatsapp"
     state: directory
     mode: 0755
     owner: "{{ nobody.user }}"
@@ -12,7 +12,7 @@
 - name: Copy whatsapp config template to server
   template:
     src: whatsapp.yaml.j2
-    dest: "{{ docker_data_location }}/matrix-bridges/mautrix-whatsapp/config.yaml"
+    dest: "{{ docker_config_location }}/matrix-bridges/mautrix-whatsapp/config.yaml"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
     mode: 0755
@@ -39,7 +39,7 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.mautrix_whatsapp }}"
     purge_networks: yes
     volumes:
-      - "{{ docker_data_location }}/matrix-bridges/mautrix-whatsapp:/data"
+      - "{{ docker_config_location }}/matrix-bridges/mautrix-whatsapp:/data"
     env:
       UID: "{{ nobody.user }}"
       GID: "{{ nobody.group }}"
