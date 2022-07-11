@@ -1,0 +1,14 @@
+- name: install cloudflared package
+  apt:
+    deb: https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+
+- name: install the service
+  command: "cloudflared service install {{cloudflared.service_token}}"
+  ignore_errors: true
+
+- name: start cloudflared
+  systemd:
+    name: cloudflared
+    state: restarted
+    enabled: true
+

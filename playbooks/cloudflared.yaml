@@ -1,0 +1,6 @@
+- name: setup cloudflared
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - cloudflared

@@ -6,13 +6,7 @@ all:
           hosts:
             captain:
               ansible_python_interpreter: /usr/bin/python3
-            captain2:
-              ansible_python_interpreter: /usr/bin/python3
               ansible_host: 172.16.33.8
-        storage:
-          hosts:
-            hulk:
-              ansible_python_interpreter: /usr/bin/python3
     routers:
       children:
         mikrotik:
