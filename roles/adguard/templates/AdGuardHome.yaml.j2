@@ -35,17 +35,13 @@ dns:
   - 1.0.0.1
   - 2606:4700:4700::1111
   - 2606:4700:4700::1001
-  - tls://1.1.1.1
-  - tls://1.0.0.1
-  - https://1.1.1.1/dns-query
-  - https://1.0.0.1/dns-query
   upstream_dns_file: ""
   bootstrap_dns:
   - 1.1.1.1
   - 1.0.0.1
   - 2606:4700:4700::1111
   - 2606:4700:4700::1001
-  all_servers: false
+  all_servers: true
   fastest_addr: false
   fastest_timeout: 1s
   allowed_clients: []
@@ -97,11 +93,9 @@ dns:
     answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
   - domain: '*.unitix.be'
     answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
-
   blocked_services: []
   upstream_timeout: 10s
-  local_domain_name: lan
-  resolve_clients: true
+  private_networks: []
   use_private_ptr_resolvers: true
   local_ptr_upstreams: []
 tls:
@@ -129,6 +123,7 @@ user_rules: []
 dhcp:
   enabled: false
   interface_name: ""
+  local_domain_name: lan
   dhcpv4:
     gateway_ip: ""
     subnet_mask: ""
@@ -142,7 +137,14 @@ dhcp:
     lease_duration: 86400
     ra_slaac_only: false
     ra_allow_slaac: false
-clients: []
+clients:
+  runtime_sources:
+    whois: true
+    arp: true
+    rdns: true
+    dhcp: true
+    hosts: true
+  persistent: []
 log_compress: false
 log_localtime: false
 log_max_backups: 0
@@ -154,4 +156,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 12
+schema_version: 14
