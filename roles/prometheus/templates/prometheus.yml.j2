@@ -125,7 +125,7 @@ scrape_configs:
   - job_name: 'docker'
     scrape_interval: 2m
     static_configs:
-      - targets: ['172.16.33.5:9323']
+      - targets: ['172.16.33.8:9323']
 
   - job_name: "hass"
     metrics_path: /api/prometheus
