@@ -9,13 +9,39 @@
   with_items:
     - "{{ docker_config_location }}/prometheus_snmp"
 
-- name: copy snmp config
+- name: copy generator config
   copy:
-    src: snmp.yml
-    dest: "{{ docker_config_location }}/prometheus_snmp/snmp.yml"
+    src: generator.yml
+    dest: "{{ docker_config_location }}/prometheus_snmp/generator.yml"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
     mode: 0755
+
+- name: copy mibs
+  copy:
+    src: mibs/
+    dest: "{{ docker_config_location }}/prometheus_snmp/mibs/"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0755
+
+- name: setup prometheus snmp generator
+  docker_container:
+    name: prometheus-snmp-generator
+    image: prom/snmp-generator:latest
+    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/prometheus_snmp:/opt"
+    restart: yes
+    restart_policy: no
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
+
+- name: wait for generator to have created snmp.yml
+  pause:
+    seconds: 10
 
 - name: setup prometheus snmp exporter
   docker_container:
@@ -35,3 +61,8 @@
     pull: true
     labels:
       traefik.enable: "false"
+
+- name: remove generator container
+  docker_container:
+    name: prometheus-snmp-generator
+    state: absent   

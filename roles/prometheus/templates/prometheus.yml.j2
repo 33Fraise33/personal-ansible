@@ -113,7 +113,7 @@ scrape_configs:
     metrics_path: /snmp
     params:
       module:
-        - ruckus_ap
+        - if_mib
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target

@@ -7,6 +7,8 @@ all:
             captain:
               ansible_python_interpreter: /usr/bin/python3
               ansible_host: 172.16.33.8
+        proxmox:
+          hosts: 
             falcon:
               ansible_python_interpreter: /usr/bin/python3
               ansible_host: 172.16.33.7
