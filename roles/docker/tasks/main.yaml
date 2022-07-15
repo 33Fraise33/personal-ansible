@@ -18,6 +18,7 @@
         state: latest
         update_cache: yes
   when: ansible_os_family == "Debian"
+  tags: install
 
 - name: Arch based setup
   block:
@@ -59,7 +60,7 @@
   pip:
     name: ['pip', 'docker']
     state: latest
-  tags: pip
+  tags: pip, install
 
 - name: create docker macvlan333 network
   docker_network:

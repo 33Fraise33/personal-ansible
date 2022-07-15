@@ -29,7 +29,7 @@
   tags: dns
 
 - import_tasks: 06-node_exporter.yml
-  tags: dns
+  tags: node_exporter
 
 - import_tasks: 07-networking.yml
   tags: networking
