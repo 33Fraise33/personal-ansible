@@ -1,5 +1,5 @@
 - name: setup lancache
-  hosts: all
+  hosts: compute
   connection: ssh
   become: true
   roles:
