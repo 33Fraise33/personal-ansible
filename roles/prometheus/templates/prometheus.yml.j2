@@ -7,7 +7,10 @@ alerting:
   alertmanagers:
   - static_configs:
     - targets:
-      # - alertmanager:9093
+      - "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_alertmanager }}]:9093"
+
+rule_files:
+  - "alerts.d/*.yml"
 
 scrape_configs:
   - job_name: 'prometheus'
@@ -55,10 +58,10 @@ scrape_configs:
     - files:
       - '/config/file_sd/targets_frr_exporter*.json'
 
-  - job_name: 'windows_exporter'
-    file_sd_configs:
-    - files:
-      - '/config/file_sd/targets_windows*.json'
+#  - job_name: 'windows_exporter'
+#    file_sd_configs:
+#    - files:
+#      - '/config/file_sd/targets_windows*.json'
 
   - job_name: 'speedtest'
     metrics_path: /probe

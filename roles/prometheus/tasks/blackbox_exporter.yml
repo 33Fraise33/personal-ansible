@@ -1,14 +1,11 @@
 
 - name: create blackbox config directory
   file:
-    path: "{{ item }}"
+    path: "{{ docker_config_location }}/prometheus_blackbox"
     state: directory
     mode: 0755
     owner: "{{ nobody.group }}"
     group: "{{ nobody.group }}"
-    recurse: yes
-  with_items:
-    - "{{ docker_config_location }}/prometheus_blackbox"
 
 - name: copy blackbox config
   copy:

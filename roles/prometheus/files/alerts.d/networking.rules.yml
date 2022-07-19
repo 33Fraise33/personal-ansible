@@ -1,0 +1,16 @@
+groups:
+- name: networking.rules
+  rules:
+  - alert: BGP Session Offline
+    expr: frr_bgp_peer_state{safi="unicast"} == 0
+    for: 2m
+    annotations:
+      summary: "IDLE - {{ $labels.peer }}:AS{{ $labels.peer_as }} - {{ $labels.peer_desc }}"
+
+  - alert: Interface offline
+    expr: ifOperStatus{ifDescr!~".*LOCAL_MGMT", ifDescr!~"wlan.*", node_name!="SW_JARVIS", job!="snmp-ruckus-ap",} != 1 and ifAdminStatus==1
+    for: 2m
+    
+  - alert: High CPU Usage
+    expr: (avg by (node_name) (hrProcessorLoad)) > 75
+    for: 2m

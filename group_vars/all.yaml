@@ -70,39 +70,30 @@ docker_network:
     portainer: 16
     wordpress: 17
     unms: 18
-    influxdb: 19
     mariadb: 20
-    watchtower: 21
     syncthing: 22
     prometheus: 23
     prometheus_snmp_exporter: 24
     prometheus_blackbox: 25
     prometheus_speedtest: 26
+    prometheus_alertmanager: 27
     homer: 28
     homeassistant: 29
     jackett: 30
-    pihole: 31
     jellyfin: 32
     redis: 33
     postgres: 34
     nginx: 35
     unbound: 37
-    acserver: 38
-    impostor: 39
-    accserver: 40
     synapse: 41
     mautrix_telegram: 42
     mautrix_whatsapp: 43
     solaredge_exporter: 44
-    iptvproxy: 45
-    puppet_slack: 46
     radarr: 47
     lancache_monolitic: 48
     calibre: 49
     calibre_web: 50
     ddclient: 51
-    guacd: 52
-    guacamole: 53
     netboot: 54
     coturn: 55
     maubot: 56

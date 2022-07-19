@@ -1,0 +1,35 @@
+- name: create alertmanager config directory
+  file:
+    path: "{{ docker_config_location }}/prometheus_alertmanager"
+    state: directory
+    mode: 0755
+    owner: "{{ nobody.group }}"
+    group: "{{ nobody.group }}"
+
+- name: copy alertmanager config
+  template:
+    src: alertmanager.yml.j2
+    dest: "{{ docker_config_location }}/prometheus_alertmanager/alertmanager.yml"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: 0755
+
+- name: setup prometheus alertmanager
+  docker_container:
+    name: prometheus-alertmanager
+    image: prom/alertmanager:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_alertmanager }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_alertmanager }}"
+    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/prometheus_alertmanager:/etc/alertmanager"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.alertmanager.tls: "true"
+      traefik.http.routers.alertmanager.tls.certresolver: "le"
+      traefik.http.services.alertmanager.loadbalancer.server.port: "9093"

@@ -46,11 +46,14 @@
 
 - name: copy prometheus files
   copy:
-    src: file_sd/
-    dest: "{{ docker_config_location }}/prometheus/file_sd/"
+    src: "{{ item }}/"
+    dest: "{{ docker_config_location }}/prometheus/{{ item }}/"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
     mode: 0755
+  loop: 
+    - file_sd
+    - alerts.d
   tags:
     - prometheus
     - config
@@ -79,3 +82,6 @@
       traefik.http.services.prometheus.loadbalancer.server.port: "9090"
   tags:
     - prometheus
+
+- import_tasks: alertmanager.yml
+  tags: alertmanager

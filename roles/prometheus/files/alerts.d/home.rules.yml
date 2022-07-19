@@ -1,0 +1,8 @@
+groups:
+- name: home.rules
+  rules:
+  - alert: Solar panels broken
+    expr: AC_Power * 10^AC_Power_SF == 0
+    for: 3d
+    annotations:
+      summary: "Check solar panel production"

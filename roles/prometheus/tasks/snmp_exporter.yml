@@ -1,13 +1,10 @@
 - name: create snmp config directory
   file:
-    path: "{{ item }}"
+    path: "{{ docker_config_location }}/prometheus_snmp"
     state: directory
     mode: 0755
     owner: "{{ nobody.group }}"
     group: "{{ nobody.group }}"
-    recurse: yes
-  with_items:
-    - "{{ docker_config_location }}/prometheus_snmp"
 
 - name: copy generator config
   copy:
