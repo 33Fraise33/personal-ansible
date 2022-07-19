@@ -71,7 +71,11 @@
     volumes:
       - "{{ docker_config_location }}/prometheus:/config:ro"
       - "data_prometheus:/prometheus"
-    command: [ "--config.file=/config/prometheus.yml", "--storage.tsdb.retention.time=150d", "--web.enable-admin-api" ]
+    command:
+      - "--config.file=/config/prometheus.yml"
+      - "--storage.tsdb.retention.time=150d"
+      - "--web.enable-admin-api"
+      - "--web.external-url=https://prometheus.frai.se"
     restart: yes
     restart_policy: always
     state: started

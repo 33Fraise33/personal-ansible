@@ -1,66 +1,63 @@
 [
   {
     "labels": {
-      "job": "blackbox_icmp_monitoring",
-      "node_name": "Cloudflare DNS"
+      "node_name": "Cloudflare DNS",
+      "tenant": "EXTERNAL"
     },
     "targets": ["1.1.1.1"]
   },
   {
     "labels": {
-      "job": "blackbox_icmp_monitoring",
-      "node_name": "Google DNS"
+      "node_name": "Google DNS",
+      "tenant": "EXTERNAL"
     },
     "targets": ["8.8.8.8"]
   },
   {
     "labels": {
-      "job": "blackbox_icmp_monitoring",
-      "node_name": "Twitter"
+      "node_name": "Twitter",
+      "tenant": "EXTERNAL"
     },
     "targets": ["twitter.com"]
   },
   {
     "labels": {
-      "job": "blackbox_icmp_monitoring",
-      "node_name": "Discord"
+      "node_name": "Discord",
+      "tenant": "EXTERNAL"
     },
     "targets": ["discord.com"]
   },
   {
     "labels": {
-      "job": "blackbox_icmp_monitoring",
-      "node_name": "Tweakers"
+      "node_name": "Tweakers",
+      "tenant": "EXTERNAL"
     },
     "targets": ["tweakers.net"]
   },
   {
     "labels": {
-      "job": "blackbox_icmp_monitoring",
-      "node_name": "Valorant"
+      "node_name": "Valorant",
+      "tenant": "EXTERNAL"
     },
     "targets": ["euc.pp.riotgames.com"]
   },
   {
     "labels": {
-      "job": "blackbox_icmp",
-      "node_name": "dad",
+      "node_name": "Dad PUB IP",
       "tenant": "DAD"
     },
     "targets": ["8a7709c681f5.sn.mynetname.net"]
   },
   {
     "labels": {
-      "job": "blackbox_icmp",
-      "node_name": "mom",
+      "node_name": "Mom PUB IP",
       "tenant": "MOM"
     },
     "targets": ["8b010aa79be4.sn.mynetname.net"]
   },
   {
     "labels": {
-      "job": "blackbox_icmp",
-      "node_name": "kingpin",
+      "node_name": "Kingpin PUB IP",
       "tenant": "VORMIR"
     },
     "targets": ["193.148.249.106"]

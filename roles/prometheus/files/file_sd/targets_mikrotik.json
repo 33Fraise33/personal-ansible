@@ -1,7 +1,6 @@
 [
   {
     "labels": {
-      "job": "mikrotik-snmp",
       "tenant": "ASGARD",
       "node_name": "CR_IRONMAN"
     },
@@ -9,7 +8,6 @@
   },
   {
     "labels": {
-      "job": "mikrotik-snmp",
       "tenant": "DAD",
       "node_name": "CR_DAD"
     },
@@ -17,7 +15,6 @@
   },
   {
     "labels": {
-      "job": "mikrotik-snmp",
       "tenant": "DAD",
       "node_name": "SW_DAD"
     },
@@ -25,7 +22,6 @@
   },
   {
     "labels": {
-      "job": "mikrotik-snmp",
       "tenant": "MOM",
       "node_name": "CR_MOM"
     },
@@ -33,7 +29,6 @@
   },
   {
     "labels": {
-      "job": "mikrotik-snmp",
       "tenant": "MOM",
       "node_name": "SW_MOM"
     },

@@ -1,23 +1,20 @@
 [
   {
     "labels": {
-      "job": "node_exporter",
-      "tenant": "HOME",
+      "tenant": "ASGARD",
       "node_name": "FALCON"
     },
     "targets": ["172.16.33.7:9100"]
   },
   {
     "labels": {
-      "job": "node_exporter",
-      "tenant": "HOME",
+      "tenant": "ASGARD",
       "node_name": "CAPTAIN"
     },
     "targets": ["172.16.33.8:9100"]
   },
   {
     "labels": {
-      "job": "node_exporter",
       "tenant": "VORMIR",
       "node_name": "kingpin"
     },

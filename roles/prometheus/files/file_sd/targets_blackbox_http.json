@@ -1,91 +1,78 @@
 [
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "unms"
     },
     "targets": ["https://unms.frai.se"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "portainer"
     },
     "targets": ["https://portainer.frai.se"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "plex"
     },
     "targets": ["https://plex.frai.se/web/index.html"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "adguard"
     },
     "targets": ["https://adguard.frai.se/login.html"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "jackett"
     },
     "targets": ["https://jackett.frai.se"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "Unitix"
     },
     "targets": ["https://unitix.be"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "Homer"
     },
     "targets": ["https://frai.se"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "deluge"
     },
     "targets": ["https://deluge.frai.se"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "grafana"
     },
     "targets": ["https://grafana.frai.se"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "homeassistant"
     },
     "targets": ["https://ha.frai.se"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "status"
     },
     "targets": ["https://status.frai.se"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "netbox"
     },
     "targets": ["https://netbox.frai.se"]
   },
   {
     "labels": {
-      "job": "blackbox_http",
       "node_name": "matrix"
     },
     "targets": ["https://matrix.frai.se/_matrix/static/"]

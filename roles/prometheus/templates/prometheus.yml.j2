@@ -24,6 +24,9 @@ scrape_configs:
     file_sd_configs:
     - files:
       - '/config/file_sd/targets_blackbox_icmp*.json'
+      - '/config/file_sd/targets_mikrotik.json'
+      - '/config/file_sd/targets_ruckus.json'
+      - '/config/file_sd/targets_ubiquiti_edgemax.json'
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target

@@ -1,7 +1,6 @@
 [
     {
       "labels": {
-        "job": "frr_exporter",
         "tenant": "VORMIR",
         "node_name": "KINGPIN"
       },
