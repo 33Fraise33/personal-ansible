@@ -1,0 +1,11 @@
+[
+    {
+      "labels": {
+        "tenant": "MIDGUARD",
+        "node_name": "SW_ODIN",
+        "offline": "true"
+      },
+      "targets": ["10.33.1.10"]
+    }
+  ]
+  

@@ -46,7 +46,7 @@
       "node_name": "Dad PUB IP",
       "tenant": "DAD"
     },
-    "targets": ["8a7709c681f5.sn.mynetname.net"]
+    "targets": ["968a0904d914.sn.mynetname.net"]
   },
   {
     "labels": {
@@ -54,6 +54,14 @@
       "tenant": "MOM"
     },
     "targets": ["8b010aa79be4.sn.mynetname.net"]
+  },
+  {
+    "labels": {
+      "node_name": "Midguard PUB IP",
+      "tenant": "MIDGUARD",
+      "offline": "true"
+    },
+    "targets": ["b8f60adc0cd2.sn.mynetname.net"]
   },
   {
     "labels": {

@@ -2,7 +2,7 @@ groups:
 - name: generic.rules
   rules:
   - alert: Device offline
-    expr: up == 0
+    expr: up{offline!="true"} == 0
     for: 1m
     annotations:
       summary: "Device {{ $labels.node_name }} down (exporter: {{ $labels.job }})"

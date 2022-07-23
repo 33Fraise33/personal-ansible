@@ -13,10 +13,6 @@ rule_files:
   - "alerts.d/*.yml"
 
 scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-    - targets: ['localhost:9090']
-
   - job_name: 'blackbox_icmp'
     metrics_path: /probe
     params:
@@ -96,10 +92,11 @@ scrape_configs:
       - target_label: __address__
         replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}]:9116"  # The SNMP exporter's real hostname:port.
 
-  - job_name: 'ubiquiti-snmp'
+  - job_name: 'generic-snmp'
     file_sd_configs:
     - files:
       - '/config/file_sd/targets_ubiquiti_edgemax*.json'
+      - '/config/file_sd/targets_juniper*.json'
     metrics_path: /snmp
     params:
       module:

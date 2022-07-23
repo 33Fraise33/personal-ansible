@@ -12,6 +12,9 @@ modules:
       - ifHCOutOctets #ifXTable
       - ifName #ifXTable
       - ifAlias #ifXTable
+    lookups:
+      - source_indexes: [ifIndex]
+        lookup: ifDescr
     version: 2
     auth:
       community: frai.se
