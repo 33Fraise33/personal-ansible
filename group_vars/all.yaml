@@ -70,6 +70,7 @@ docker_network:
     portainer: 16
     wordpress: 17
     unms: 18
+    cloudflared: 19
     mariadb: 20
     syncthing: 22
     prometheus: 23

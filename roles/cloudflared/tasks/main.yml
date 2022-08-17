@@ -1,14 +1,22 @@
-- name: install cloudflared package
-  apt:
-    deb: https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+- name: Set buffer size for quic # https://github.com/lucas-clemente/quic-go/wiki/UDP-Receive-Buffer-Size
+  sysctl:
+    name: "net.core.rmem_max"
+    value: "2500000"
+    state: present
 
-- name: install the service
-  command: "cloudflared service install {{cloudflared.service_token}}"
-  ignore_errors: true
-
-- name: start cloudflared
-  systemd:
+- name: Start cloudflared docker container
+  docker_container:
     name: cloudflared
-    state: restarted
-    enabled: true
-
+    image: cloudflare/cloudflared:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.cloudflared }}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.cloudflared }}"
+    purge_networks: yes
+    command: tunnel --no-autoupdate run --token {{ cloudflared.service_token }}
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
