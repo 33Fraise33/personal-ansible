@@ -3,14 +3,14 @@ groups:
   rules:
   - alert: BGP Session Offline
     expr: frr_bgp_peer_state{safi="unicast"} == 0
-    for: 2m
+    for: 10m
     annotations:
       summary: "IDLE - {{ $labels.peer }}:AS{{ $labels.peer_as }} - {{ $labels.peer_desc }}"
 
   - alert: Interface offline
-    expr: ifOperStatus{ifDescr!~".*LOCAL_MGMT", ifDescr!~"wlan.*", node_name!="SW_JARVIS", job!="ruckus-snmp",} != 1 and ifAdminStatus==1
-    for: 2m
+    expr: ifOperStatus{ifDescr!~".*me.*", ifDescr!~".*LOCAL_MGMT", ifDescr!~"wlan.*", node_name!="SW_JARVIS", job!="ruckus-snmp"} != 1 and ifAdminStatus==1
+    for: 10m
     
   - alert: High CPU Usage
     expr: (avg by (node_name) (hrProcessorLoad)) > 75
-    for: 2m
+    for: 5m

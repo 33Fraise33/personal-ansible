@@ -3,13 +3,13 @@ groups:
   rules:
   - alert: Device offline
     expr: up{offline!="true"} == 0
-    for: 1m
+    for: 10m
     annotations:
       summary: "Device {{ $labels.node_name }} down (exporter: {{ $labels.job }})"
 
   - alert: High latency
     expr: probe_icmp_duration_seconds{phase="rtt"} *1000 > 100
-    for: 5m
+    for: 10m
     annotations:
       summary: "Endpoint {{ $labels.node_name }} has high latency: {{ $value }}"
 
