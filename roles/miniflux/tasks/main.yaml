@@ -1,0 +1,40 @@
+- name: Get postgres container ip 
+  docker_container_info:
+    name: postgres
+  register: result_containerip
+
+- name: Create a new database with name "miniflux"
+  community.general.postgresql_db:
+    name: miniflux
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.macvlan333.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+    encoding: UTF-8
+    lc_collate: C
+    lc_ctype: C
+    template: template0
+
+- name: setup miniflux docker container
+  docker_container:
+    name: miniflux
+    image: miniflux/miniflux:latest
+    networks:
+      - name: macvlan333
+    purge_networks: yes
+    env:
+      DATABASE_URL: 'postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#","%23") }}@postgres/miniflux?sslmode=disable'
+      RUN_MIGRATIONS: "1"
+      CREATE_ADMIN: "1"
+      ADMIN_USERNAME: "{{ miniflux.user }}"
+      ADMIN_PASSWORD: "{{ miniflux.password }}"
+      FETCH_YOUTUBE_WATCH_TIME: "1"
+      BASE_URL: "https://rss.frai.se"
+    state: started
+    restart: yes
+    restart_policy: always
+    pull: true
+    labels:
+      traefik.http.routers.miniflux.tls: "true"
+      traefik.http.routers.miniflux.rule: "Host(`rss.frai.se`)"
+      traefik.http.routers.miniflux.tls.certresolver: "le"
+      traefik.http.services.miniflux.loadbalancer.server.port: "8080"
