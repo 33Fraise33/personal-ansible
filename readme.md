@@ -27,10 +27,10 @@ I have 3 vlans configured on my router,
 type in your ansible vault password (I use the same generated vault key for all my variables in this project and store the one password in my password manager.)
 Next enter your variable to encrypt and press ctrl+d twice.
 
+## Matrix Setup
+- nginx serves frai.se => /.well-known/matrix/server redirects to https://matrix.frai.se:443
+- matrix.frai.se directs directly towards the synapse server
 
 ## Todo
 - Make my grafana dashboards managed by Ansible: [More Info](https://docs.ansible.com/ansible/latest/collections/community/grafana/grafana_dashboard_module.html)
-- Make my networking config managed by Ansible (although Mikrotik is a pain in the ass for automation) kind of there with [AS211184](https://github.com/33Fraise33/AS211184) project
-- Make my home assistant config managed by Ansible (halfway there)
-- Plex / Deluge / Nextcloud permissions set to Nobody so they can be moved and managed by Samba users
-- Matrix Telegram rework like whatsapp bridge
+
