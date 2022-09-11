@@ -4,11 +4,9 @@ default_config:
 http:
   use_x_forwarded_for: true
   trusted_proxies:
-    - "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}"
-    - "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}"
-    - 172.16.33.8
-    - 2a12:4946:4000:33:8c7f:15ff:feb7:4d74
-
+    - "{{ docker_network.ipv4_prefix }}0/24"
+    - "{{ docker_network.ipv6_prefix }}/64"
+    
 # Text to speech
 tts:
   - platform: google_translate

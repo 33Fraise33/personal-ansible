@@ -59,9 +59,13 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: sensor.garage_status
+    entity_id:
+    - sensor.garage_status
     to: open
-    for: 00:05:00
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
   condition: []
   action:
   - service: notify.mobile_app_pixel6_gianni
@@ -72,7 +76,12 @@
         url: /lovelace/default_view
         icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
   - service: notify.mobile_app_sm_s901b
-    data: {}
+    data:
+      message: Garage has been open for more then 5 minutes!
+      title: Garage Open
+      data:
+        url: /lovelace/default_view
+        icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
   mode: single
 - id: '1629316694097'
   alias: Turn off ledstrip when pc goes off
@@ -80,10 +89,6 @@
   trigger:
   - platform: state
     entity_id: binary_sensor.pc_fraise
-    from: 'on'
-    to: 'off'
-  - platform: state
-    entity_id: binary_sensor.pc_amelle
     from: 'on'
     to: 'off'
   condition:
@@ -95,13 +100,11 @@
   - condition: state
     entity_id: binary_sensor.pc_fraise
     state: 'off'
-  - condition: state
-    entity_id: binary_sensor.pc_amelle
-    state: 'off'
   action:
   - service: light.turn_off
     target:
       entity_id: light.iot_shelly_bureau
+    data: {}
   mode: single
 - id: '1635756544900'
   alias: Turn on ledstrip when pc goes on
@@ -109,10 +112,6 @@
   trigger:
   - platform: state
     entity_id: binary_sensor.pc_fraise
-    from: 'off'
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.pc_amelle
     from: 'off'
     to: 'on'
   condition:
@@ -125,6 +124,7 @@
   - service: light.turn_on
     target:
       device_id: fc0ccf3780e821bbae16cdb570b91f99
+    data: {}
   mode: single
 - id: '1646668240722'
   alias: Google Doorbells
@@ -142,21 +142,18 @@
       title: DING DONG
       message: TTS
       data:
+        tts_text: DING DONG
         importance: high
         vibrationPattern: 100, 1000, 100, 1000, 100
-        ttl: 0
-        priority: high
-        channel: alarm_stream
+        channel: alarm_stream_max
   - service: notify.mobile_app_sm_s901b
     data:
       title: DING DONG
-      message: TTS
+      message: Someone at the door
       data:
-        importance: high
+        channel: Doorbell
         vibrationPattern: 100, 1000, 100, 1000, 100
-        ttl: 0
-        priority: high
-        channel: alarm_stream
+        importance: high
   - service: media_player.volume_set
     data:
       volume_level: 0.5
