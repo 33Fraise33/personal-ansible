@@ -1,0 +1,24 @@
+- name: Create a volume for minecraft data
+  docker_volume:
+    name: data_minecraft_bedrock
+
+- name: setup minecraft docker container
+  docker_container:
+    name: minecraft-bedrock
+    image: itzg/minecraft-bedrock-server:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.minecraft}}"
+        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.minecraft}}"
+    purge_networks: yes
+    volumes: 
+      - "data_minecraft_bedrock:/data"
+    env:
+      EULA: "TRUE"
+      SERVER_NAME: "Bits 'n Tits - Minecraft Vanilla"
+    state: started
+    restart: yes
+    restart_policy: always
+    pull: true
+    labels:
+      traefik.enable: "false"

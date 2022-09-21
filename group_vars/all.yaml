@@ -51,6 +51,8 @@ domains:
         ipv6: "2a12:4946:4000::1"
       - name: coturn
         ipv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.coturn }}"
+      - name: minecraft
+        ipv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.minecraft }}"
       - name: wireguard
         ipv6: 2a12:4946:4000:35::1
       - name: syncthing
@@ -100,6 +102,7 @@ docker_network:
     maubot: 56
     flaresolverr: 57
     adguard: 60
+    minecraft: 61
 
 postgres_user: db_admin
 postgres_password: !vault |
