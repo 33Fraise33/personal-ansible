@@ -1,21 +1,28 @@
 - name: Create a volume for minecraft data
   docker_volume:
-    name: data_minecraft_bedrock
+    name: data_minecraft
 
 - name: setup minecraft docker container
   docker_container:
-    name: minecraft-bedrock
-    image: itzg/minecraft-bedrock-server:latest
+    name: minecraft
+    image: itzg/minecraft-server:latest
     networks:
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.minecraft}}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.minecraft}}"
     purge_networks: yes
     volumes: 
-      - "data_minecraft_bedrock:/data"
+      - "data_minecraft:/data"
     env:
       EULA: "TRUE"
       SERVER_NAME: "Bits 'n Tits - Minecraft Vanilla"
+      MODS: "https://mediafiles.forgecdn.net/files/3865/500/Ping-1.19-1.9.1.jar"
+      VANILLATWEAKS_SHARECODE: "7KADxv"
+      OVERRIDE_SERVER_PROPERTIES: "true"
+      MOTD: "Bits 'n Tits - Minecraft"
+      ANNOUNCE_PLAYER_ACHIEVEMENTS: "true"
+      PVP: "false"
+      TYPE: "FORGE"
     state: started
     restart: yes
     restart_policy: always

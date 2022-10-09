@@ -102,7 +102,7 @@ docker_network:
     maubot: 56
     flaresolverr: 57
     adguard: 60
-    minecraft: 61
+    minecraft: 62
 
 postgres_user: db_admin
 postgres_password: !vault |
