@@ -1,6 +1,6 @@
 # https://hub.docker.com/r/matrixdotorg/synapse
 
-- name: create matrix config directories
+- name: create dendrite config directories
   file:
     path: "{{ item }}"
     state: directory
@@ -9,31 +9,27 @@
     group: "{{ nobody.group }}"
     recurse: yes
   loop:
-    - "{{ docker_config_location }}/synapse"
-    - "{{ docker_config_location }}/matrix-bridges"
-  tags: synapse
+    - "{{ docker_config_location }}/dendrite"
+  tags: dendrite
 
 - name: Copy config template to server
   template:
-    src: homeserver.yaml.j2
-    dest: "{{ docker_config_location }}/synapse/homeserver.yaml"
+    src: "{{ item }}.j2"
+    dest: "{{ docker_config_location }}/dendrite/{{ item }}"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
     mode: 0755
-  tags: synapse, config
+  tags: dendrite, config
+  loop: 
+    - matrix_key.pem
+    - server.crt
+    - server.key
+    - old_synapse_key.pem
+    - dendrite.yaml
 
-- name: Copy logging config to server
-  copy:
-    src: frai.se.log.config
-    dest: "{{ docker_config_location }}/synapse/frai.se.log.config"
-    owner: "{{ nobody.user }}"
-    group: "{{ nobody.group }}"
-    mode: 0755
-  tags: synapse, config
-
-- name: Create a new database with name "synapse"
+- name: Create a new database with name "dendrite"
   community.general.postgresql_db:
-    name: synapse
+    name: dendrite
     login_host: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
@@ -41,58 +37,148 @@
     lc_collate: C
     lc_ctype: C
     template: template0
-  tags: synapse
+  tags: dendrite
 
-- name: Create a volume for synapse content
+- name: Create a volume for persistent media and jetstream
   docker_volume:
-    name: data_synapse
+    name: "{{ item }}"
+  loop:
+    - data_dendrite_media
+    - data_dendrite_jetstream
 
-- name: Start synapse docker container
+- name: set permissions to data volume for jetstream
+  file:
+    path: "{{ docker_data_location }}/docker/volumes/{{ item }}/_data"
+    state: directory
+    mode: 0755
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+  loop:
+    - data_dendrite_media
+    - data_dendrite_jetstream
+
+- name: Start dendrite docker container
   docker_container:
-    name: synapse
-    image: matrixdotorg/synapse:latest
+    name: matrix
+    image: matrixdotorg/dendrite-monolith:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.synapse}}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.synapse}}"
     purge_networks: yes
     volumes:
-      - "{{ docker_config_location }}/synapse:/config"
-      - "data_synapse:/data"
-      - "{{ docker_config_location }}/matrix-bridges:/bridges"
+      - "{{ docker_config_location }}/dendrite:/etc/dendrite"
+      - "data_dendrite_media:/var/dendrite/media"
+      - "data_dendrite_jetstream:/jetstream"
     user: "{{ nobody.user }}:{{ nobody.group }}"
-    env:
-      SYNAPSE_CONFIG_DIR: "/config"
-      TZ: "Europe/Brussels"
+    command: 
+      - "--tls-cert=server.crt"
+      - "--tls-key=server.key"
     restart: yes
     restart_policy: always
     state: started
     pull: true
     labels:
-      traefik.http.routers.synapse.rule: "Host(`{{ matrix_base_url }}`)"
-      traefik.http.routers.synapse.tls: "true"
-      traefik.http.routers.synapse.tls.certresolver: "le"
-      traefik.http.services.synapse.loadbalancer.server.port: "8008"
-  tags: synapse,config
+      traefik.http.routers.dendrite.rule: "Host(`{{ matrix_base_url }}`)"
+      traefik.http.routers.dendrite.tls: "true"
+      traefik.http.routers.dendrite.tls.certresolver: "le"
+      traefik.http.services.dendrite.loadbalancer.server.port: "8008"
+  tags: dendrite,config
 
-- name: wait for container to be healthy
-  pause:
-    seconds: 70
-  tags: synapse
+#### USE dendrite instead of synapse
 
-- name: create admin user
-  command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u {{ synapse_admin }} -p {{ synapse_admin_password }} -a https://{{ matrix_base_url }}"
-  tags: synapse
-  ignore_errors: true
+# - name: create matrix config directories
+#   file:
+#     path: "{{ item }}"
+#     state: directory
+#     mode: 0755
+#     owner: "{{ nobody.user }}"
+#     group: "{{ nobody.group }}"
+#     recurse: yes
+#   loop:
+#     - "{{ docker_config_location }}/synapse"
+#     - "{{ docker_config_location }}/matrix-bridges"
+#   tags: synapse
 
-- import_tasks: coturn.yaml
-  tags: coturn
+# - name: Copy config template to server
+#   template:
+#     src: homeserver.yaml.j2
+#     dest: "{{ docker_config_location }}/synapse/homeserver.yaml"
+#     owner: "{{ nobody.user }}"
+#     group: "{{ nobody.group }}"
+#     mode: 0755
+#   tags: synapse, config
 
-- import_tasks: maubot.yaml
-  tags: maubot
+# - name: Copy logging config to server
+#   copy:
+#     src: frai.se.log.config
+#     dest: "{{ docker_config_location }}/synapse/fpostgresrai.se.log.config"
+#     owner: "{{ nobody.user }}"
+#     group: "{{ nobody.group }}"
+#     mode: 0755
+#   tags: synapse, config
 
-- import_tasks: telegram.yaml
-  tags: telegram,bridges
+# - name: Create a new database with name "synapse"
+#   community.general.postgresql_db:
+#     name: synapse
+#     login_host: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
+#     login_password: "{{ postgres_password }}"
+#     login_user: "{{ postgres_user }}"
+#     encoding: UTF-8
+#     lc_collate: C
+#     lc_ctype: C
+#     template: template0
+#   tags: synapse
 
-- import_tasks: whatsapp.yaml
-  tags: whatsapp,bridges
+# - name: Create a volume for synapse content
+#   docker_volume:
+#     name: data_synapse
+
+# - name: Start synapse docker container
+#   docker_container:
+#     name: synapse
+#     image: matrixdotorg/synapse:latest
+#     networks:
+#       - name: macvlan333
+#         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.synapse}}"
+#         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.synapse}}"
+#     purge_networks: yes
+#     volumes:
+#       - "{{ docker_config_location }}/synapse:/config"
+#       - "data_synapse:/data"
+#       - "{{ docker_config_location }}/matrix-bridges:/bridges"
+#     user: "{{ nobody.user }}:{{ nobody.group }}"
+#     env:
+#       SYNAPSE_CONFIG_DIR: "/config"
+#       TZ: "Europe/Brussels"
+#     restart: yes
+#     restart_policy: always
+#     state: started
+#     pull: true
+#     labels:
+#       traefik.http.routers.synapse.rule: "Host(`{{ matrix_base_url }}`)"
+#       traefik.http.routers.synapse.tls: "true"
+#       traefik.http.routers.synapse.tls.certresolver: "le"
+#       traefik.http.services.synapse.loadbalancer.server.port: "8008"
+#   tags: synapse,config
+
+# - name: wait for container to be healthy
+#   pause:
+#     seconds: 70
+#   tags: synapse
+
+# - name: create admin user
+#   command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u {{ synapse_admin }} -p {{ synapse_admin_password }} -a https://{{ matrix_base_url }}"
+#   tags: synapse
+#   ignore_errors: true
+
+# not running these anymore
+# - import_tasks: coturn.yaml
+#   tags: coturn
+
+# - import_tasks: maubot.yaml
+#   tags: maubot
+
+# - import_tasks: telegram.yaml
+#   tags: telegram,bridges
+
+# - import_tasks: whatsapp.yaml
+#   tags: whatsapp,bridges

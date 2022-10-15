@@ -12,15 +12,15 @@ http {
     }
 
     location /.well-known/matrix/server {
-    return 200 '{"m.server": "{{ matrix_base_url }}:443"}';
-    default_type application/json;
-      add_header Access-Control-Allow-Origin  *;
+      return 200 '{"m.server": "{{ matrix_base_url }}:443"}';
     }
 
     location /.well-known/matrix/client {
-    return 200 '{"m.homeserver": {"base_url": "https://{{ matrix_base_url }}"}}';
-    default_type application/json;
-    add_header Access-Control-Allow-Origin *;
+      # If your sever_name here doesn't match your matrix homeserver URL
+      # (e.g. hostname.com as server_name and matrix.hostname.com as homeserver URL)
+      add_header Access-Control-Allow-Origin *;
+
+      return 200 '{"m.homeserver": {"base_url": "https://{{ matrix_base_url }}"} }';
     }
   }
   client_body_temp_path /tmp/client_temp;
