@@ -1,11 +1,10 @@
 # https://hub.docker.com/_/postgres
-# update: do pg_dumpall -U db_admin -W -f /backupfilename.sql
-# restore: docker exec -it postgres /bin/bash
-# psql -U db_admin < /backup/backupfile.sql
+# update take backup: pg_dumpall -U db_admin -W -f /var/lib/postgresql/data/backup14.sql
+# import: psql -U db_admin < /old_data/backup14.sql
 
 - name: Create a volume for postgres data
   docker_volume:
-    name: data_postgres
+    name: data_postgres_15
 
 - name: setup postgres
   docker_container:
@@ -17,7 +16,8 @@
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.postgres }}"
     purge_networks: yes
     volumes:
-      - "data_postgres:/var/lib/postgresql/data"
+    #  - "data_postgres:/old_data"
+      - "data_postgres_15:/var/lib/postgresql/data"
     env:
       POSTGRES_USER: "{{ postgres_user }}"
       POSTGRES_PASSWORD: "{{ postgres_password }}"
