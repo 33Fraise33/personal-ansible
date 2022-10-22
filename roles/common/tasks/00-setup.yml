@@ -6,12 +6,12 @@
   vars:
     ansible_become_method: su
 
-- name: SETUP - Allow sudo user group to have passwordless sudo
+- name: SETUP - Allow wheel user group to have passwordless sudo
   lineinfile:
     dest: /etc/sudoers
     state: present
-    regexp: '^%sudo'
-    line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL:ALL) NOPASSWD:ALL'
     validate: '/usr/sbin/visudo -cf %s'
   vars:
     ansible_become_method: su
@@ -19,7 +19,7 @@
 - name: SETUP - temporarily add debian to the sudo group
   user:
     name: debian
-    groups: sudo
+    groups: wheel
     append: yes
   vars:
     ansible_become_method: su

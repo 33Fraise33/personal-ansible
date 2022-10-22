@@ -1,22 +1,45 @@
 # install lancache from: http://lancache.net/docs/containers/monolithic/
     
+- name: create lancache directory
+  file:
+    path: "{{ lancache.dir }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
 - name: setup lancache docker container
   docker_container:
     name: lancache
     image: lancachenet/monolithic:latest
     networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache_monolitic }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.lancache_monolitic }}"
+      - name: "{{ docker_network.name }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache }}"
     env:
       CACHE_DISK_SIZE: "500000m"
       CACHE_MAX_AGE: "365d"
     purge_networks: yes
     volumes:
-      - "/lancache:/data/cache"
+      - "{{ lancache.dir }}:/data/cache"
     restart: yes
     restart_policy: always
     state: started
     pull: true
     labels:
       traefik.enable: "false"
+
+- name: setup lancache-dns docker container
+  docker_container:
+    name: lancache-dns
+    image: lancachenet/lancache-dns:latest
+    network_mode: host
+    env:
+      USE_GENERIC_CACHE: "true" 
+      LANCACHE_IP: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache }}"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
+  when: lancache.dns|default(false)

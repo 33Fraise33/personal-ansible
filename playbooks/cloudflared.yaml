@@ -1,5 +1,7 @@
 - name: setup cloudflared
-  hosts: compute
+  hosts: 
+    - compute
+    - kang
   connection: ssh
   become: true
   roles:

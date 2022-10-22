@@ -14,3 +14,74 @@ cloudflared:
     30386539343235616237363535376530383364626331343330316231353864653562656562343463
     31666565393963633964623339373133393536393130356330633034373566326331653363646237
     36353962383230376465323564323332666239663064333963306364663862383363
+
+lancache: 
+  dir: /lancache
+
+domains:
+  ipv6_proxy: "2a12:4946:4000:333::10"
+  fraise:
+    direct: #specific ipv4 at the front, no ipv4 = ddclient
+      - name: kingpin
+        ipv6: "2a12:4946:4001::1"
+        ipv4: "193.148.249.106"
+      - name: minecraft
+        ipv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.minecraft }}"
+      - name: wireguard
+        ipv6: 2a12:4946:4000:35::1
+    local: []
+
+docker_network:
+  ipv4_prefix: "10.33.0."
+  ipv6_prefix: "2a12:4946:4000:333::"
+  name: macvlan333
+  hosts:
+    traefik: 10
+    plex: 11
+    netbox: 12
+    deluge: 13
+    graylog: 14 # TODO
+    grafana: 15
+    portainer: 16
+    wordpress: 17
+    unms: 18
+    cloudflared: 19
+    mariadb: 20
+    syncthing: 22
+    prometheus: 23
+    prometheus_snmp_exporter: 24
+    prometheus_blackbox: 25
+    prometheus_speedtest: 26
+    prometheus_alertmanager: 27
+    homer: 28
+    homeassistant: 29
+    jackett: 30
+    jellyfin: 32
+    redis: 33
+    postgres: 34
+    nginx: 35
+    unbound: 37
+    synapse: 41
+    mautrix_telegram: 42
+    mautrix_whatsapp: 43
+    solaredge_exporter: 44
+    radarr: 47
+    lancache_monolitic: 48
+    calibre: 49
+    calibre_web: 50
+    ddclient: 51
+    netboot: 54
+    coturn: 55
+    maubot: 56
+    flaresolverr: 57
+    adguard: 60
+    minecraft: 62
+
+postgres_user: db_admin
+postgres_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          63366632623430353732616366393332376335623066393731386139353664313932373762306332
+          3866313732663238623432653838613365376161663335350a386165336365656233323539313135
+          35313035363664653233393930656232353362393362333764333036656131663365393233626462
+          3561373730656636350a356232353961356465373535343333376135363336303231636663333532
+          33376330373832353538636334323633636338373139656161343061643466626632

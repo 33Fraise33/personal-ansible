@@ -9,9 +9,7 @@
     name: cloudflared
     image: cloudflare/cloudflared:latest
     networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.cloudflared }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.cloudflared }}"
+      - name: "{{ docker_network.name }}"
     purge_networks: yes
     command: tunnel --no-autoupdate run --token {{ cloudflared.service_token }}
     restart: yes
