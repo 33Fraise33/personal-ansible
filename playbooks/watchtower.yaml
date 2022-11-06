@@ -1,5 +1,7 @@
 - name: Setup watchtower
-  hosts: compute
+  hosts: 
+    - compute
+    - kang
   connection: ssh
   become: true
   roles:

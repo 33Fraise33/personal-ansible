@@ -16,7 +16,7 @@ all:
           hosts: 
             kang:
               ansible_python_interpreter: /usr/bin/python3
-              ansible_host: 172.16.33.6
+              ansible_host: 10.33.1.6
               ansible_user: root
     routers:
       children:

@@ -32,8 +32,12 @@
   docker_container:
     name: lancache-dns
     image: lancachenet/lancache-dns:latest
-    network_mode: host
+    networks:
+      - name: "{{ docker_network.name }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache_dns }}"
+    # network_mode: host
     env:
+      UPSTREAM_DNS: 1.1.1.1
       USE_GENERIC_CACHE: "true" 
       LANCACHE_IP: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache }}"
     restart: yes
