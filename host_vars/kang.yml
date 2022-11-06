@@ -10,7 +10,7 @@ admin_users:
     name: "Gianni Stubbe"
     ssh_key: "https://github.com/33Fraise33.keys"
 
-docker_data_location: /mnt/user/docker
+docker_data_location: /mnt/user/bulk/containers
 lancache: 
   dir: "{{ docker_data_location }}/lancache"
   dns: true

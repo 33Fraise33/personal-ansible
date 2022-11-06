@@ -18,6 +18,7 @@
     env:
       CACHE_DISK_SIZE: "500000m"
       CACHE_MAX_AGE: "365d"
+      CACHE_INDEX_SIZE: "500m"
     purge_networks: yes
     volumes:
       - "{{ lancache.dir }}:/data/cache"
