@@ -16,10 +16,10 @@
     owner: root
     group: root
 
-- name: copy uploads file
+- name: copy wordpress ini file
   copy:
-    src: uploads.ini
-    dest: "{{ docker_config_location }}/wordpress/uploads.ini"
+    src: wordpress.ini
+    dest: "{{ docker_config_location }}/wordpress/wordpress.ini"
     mode: 0644
     owner: root
     group: root
@@ -40,7 +40,7 @@
       WORDPRESS_DB_PASSWORD: "{{ mysql_user_password }}"
     volumes:
       - "data_wordpress:/var/www/html/wp-content"
-      - "{{ docker_config_location }}/wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro"
+      - "{{ docker_config_location }}/wordpress/wordpress.ini:/usr/local/etc/php/conf.d/wordpress.ini:ro"
     restart: yes
     restart_policy: always
     state: started
