@@ -8,13 +8,6 @@
   },
   {
     "labels": {
-      "tenant": "ASGARD",
-      "node_name": "SW_MARVEL"
-    },
-    "targets": ["172.16.33.22"]
-  },
-  {
-    "labels": {
       "tenant": "DAD",
       "node_name": "CR_DAD"
     },

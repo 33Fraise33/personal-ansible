@@ -27,5 +27,13 @@
       "offline": "true"
     },
     "targets": ["10.33.1.5:9100"]
+  },
+  {
+    "labels": {
+      "tenant": "MIDGUARD",
+      "node_name": "KANG",
+      "offline": "true"
+    },
+    "targets": ["10.33.1.6:9100"]
   }
 ]
