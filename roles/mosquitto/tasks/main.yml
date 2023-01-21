@@ -1,0 +1,39 @@
+# setup mosquitto with a docker container
+# container from: https://hub.docker.com/_/eclipse-mosquitto
+
+- name: create mqtt config directory
+  file:
+    path: "{{ docker_config_location }}/mqtt"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: copy config file
+  copy: 
+    src: mosquitto.conf
+    dest: "{{ docker_config_location }}/mqtt/mosquitto.conf"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create a volume for persistent data
+  docker_volume:
+    name: "data_mqtt"
+
+- name: setup mosquitto mqtt docker container
+  docker_container:
+    name: mosquitto
+    image: eclipse-mosquitto:latest
+    networks:
+      - name: macvlan333
+    purge_networks: yes
+    volumes:
+      - "data_mqtt:/mosquitto/data"
+      - "{{ docker_config_location }}/mqtt:/mosquitto/config"
+    restart: yes
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enabled: "false"

@@ -1,0 +1,41 @@
+homeassistant:
+  legacy_entity_attributes: false
+  legacy_triggers: false
+permit_join: false
+frontend:
+  url: https://z2m.frai.se
+advanced:
+  network_key:
+    - 49
+    - 148
+    - 46
+    - 229
+    - 225
+    - 132
+    - 3
+    - 168
+    - 57
+    - 64
+    - 168
+    - 166
+    - 157
+    - 210
+    - 192
+    - 135
+  channel: 15
+log_output:
+  - console
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://mosquitto
+  version: 5
+serial:
+  port: /dev/ttyACM0
+device_options: 
+  legacy: false
+devices:
+  '0x003c84fffe1fd811':
+    friendly_name: styrbar_bureau
+    legacy: false
+  '0x385b44fffe1d4d4e':
+    friendly_name: tradfri_outlet_bureau

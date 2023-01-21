@@ -1,0 +1,6 @@
+- name: setup z2m docker container
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - z2m
