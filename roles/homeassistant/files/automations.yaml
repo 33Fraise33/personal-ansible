@@ -107,24 +107,44 @@
     data: {}
   mode: single
 - id: '1635756544900'
-  alias: Turn on ledstrip when pc goes on
+  alias: Change Ledstrip on PC boot
   description: ''
   trigger:
   - platform: state
-    entity_id: binary_sensor.pc_fraise
-    from: 'off'
-    to: 'on'
-  condition:
-  - condition: device
-    type: is_off
-    device_id: fc0ccf3780e821bbae16cdb570b91f99
-    entity_id: light.iot_shelly_bureau
-    domain: light
+    entity_id:
+    - binary_sensor.pc_fraise
+  condition: []
   action:
-  - service: light.turn_on
-    target:
-      device_id: fc0ccf3780e821bbae16cdb570b91f99
-    data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.pc_fraise
+        state: 'on'
+      - condition: device
+        type: is_off
+        device_id: fc0ccf3780e821bbae16cdb570b91f99
+        entity_id: light.iot_shelly_bureau
+        domain: light
+      sequence:
+      - type: turn_on
+        device_id: fc0ccf3780e821bbae16cdb570b91f99
+        entity_id: light.iot_shelly_bureau
+        domain: light
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.pc_fraise
+        state: 'off'
+      - condition: device
+        type: is_on
+        device_id: fc0ccf3780e821bbae16cdb570b91f99
+        entity_id: light.iot_shelly_bureau
+        domain: light
+      sequence:
+      - type: turn_off
+        device_id: fc0ccf3780e821bbae16cdb570b91f99
+        entity_id: light.iot_shelly_bureau
+        domain: light
+    default: []
   mode: single
 - id: '1646668240722'
   alias: Google Doorbells
@@ -220,4 +240,92 @@
       - d9a7a94b0909413cd5ebdd78e5656a67
       - 1efdce172f583ce2f3228a207375c615
       - c1325734b3404d4d8390c4d1ad656a06
+  mode: single
+- id: '1672756895625'
+  alias: New Automation
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: b6a7367363b2689386e9ee5467f98824
+    type: action
+    subtype: 'on'
+    discovery_id: 0x003c84fffe1fd811 action_on
+  condition: []
+  action:
+  - type: toggle
+    device_id: a09e03e9cf3fd5812272d5c4d2af9a76
+    entity_id: switch.tradfri_outlet_bureau
+    domain: switch
+  mode: single
+- id: '1672865401228'
+  alias: Play Stubru Button
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: b6a7367363b2689386e9ee5467f98824
+    type: action
+    subtype: 'off'
+    discovery_id: 0x003c84fffe1fd811 action_off
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: device
+        device_id: d9a7a94b0909413cd5ebdd78e5656a67
+        domain: media_player
+        entity_id: media_player.nesthubf1f7
+        type: is_playing
+      sequence:
+      - service: media_player.media_stop
+        data: {}
+        target:
+          area_id: b3a8420b41d54c4e9c7ea23f2bf90c0b
+    default:
+    - service: media_player.play_media
+      target:
+        entity_id: media_player.nesthubf1f7
+      data:
+        media_content_id: media-source://radio_browser/9612651b-0601-11e8-ae97-52543be04c81
+        media_content_type: audio/mpeg
+      metadata:
+        title: Studio Brussel
+        thumbnail: https://upload.wikimedia.org/wikipedia/commons/1/19/VRT_Studio_Brussel_logo.png
+        media_class: music
+        children_media_class:
+        navigateIds:
+        - {}
+        - media_content_type: app
+          media_content_id: media-source://radio_browser
+        - media_content_type: music
+          media_content_id: media-source://radio_browser/country/BE
+  mode: single
+- id: '1672914124011'
+  alias: Lucifer Button
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: b6a7367363b2689386e9ee5467f98824
+    type: action
+    subtype: arrow_right_click
+    discovery_id: 0x003c84fffe1fd811 action_arrow_right_click
+  condition: []
+  action:
+  - service: media_player.turn_on
+    data: {}
+    target:
+      device_id: d6ca95811e63498241d2f3bddb5dd1ad
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: androidtv.adb_command
+    data:
+      command: am start -n com.netflix.ninja/.MainActivity -a android.intent.action.VIEW
+        -d http://www.netflix.com/watch/80057918 -f 0x10808000 -e source 30
+    target:
+      device_id: d6ca95811e63498241d2f3bddb5dd1ad
   mode: single

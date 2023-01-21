@@ -8,7 +8,7 @@ groups:
       summary: "IDLE - {{ $labels.peer }}:AS{{ $labels.peer_as }} - {{ $labels.peer_desc }}"
 
   - alert: Interface offline
-    expr: ifOperStatus{ifDescr!~".*me.*", ifDescr!~".*LOCAL_MGMT", ifDescr!~"wlan.*", node_name!="SW_JARVIS", job!="ruckus-snmp"} != 1 and ifAdminStatus==1
+    expr: ifOperStatus{ifDescr!~".*me.*", ifDescr!~".*LOCAL_MGMT",ifDescr!~"tunnel.*",ifDescr!~"Logical-int.*", ifDescr!~"wlan.*", node_name!="SW_JARVIS", job!="ruckus-snmp"} != 1 and ifAdminStatus==1
     for: 10m
     
   - alert: High CPU Usage

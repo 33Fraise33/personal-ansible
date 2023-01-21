@@ -1,8 +1,8 @@
 [
     {
       "labels": {
-        "tenant": "MIDGUARD",
-        "node_name": "SW_ODIN",
+        "tenant": "UNITIX_KIT01",
+        "node_name": "KIT01_SW01",
         "offline": "true"
       },
       "targets": ["10.33.1.10"]

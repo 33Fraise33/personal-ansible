@@ -9,6 +9,19 @@ docker_config_location: /data/docker-config
 docker_data_location: /data/docker
 matrix_base_url: matrix.frai.se
 
+domains:
+  ipv6_proxy: "2a12:4946:4000:333::10"
+  fraise:
+    direct: #specific ipv4 at the front, no ipv4 = ddclient
+      - name: kingpin
+        ipv6: "2a12:4946:4001::1"
+        ipv4: "193.148.249.106"
+      - name: rustdesk
+      - name: rustdesk-relay
+      - name: minecraft
+        ipv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.minecraft }}"
+    local: []
+
 gsuite_smtp_user: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           61353261383964363338646539653566396232636666643431383261646336386630653037383337

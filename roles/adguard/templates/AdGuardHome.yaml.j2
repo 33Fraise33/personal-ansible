@@ -2,8 +2,8 @@ bind_host: 0.0.0.0
 bind_port: 80
 beta_bind_port: 0
 users:
-- name: fraise
-  password: {{ adguard_password }}
+  - name: fraise
+    password: {{ adguard_password }}
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
@@ -12,9 +12,9 @@ debug_pprof: false
 web_session_ttl: 720
 dns:
   bind_hosts:
-  - 0.0.0.0
+    - 0.0.0.0
   port: 53
-  statistics_interval: 1
+  statistics_interval: 7
   querylog_enabled: true
   querylog_file_enabled: true
   querylog_interval: 2160h
@@ -31,28 +31,25 @@ dns:
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
-  - 1.1.1.1
-  - 1.0.0.1
-  - 2606:4700:4700::1111
-  - 2606:4700:4700::1001
+    - {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.unbound }}
   upstream_dns_file: ""
   bootstrap_dns:
-  - 1.1.1.1
-  - 1.0.0.1
-  - 2606:4700:4700::1111
-  - 2606:4700:4700::1001
+    - 1.1.1.1
+    - 1.0.0.1
+    - 2606:4700:4700::1111
+    - 2606:4700:4700::1001
   all_servers: true
   fastest_addr: false
   fastest_timeout: 1s
   allowed_clients: []
   disallowed_clients: []
   blocked_hosts:
-  - version.bind
-  - id.server
-  - hostname.bind
+    - version.bind
+    - id.server
+    - hostname.bind
   trusted_proxies:
-  - 127.0.0.0/8
-  - ::1/128
+    - 127.0.0.0/8
+    - ::1/128
   cache_size: 4194304
   cache_ttl_min: 0
   cache_ttl_max: 0
@@ -62,7 +59,9 @@ dns:
   enable_dnssec: true
   edns_client_subnet: false
   max_goroutines: 300
+  handle_ddr: true
   ipset: []
+  ipset_file: ""
   filtering_enabled: true
   filters_update_interval: 24
   parental_enabled: false
@@ -73,31 +72,33 @@ dns:
   parental_cache_size: 1048576
   cache_time: 30
   rewrites:
-  - domain: wireguard.frai.se
-    answer: 172.16.33.1
-  - domain: wireguard.frai.se
-    answer: 2a12:4946:4000:35::1
-  - domain: coturn.frai.se
-    answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.coturn }}
-  - domain: coturn.frai.se
-    answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.coturn }}
-  - domain: '*.frai.se'
-    answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
-  - domain: '*.frai.se'
-    answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
-  - domain: frai.se
-    answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
-  - domain: frai.se
-    answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
-  - domain: '*.unitix.be'
-    answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
-  - domain: '*.unitix.be'
-    answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
+    - domain: rustdesk.frai.se
+      answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.rustdesk_hbbs }}
+    - domain: rustdesk-relay.frai.se
+      answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.rustdesk_hbbr }}
+    - domain: coturn.frai.se
+      answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.coturn }}
+    - domain: coturn.frai.se
+      answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.coturn }}
+    - domain: '*.frai.se'
+      answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
+    - domain: '*.frai.se'
+      answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
+    - domain: frai.se
+      answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
+    - domain: frai.se
+      answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
+    - domain: '*.unitix.be'
+      answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
+    - domain: '*.unitix.be'
+      answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
   blocked_services: []
   upstream_timeout: 10s
   private_networks: []
   use_private_ptr_resolvers: true
   local_ptr_upstreams: []
+  serve_http3: false
+  use_http3_upstreams: false
 tls:
   enabled: true
   server_name: ""
@@ -108,16 +109,16 @@ tls:
   port_dnscrypt: 0
   dnscrypt_config_file: ""
   allow_unencrypted_doh: true
-  strict_sni_check: false
   certificate_chain: ""
   private_key: ""
   certificate_path: ""
   private_key_path: ""
+  strict_sni_check: false
 filters:
-- enabled: true
-  url: https://abp.oisd.nl/
-  name: OISD Blocklist
-  id: 3
+  - enabled: true
+    url: https://abp.oisd.nl/
+    name: OISD Blocklist
+    id: 3
 whitelist_filters: []
 user_rules: []
 dhcp:
@@ -144,13 +145,26 @@ clients:
     rdns: true
     dhcp: true
     hosts: true
-  persistent: []
-log_compress: false
-log_localtime: false
+  persistent:
+    - name: WG RANGE (NO LANCACHE)
+      tags: []
+      ids:
+        - 10.10.35.0/24
+      blocked_services: []
+      upstreams:
+        - 1.1.1.1
+      use_global_settings: true
+      filtering_enabled: false
+      parental_enabled: false
+      safesearch_enabled: false
+      safebrowsing_enabled: false
+      use_global_blocked_services: true
+log_file: ""
 log_max_backups: 0
 log_max_size: 100
 log_max_age: 3
-log_file: ""
+log_compress: false
+log_localtime: false
 verbose: false
 os:
   group: ""

@@ -18,19 +18,6 @@ cloudflared:
 lancache: 
   dir: /lancache
 
-domains:
-  ipv6_proxy: "2a12:4946:4000:333::10"
-  fraise:
-    direct: #specific ipv4 at the front, no ipv4 = ddclient
-      - name: kingpin
-        ipv6: "2a12:4946:4001::1"
-        ipv4: "193.148.249.106"
-      - name: minecraft
-        ipv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.minecraft }}"
-      - name: wireguard
-        ipv6: 2a12:4946:4000:35::1
-    local: []
-
 docker_network:
   ipv4_prefix: "10.33.0."
   ipv6_prefix: "2a12:4946:4000:333::"
@@ -76,6 +63,8 @@ docker_network:
     flaresolverr: 57
     adguard: 60
     minecraft: 62
+    rustdesk_hbbs: 63
+    rustdesk_hbbr: 64
 
 postgres_user: db_admin
 postgres_password: !vault |

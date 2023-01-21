@@ -66,15 +66,9 @@ binary_sensor:
 prometheus:
   namespace: "homeassistant"
   filter:
-    include_entities:
-      - sensor.garage_status
-      - sensor.dryer_energy_2
-      - sensor.p1_meter_3c39e7250142_active_power
-      - sensor.p1_meter_3c39e7250142_total_gas
-      - sensor.p1_meter_3c39e7250142_total_power_export_t1
-      - sensor.p1_meter_3c39e7250142_total_power_export_t2
-      - sensor.p1_meter_3c39e7250142_total_power_import_t1
-      - sensor.p1_meter_3c39e7250142_total_power_import_t2
+    include_entity_globs:
+      - sensor.*power
+      - sensor.*energy
 
 google_assistant:
   project_id: ha-assistant-57f43

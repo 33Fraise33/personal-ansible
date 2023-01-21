@@ -46,7 +46,7 @@
       - --log.level=INFO
       - --providers.docker=true
       - --providers.docker.endpoint=unix:///var/run/docker.sock
-      - --providers.docker.defaultRule="Host(`{{ '{{' }} .Name {{ '}}' }}.frai.se`)"
+      - --providers.docker.defaultRule=Host(`{{ '{{' }} .Name {{ '}}' }}.frai.se`)
       - --providers.docker.exposedByDefault=true
       - --providers.docker.swarmMode=false
       - --providers.file.filename=/etc/traefik/custom_rules.yml

@@ -19,10 +19,12 @@ scrape_configs:
       module: [icmp]
     file_sd_configs:
     - files:
-      - '/config/file_sd/targets_blackbox_icmp*.json'
+      - '/config/file_sd/targets_blackbox_icmp.json'
       - '/config/file_sd/targets_mikrotik.json'
       - '/config/file_sd/targets_ruckus.json'
       - '/config/file_sd/targets_ubiquiti_edgemax.json'
+      - '/config/file_sd/targets_juniper.json'
+      - '/config/file_sd/targets_aruba.json'
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -38,7 +40,7 @@ scrape_configs:
       module: [http_2xx]
     file_sd_configs:
     - files:
-      - '/config/file_sd/targets_blackbox_http*.json'
+      - '/config/file_sd/targets_blackbox_http.json'
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -50,17 +52,17 @@ scrape_configs:
   - job_name: 'node_exporter'
     file_sd_configs:
     - files:
-      - '/config/file_sd/targets_node_exporter*.json'
+      - '/config/file_sd/targets_node_exporter.json'
 
   - job_name: 'frr_exporter'
     file_sd_configs:
     - files:
-      - '/config/file_sd/targets_frr_exporter*.json'
+      - '/config/file_sd/targets_frr_exporter.json'
 
 #  - job_name: 'windows_exporter'
 #    file_sd_configs:
 #    - files:
-#      - '/config/file_sd/targets_windows*.json'
+#      - '/config/file_sd/targets_windows.json'
 
   - job_name: 'speedtest'
     metrics_path: /probe
@@ -79,7 +81,7 @@ scrape_configs:
   - job_name: 'mikrotik-snmp'
     file_sd_configs:
     - files:
-      - '/config/file_sd/targets_mikrotik*.json'
+      - '/config/file_sd/targets_mikrotik.json'
     metrics_path: /snmp
     params:
       module:
@@ -95,8 +97,9 @@ scrape_configs:
   - job_name: 'generic-snmp'
     file_sd_configs:
     - files:
-      - '/config/file_sd/targets_ubiquiti_edgemax*.json'
-      - '/config/file_sd/targets_juniper*.json'
+      - '/config/file_sd/targets_ubiquiti_edgemax.json'
+      - '/config/file_sd/targets_juniper.json'
+      - '/config/file_sd/targets_aruba.json'
     metrics_path: /snmp
     params:
       module:
@@ -112,7 +115,7 @@ scrape_configs:
   - job_name: 'ruckus-snmp'
     file_sd_configs:
     - files:
-      - '/config/file_sd/targets_ruckus*.json'
+      - '/config/file_sd/targets_ruckus.json'
     metrics_path: /snmp
     params:
       module:

@@ -6,11 +6,11 @@
   tags: always,ipify
 
 - name: Set Cloudflare DNS Records
-  hosts: localhost
+  hosts: captain
   connection: ssh
   become: true
   roles:
-    - cloudflare
+    - ../roles/cloudflare
   tags: cloudflare
 
 - name: Setup ddclient
@@ -18,7 +18,7 @@
   connection: ssh
   become: true
   roles:
-    - ddclient
+    - ../roles/ddclient
   tags: ddclient
 
 - name: Setup unbound
@@ -26,7 +26,7 @@
   connection: ssh
   become: true
   roles:
-    - unbound
+    - ../roles/unbound
   tags: unbound
 
 - name: Setup adguard
@@ -34,5 +34,5 @@
   connection: ssh
   become: true
   roles:
-    - adguard
+    - ../roles/adguard
   tags: adguard

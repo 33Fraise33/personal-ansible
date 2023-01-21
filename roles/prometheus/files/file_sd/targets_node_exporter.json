@@ -22,7 +22,7 @@
   },
   {
     "labels": {
-      "tenant": "MIDGUARD",
+      "tenant": "UNITIX_KIT01",
       "node_name": "ZEUS",
       "offline": "true"
     },
@@ -30,7 +30,7 @@
   },
   {
     "labels": {
-      "tenant": "MIDGUARD",
+      "tenant": "UNITIX_KIT01",
       "node_name": "KANG",
       "offline": "true"
     },

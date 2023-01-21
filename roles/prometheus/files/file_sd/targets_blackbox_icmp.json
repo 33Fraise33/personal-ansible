@@ -57,8 +57,16 @@
   },
   {
     "labels": {
-      "node_name": "Midguard PUB IP",
-      "tenant": "MIDGUARD",
+      "node_name": "KIT01_CR PUB IP",
+      "tenant": "UNITIX_KIT01",
+      "offline": "true"
+    },
+    "targets": ["c6cc0bd4ce43.sn.mynetname.net"]
+  },
+  {
+    "labels": {
+      "node_name": "KIT02_CR PUB IP",
+      "tenant": "UNITIX_KIT02",
       "offline": "true"
     },
     "targets": ["b8f60adc0cd2.sn.mynetname.net"]

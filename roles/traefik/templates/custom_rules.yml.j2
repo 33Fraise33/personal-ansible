@@ -9,14 +9,14 @@ http:
       loadBalancer:
         servers:
           - url: "https://172.16.33.7:8006/"
+    unifi-camera:
+      loadBalancer:
+        servers:
+          - url: "https://172.16.53.2"
     status:
       loadBalancer:
         servers:
           - url: "https://33fraise33.github.io"
-    googlehosted:
-      loadBalancer:
-        servers:
-          - url: "https://ghs.googlehosted.com"
   routers:
     ironman:
       rule: "Host(`ironman.frai.se`)"
@@ -39,23 +39,9 @@ http:
         certResolver: le
         domains:
           - main: "*.frai.se"
-    calendar:
-      rule: "Host(`calendar.frai.se`)"
-      service: "googlehosted"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    mail:
-      rule: "Host(`mail.frai.se`)"
-      service: "googlehosted"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    drive:
-      rule: "Host(`drive.frai.se`)"
-      service: "googlehosted"
+    unifi-camera:
+      rule: "Host(`nvr.frai.se`)"
+      service: "unifi-camera"
       tls:
         certResolver: le
         domains:
