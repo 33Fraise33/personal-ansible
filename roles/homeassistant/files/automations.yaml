@@ -60,7 +60,7 @@
   trigger:
   - platform: state
     entity_id:
-    - sensor.garage_status
+    - cover.garage_door
     to: open
     for:
       hours: 0
@@ -83,36 +83,18 @@
         url: /lovelace/default_view
         icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
   mode: single
-- id: '1629316694097'
-  alias: Turn off ledstrip when pc goes off
-  description: ''
-  trigger:
-  - platform: state
-    entity_id: binary_sensor.pc_fraise
-    from: 'on'
-    to: 'off'
-  condition:
-  - condition: device
-    type: is_on
-    device_id: fc0ccf3780e821bbae16cdb570b91f99
-    entity_id: light.iot_shelly_bureau
-    domain: light
-  - condition: state
-    entity_id: binary_sensor.pc_fraise
-    state: 'off'
-  action:
-  - service: light.turn_off
-    target:
-      entity_id: light.iot_shelly_bureau
-    data: {}
-  mode: single
 - id: '1635756544900'
-  alias: Change Ledstrip on PC boot
+  alias: Change Ledstrip PC State
   description: ''
   trigger:
   - platform: state
     entity_id:
     - binary_sensor.pc_fraise
+    to: 'on'
+  - platform: state
+    entity_id:
+    - binary_sensor.pc_fraise
+    to: 'off'
   condition: []
   action:
   - choose:
@@ -145,101 +127,6 @@
         entity_id: light.iot_shelly_bureau
         domain: light
     default: []
-  mode: single
-- id: '1646668240722'
-  alias: Google Doorbells
-  description: ''
-  trigger:
-  - platform: device
-    type: turned_on
-    device_id: f38064e068d82e5d815d24ea85a35b73
-    entity_id: switch.iot_shelly_doorbell
-    domain: switch
-  condition: []
-  action:
-  - service: notify.mobile_app_pixel6_gianni
-    data:
-      title: DING DONG
-      message: TTS
-      data:
-        tts_text: DING DONG
-        importance: high
-        vibrationPattern: 100, 1000, 100, 1000, 100
-        channel: alarm_stream_max
-  - service: notify.mobile_app_sm_s901b
-    data:
-      title: DING DONG
-      message: Someone at the door
-      data:
-        channel: Doorbell
-        vibrationPattern: 100, 1000, 100, 1000, 100
-        importance: high
-  - service: media_player.volume_set
-    data:
-      volume_level: 0.5
-    target:
-      device_id:
-      - d9a7a94b0909413cd5ebdd78e5656a67
-      - 1efdce172f583ce2f3228a207375c615
-      - c1325734b3404d4d8390c4d1ad656a06
-  - service: media_player.play_media
-    target:
-      entity_id: media_player.nesthubf1f7
-    data:
-      media_content_id: media-source://media_source/local/Ding-dong-sound-effect.mp3
-      media_content_type: audio/mpeg
-    metadata:
-      title: Ding-dong-sound-effect.mp3
-      thumbnail:
-      media_class: music
-      children_media_class:
-      navigateIds:
-      - {}
-      - media_content_type: app
-        media_content_id: media-source://media_source
-  - service: media_player.play_media
-    target:
-      entity_id: media_player.living_speaker
-    data:
-      media_content_id: media-source://media_source/local/Ding-dong-sound-effect.mp3
-      media_content_type: audio/mpeg
-    metadata:
-      title: Ding-dong-sound-effect.mp3
-      thumbnail:
-      media_class: music
-      children_media_class:
-      navigateIds:
-      - {}
-      - media_content_type: app
-        media_content_id: media-source://media_source
-  - service: media_player.play_media
-    target:
-      entity_id: media_player.googlehome4127
-    data:
-      media_content_id: media-source://media_source/local/Ding-dong-sound-effect.mp3
-      media_content_type: audio/mpeg
-    metadata:
-      title: Ding-dong-sound-effect.mp3
-      thumbnail:
-      media_class: music
-      children_media_class:
-      navigateIds:
-      - {}
-      - media_content_type: app
-        media_content_id: media-source://media_source
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 5
-      milliseconds: 0
-  - service: media_player.volume_set
-    data:
-      volume_level: 0.25
-    target:
-      device_id:
-      - d9a7a94b0909413cd5ebdd78e5656a67
-      - 1efdce172f583ce2f3228a207375c615
-      - c1325734b3404d4d8390c4d1ad656a06
   mode: single
 - id: '1672756895625'
   alias: New Automation

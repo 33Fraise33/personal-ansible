@@ -22,6 +22,36 @@ frontend:
 
 shopping_list:
 
+cover: 
+  - platform: template
+    covers: 
+      garage_door: 
+        device_class: garage
+        friendly_name: "Garage Door"
+        open_cover:
+          - condition: state
+            entity_id: binary_sensor.shelly_garagedoor_input
+            state: "on"
+          - service: switch.toggle
+            target:
+              entity_id: switch.shelly_garagedoor
+        close_cover:
+          service: switch.toggle
+          target:
+            entity_id: switch.shelly_garagedoor
+        stop_cover:
+          service: switch.toggle
+          target:
+            entity_id: switch.shelly_garagedoor
+        {% raw -%}
+        value_template: >- 
+          {% if is_state('binary_sensor.shelly_garagedoor_input', 'on') %}
+            closed
+          {% else %}
+            open
+          {% endif %}
+        {% endraw %}
+
 sensor:
   - platform: afvalbeheer
     wastecollector: RecycleApp
@@ -33,23 +63,6 @@ sensor:
     postcode: 8490
     streetname: Eernegemweg
     streetnumber: 96
-  - platform: template
-    sensors:
-      garage_status:
-        friendly_name: "Garage Status"
-        value_template: >- {% raw %}
-          {% if is_state('binary_sensor.shelly_garagedoor_input', 'off') %}
-            open
-          {% else %}
-            closed
-          {% endif %}
-        icon_template: >-
-          {% if is_state('binary_sensor.shelly_garagedoor_input', 'off') %}
-            mdi:garage-open
-          {% else %}
-            mdi:garage
-          {% endif %}
-          {% endraw %}
 
 binary_sensor:
   - platform: ping
