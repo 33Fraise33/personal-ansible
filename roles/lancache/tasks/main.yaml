@@ -14,11 +14,12 @@
     image: lancachenet/monolithic:latest
     networks:
       - name: "{{ docker_network.name }}"
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache }}"
+        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache_monolitic }}"
     env:
       CACHE_DISK_SIZE: "500000m"
       CACHE_MAX_AGE: "365d"
       CACHE_INDEX_SIZE: "500m"
+      CACHE_SLICE_SIZE: "0m"
     purge_networks: yes
     volumes:
       - "{{ lancache.dir }}:/data/cache"
