@@ -3,7 +3,7 @@
   connection: ssh
   become: true
   roles:
-    - redis
+    - ../roles/redis
   tags: redis
 
 - name: Setup netbox
@@ -11,5 +11,5 @@
   connection: ssh
   become: true
   roles:
-    - netbox
+    - ../roles/netbox
   tags: netbox

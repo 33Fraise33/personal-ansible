@@ -7,15 +7,24 @@
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
 
+- name: create netbox config directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "911"
+    group: "911"
+  with_items:
+    - "{{ docker_config_location }}/netbox/"
+
 - name: Start netbox docker container
   docker_container:
     name: netbox
     image: linuxserver/netbox:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.netbox }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.netbox }}"
-    purge_networks: yes
+    volumes:
+      - "{{ docker_config_location }}/netbox:/config"
     env:
       ALLOWED_HOST: "netbox.frai.se"
       SUPERUSER_EMAIL: "{{ netbox_superuser_email }}"
@@ -23,8 +32,8 @@
       DB_NAME: netbox
       DB_USER: "{{ postgres_user }}"
       DB_PASSWORD: "{{ postgres_password }}"
-      DB_HOST: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.postgres }}"
-      REDIS_HOST: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.redis }}"
+      DB_HOST: "postgres"
+      REDIS_HOST: "redis"
       TZ: "Europe/Brussels"
     restart: yes
     restart_policy: always
