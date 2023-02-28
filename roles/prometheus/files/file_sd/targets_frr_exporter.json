@@ -4,7 +4,7 @@
         "tenant": "VORMIR",
         "node_name": "KINGPIN"
       },
-      "targets": ["193.148.249.106:9342"]
+      "targets": ["10.10.33.1:9342"]
     }
   ]
   
