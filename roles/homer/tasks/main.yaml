@@ -26,7 +26,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.homer }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.homer }}"
-    purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/homer:/www/assets"
     user: "{{ nobody.user }}:{{ nobody.group }}"

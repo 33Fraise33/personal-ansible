@@ -10,7 +10,6 @@
     image: cloudflare/cloudflared:latest
     networks:
       - name: "{{ docker_network.name }}"
-    purge_networks: yes
     command: tunnel --no-autoupdate run --token {{ cloudflared.service_token }}
     restart: yes
     restart_policy: always

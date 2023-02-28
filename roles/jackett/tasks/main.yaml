@@ -13,7 +13,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.jackett }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.jackett }}"
-    purge_networks: yes
     volumes:
       - "config_jackett:/config"
       - "data_deluge_watch:/downloads"
@@ -39,7 +38,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.flaresolverr }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.flaresolverr }}"
-    purge_networks: yes
     restart: yes
     restart_policy: always
     state: started

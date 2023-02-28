@@ -35,7 +35,6 @@
     volumes: 
       - "{{ docker_config_location }}/unbound/lancache/scripts/output/unbound/:/opt/unbound/etc/unbound/custom.conf.d/:ro"
       - "{{ docker_config_location }}/unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro"
-    purge_networks: yes
     restart: yes
     restart_policy: always
     state: started

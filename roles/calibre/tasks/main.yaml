@@ -16,7 +16,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.calibre }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.calibre }}"
-    purge_networks: yes
     volumes:
       - "config_calibre:/config"
       - "/data/media:/media"
@@ -44,7 +43,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.calibre_web }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.calibre_web }}"
-    purge_networks: yes
     volumes:
       - "config_calibre-web:/config"
       - "/data/media/books:/books"

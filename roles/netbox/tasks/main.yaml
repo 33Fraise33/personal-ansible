@@ -43,3 +43,10 @@
       traefik.http.routers.netbox.tls: "true"
       traefik.http.routers.netbox.tls.certresolver: "le"
       traefik.http.services.netbox.loadbalancer.server.port: "8000"
+
+# - name: Set prometheus plugin
+#   lineinfile:
+#     dest: "{{ docker_config_location }}/netbox/configuration.py"
+#     state: present
+#     regexp: '^PLUGINS = ['
+#     line: 'PLUGINS = ["netbox_prometheus_sd"]'

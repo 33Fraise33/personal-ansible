@@ -14,7 +14,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.postgres }}"
-    purge_networks: yes
     volumes:
     #  - "data_postgres:/old_data"
       - "data_postgres_15:/var/lib/postgresql/data"

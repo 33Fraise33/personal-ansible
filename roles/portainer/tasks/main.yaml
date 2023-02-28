@@ -15,7 +15,6 @@
     image: portainer/portainer-ce:latest
     networks:
       - name: "{{ docker_network.name }}"
-    purge_networks: yes
     volumes:
       - "{{ docker_data_location }}/portainer/:/data"
       - "/var/run/docker.sock:/var/run/docker.sock"

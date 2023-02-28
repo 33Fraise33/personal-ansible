@@ -20,7 +20,6 @@
     image: miniflux/miniflux:latest
     networks:
       - name: macvlan333
-    purge_networks: yes
     env:
       DATABASE_URL: 'postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#","%23") }}@postgres/miniflux?sslmode=disable'
       RUN_MIGRATIONS: "1"

@@ -23,7 +23,6 @@
     image: koenkk/zigbee2mqtt:latest
     networks:
       - name: macvlan333
-    purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/z2m:/app/data"
       - "/run/udev:/run/udev:ro"

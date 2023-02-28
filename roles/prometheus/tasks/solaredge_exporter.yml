@@ -39,7 +39,6 @@
       INVERTER_ADDRESS: "172.16.50.43"
       INVERTER_PORT: "1502"
       EXPORTER_INTERVAL: "15"
-    purge_networks: yes
     state: started
     restart_policy: always
     restart: yes

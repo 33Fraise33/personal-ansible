@@ -10,7 +10,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.plex }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.plex }}"
-    purge_networks: yes
     volumes:
       - "config_plex:/config"
       - "/data/media/movies:/movies"

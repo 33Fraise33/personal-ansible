@@ -63,7 +63,6 @@
     image: matrixdotorg/dendrite-monolith:latest
     networks:
       - name: macvlan333
-    purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/dendrite:/etc/dendrite"
       - "data_dendrite_media:/var/dendrite/media"
@@ -140,8 +139,7 @@
 #       - name: macvlan333
 #         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.synapse}}"
 #         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.synapse}}"
-#     purge_networks: yes
-#     volumes:
+##     volumes:
 #       - "{{ docker_config_location }}/synapse:/config"
 #       - "data_synapse:/data"
 #       - "{{ docker_config_location }}/matrix-bridges:/bridges"

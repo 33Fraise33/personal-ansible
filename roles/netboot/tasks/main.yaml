@@ -19,7 +19,6 @@
     env:
       UID: "{{ nobody.user }}"
       GID: "{{ nobody.group }}"
-    purge_networks: yes
     volumes:
       - "data_netboot:/assets"
       - "config_netboot:/config"

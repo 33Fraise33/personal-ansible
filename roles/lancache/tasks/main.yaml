@@ -20,7 +20,6 @@
       CACHE_MAX_AGE: "365d"
       CACHE_INDEX_SIZE: "500m"
       CACHE_SLICE_SIZE: "0m"
-    purge_networks: yes
     volumes:
       - "{{ lancache.dir }}:/data/cache"
     restart: yes

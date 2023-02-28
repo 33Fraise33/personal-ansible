@@ -22,7 +22,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_alertmanager }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_alertmanager }}"
-    purge_networks: yes
     volumes:
       - "{{ docker_config_location }}/prometheus_alertmanager:/etc/alertmanager"
     restart: yes

@@ -32,7 +32,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.wordpress }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.wordpress }}"
-    purge_networks: yes
     env:
       WORDPRESS_DB_HOST: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.mariadb }}"
       WORDPRESS_DB_NAME: wordpress

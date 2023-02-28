@@ -27,7 +27,6 @@
     image: eclipse-mosquitto:latest
     networks:
       - name: macvlan333
-    purge_networks: yes
     volumes:
       - "data_mqtt:/mosquitto/data"
       - "{{ docker_config_location }}/mqtt:/mosquitto/config"
