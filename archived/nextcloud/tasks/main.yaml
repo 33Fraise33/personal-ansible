@@ -18,7 +18,6 @@
     networks:
       - name: fraise_network
         ipv4_address: "{{ docker_network.nextcloud }}"
-    purge_networks: yes
     volumes:
       - "/data/nextcloud:/var/www/html"
       - "/data:/data"

@@ -17,7 +17,6 @@
     networks:
       - name: macvlan333
         ipv4_address: "{{ docker_network.impostor }}"
-    purge_networks: yes
     restart: yes
     restart_policy: always
     state: started

@@ -19,7 +19,6 @@
     networks:
       - name: macvlan333
         ipv4_address: "{{ docker_network.mariadb_invoice }}"
-    purge_networks: yes
     volumes:
       - "/data/invoiceninja/mysql:/var/lib/mysql"
     env:
@@ -48,7 +47,6 @@
     networks:
       - name: macvlan333
         ipv4_address: "{{ docker_network.invoiceninja }}"
-    purge_networks: yes
     env:
       APP_URL: "{{ invoiceninja_app_url }}"
       APP_KEY: "{{ invoiceninja_key }}"
@@ -79,7 +77,6 @@
     networks:
       - name: macvlan333
         ipv4_address: "{{ docker_network.caddy }}"
-    purge_networks: yes
     env:
       APP_URL: "{{ invoiceninja_app_url }}"
     volumes:

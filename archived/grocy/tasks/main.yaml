@@ -17,7 +17,6 @@
     networks:
       - name: macvlan333
         ipv4_address: "{{ docker_network.grocy }}"
-    purge_networks: yes
     volumes:
       - "/data/grocy:/config"
     env:

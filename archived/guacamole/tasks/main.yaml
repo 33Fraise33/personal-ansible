@@ -9,7 +9,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.guacd }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.guacd }}"
-    purge_networks: yes
     state: started
     restart_policy: always
     restart: yes
@@ -44,7 +43,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.guacamole }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.guacamole }}"
-    purge_networks: yes
     env:
       GUACD_HOSTNAME: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.guacd }}"
       GUACD_PORT: "4822"

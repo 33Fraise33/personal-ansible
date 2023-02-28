@@ -29,7 +29,6 @@
       - name: macvlan333
         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.accserver }}"
         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.accserver }}"
-    purge_networks: yes
     volumes:
       - "{{ docker_data_location }}/accweb:/accserver"
       # - "{{ docker_config_location }}/accweb:/accweb"

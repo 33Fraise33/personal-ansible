@@ -20,7 +20,6 @@
     networks:
       - name: fraise_network
         ipv4_address: "{{ docker_network.transmission }}"
-    purge_networks: yes
     volumes:
       - "/data/transmission/config:/config"
       - "/data:/data"

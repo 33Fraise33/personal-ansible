@@ -17,7 +17,6 @@
     networks:
       - name: macvlan333
         ipv4_address: "{{ docker_network.ghost }}"
-    purge_networks: yes
     volumes:
       - "/data/ghost:/var/lib/ghost/content"
     env:

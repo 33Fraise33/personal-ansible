@@ -18,7 +18,6 @@
     networks:
       - name: macvlan333
         ipv4_address: "{{ docker_network.influxdb}}"
-    purge_networks: yes
     volumes:
       - "/data/influxdb:/var/lib/influxdb"
     restart: yes
