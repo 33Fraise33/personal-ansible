@@ -16,10 +16,10 @@ domains:
       - name: kingpin
         ipv6: "2a12:4946:4001::1"
         ipv4: "193.148.249.106"
-      - name: rustdesk
-      - name: rustdesk-relay
-      - name: minecraft
-        ipv6: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.minecraft }}"
+      - name: kingpin
+        ipv6: "2a12:4946:4001::1"
+        ipv4: "193.148.249.106"
+      - name: home
     local: []
 
 gsuite_smtp_user: !vault |

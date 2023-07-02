@@ -19,7 +19,7 @@
       PGID: "{{ nobody.group }}"
       VERSION: "docker"
       # first time only
-      # PLEX_CLAIM: claim-54d_4BQ93ykS7m7vmg4X
+      # PLEX_CLAIM: CLAIMCODEHERE
     devices:
       - /dev/dri:/dev/dri
     state: started

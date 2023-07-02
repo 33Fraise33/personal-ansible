@@ -21,6 +21,7 @@
     state: present
     solo: true
   loop: "{{ domains.fraise.direct }}"
+  when: item.ipv6 is defined
 
 - name: set proxied cname records
   cloudflare_dns:

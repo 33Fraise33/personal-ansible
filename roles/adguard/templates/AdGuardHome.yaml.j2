@@ -1,6 +1,5 @@
 bind_host: 0.0.0.0
 bind_port: 80
-beta_bind_port: 0
 users:
   - name: fraise
     password: {{ adguard_password }}
@@ -8,23 +7,20 @@ auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
 language: ""
+theme: auto
 debug_pprof: false
 web_session_ttl: 720
 dns:
   bind_hosts:
     - 0.0.0.0
   port: 53
-  statistics_interval: 7
-  querylog_enabled: true
-  querylog_file_enabled: true
-  querylog_interval: 2160h
-  querylog_size_memory: 1000
   anonymize_client_ip: false
   protection_enabled: true
   blocking_mode: default
   blocking_ipv4: ""
   blocking_ipv6: ""
   blocked_response_ttl: 10
+  protection_disabled_until: null
   parental_block_host: family-block.dns.adguard.com
   safebrowsing_block_host: standard-block.dns.adguard.com
   ratelimit: 20
@@ -57,29 +53,36 @@ dns:
   bogus_nxdomain: []
   aaaa_disabled: false
   enable_dnssec: true
-  edns_client_subnet: false
+  edns_client_subnet:
+    custom_ip: ""
+    enabled: false
+    use_custom: false
   max_goroutines: 300
   handle_ddr: true
   ipset: []
   ipset_file: ""
+  bootstrap_prefer_ipv6: false
   filtering_enabled: true
   filters_update_interval: 24
   parental_enabled: false
-  safesearch_enabled: false
   safebrowsing_enabled: false
   safebrowsing_cache_size: 1048576
   safesearch_cache_size: 1048576
   parental_cache_size: 1048576
   cache_time: 30
+  safe_search:
+    enabled: false
+    bing: true
+    duckduckgo: true
+    google: true
+    pixabay: true
+    yandex: true
+    youtube: true
   rewrites:
-    - domain: rustdesk.frai.se
-      answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.rustdesk_hbbs }}
-    - domain: rustdesk-relay.frai.se
-      answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.rustdesk_hbbr }}
-    - domain: coturn.frai.se
-      answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.coturn }}
-    - domain: coturn.frai.se
-      answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.coturn }}
+    - domain: wireguard.frai.se
+      answer: 193.148.249.106
+    - domain: wireguard.frai.se
+      answer: 2a12:4946:4001:35::1
     - domain: '*.frai.se'
       answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
     - domain: '*.frai.se'
@@ -92,11 +95,16 @@ dns:
       answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
     - domain: '*.unitix.be'
       answer: {{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}
-  blocked_services: []
+  blocked_services:
+    schedule:
+      time_zone: UTC
+    ids: []
   upstream_timeout: 10s
   private_networks: []
   use_private_ptr_resolvers: true
   local_ptr_upstreams: []
+  use_dns64: false
+  dns64_prefixes: []
   serve_http3: false
   use_http3_upstreams: false
 tls:
@@ -114,13 +122,25 @@ tls:
   certificate_path: ""
   private_key_path: ""
   strict_sni_check: false
+querylog:
+  ignored: []
+  interval: 2160h
+  size_memory: 1000
+  enabled: true
+  file_enabled: true
+statistics:
+  ignored: []
+  interval: 168h
+  enabled: true
 filters:
   - enabled: true
     url: https://abp.oisd.nl/
     name: OISD Blocklist
     id: 3
 whitelist_filters: []
-user_rules: []
+user_rules:
+  - '@@||tweakers.net^$important'
+  - ""
 dhcp:
   enabled: false
   interface_name: ""
@@ -147,18 +167,30 @@ clients:
     hosts: true
   persistent:
     - name: WG RANGE (NO LANCACHE)
-      tags: []
+      safe_search:
+        enabled: false
+        bing: false
+        duckduckgo: false
+        google: false
+        pixabay: false
+        yandex: false
+        youtube: false
+      blocked_services:
+        schedule:
+          time_zone: UTC
+        ids: []
       ids:
         - 10.10.35.0/24
-      blocked_services: []
+      tags: []
       upstreams:
         - 1.1.1.1
       use_global_settings: true
       filtering_enabled: false
       parental_enabled: false
-      safesearch_enabled: false
       safebrowsing_enabled: false
       use_global_blocked_services: true
+      ignore_querylog: false
+      ignore_statistics: false
 log_file: ""
 log_max_backups: 0
 log_max_size: 100
@@ -170,4 +202,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 14
+schema_version: 22
