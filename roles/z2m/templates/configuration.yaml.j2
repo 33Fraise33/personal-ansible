@@ -23,6 +23,7 @@ advanced:
     - 192
     - 135
   channel: 15
+  log_level: warn
 log_output:
   - console
 mqtt:
@@ -31,11 +32,13 @@ mqtt:
   version: 5
 serial:
   port: /dev/ttyACM0
-device_options: 
+device_options:
   legacy: false
 devices:
   '0x003c84fffe1fd811':
     friendly_name: styrbar_bureau
     legacy: false
   '0x385b44fffe1d4d4e':
-    friendly_name: tradfri_outlet_bureau
+    friendly_name: Outlet Bureau Amelle
+  '0xa4c138ca3d9cffd0':
+    friendly_name: Outlet Wasmachine

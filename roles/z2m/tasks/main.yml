@@ -1,24 +1,24 @@
 # setup zigbee2mqtt with a docker container
 # container from: https://www.zigbee2mqtt.io/guide/installation/02_docker.html
 
-- name: create mqtt config directory
-  file:
+- name: Create mqtt config directory
+  ansible.builtin.file:
     path: "{{ docker_config_location }}/z2m"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
 
-- name: copy config file to docker volume
-  template:
+- name: Copy config file to docker volume
+  ansible.builtin.template:
     src: configuration.yaml.j2
     dest: "{{ docker_config_location }}/z2m/configuration.yaml"
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
 
-- name: setup zigbee2mqtt docker container
-  docker_container:
+- name: Setup zigbee2mqtt docker container
+  community.docker.docker_container:
     name: zigbee2mqtt
     image: koenkk/zigbee2mqtt:latest
     networks:
@@ -26,9 +26,9 @@
     volumes:
       - "{{ docker_config_location }}/z2m:/app/data"
       - "/run/udev:/run/udev:ro"
-    devices: 
-      - /dev/serial/by-id/usb-Silicon_Labs_Sonoff_Zigbee_3.0_USB_Dongle_Plus_0001-if00-port0:/dev/ttyACM0
-    restart: yes
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyACM0"
+    restart: true
     restart_policy: always
     state: started
     pull: true
