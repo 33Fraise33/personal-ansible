@@ -18,6 +18,10 @@ all:
               ansible_python_interpreter: /usr/bin/python3
               ansible_host: 10.33.1.6
               ansible_user: root
+        acc:
+          hosts: 
+            accserver:
+              ansible_host: 172.16.33.9
     routers:
       children:
         mikrotik:

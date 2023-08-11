@@ -1,0 +1,205 @@
+---
+# setup accserver on Linux CT
+# container from: https://github.com/assetto-corsa-web/accweb
+
+- name: USER - Add steam user
+  ansible.builtin.user:
+    name: "{{ item }}"
+    comment: "{{ item }} User"
+    shell: /bin/bash
+  loop:
+    - steam
+    - acc
+
+- name: Install packages
+  ansible.builtin.apt:
+    name: software-properties-common
+
+- name: Check if i386 is enabled
+  ansible.builtin.shell: dpkg --print-foreign-architectures | grep i386
+  register: result_i386_check
+  changed_when: result_i386_check.rc == 1
+  failed_when: result_i386_check.rc > 1
+
+- name: Enable i386 architecture
+  ansible.builtin.command: dpkg --add-architecture i386
+  when: result_i386_check.rc == 1
+  changed_when: false
+
+- name: Install steamcmd and update cache
+  ansible.builtin.apt:
+    name:
+      - steamcmd
+      - acl  # needed for become_user
+      - unzip  # needed to unpack accweb
+    update_cache: true
+
+- name: Login (remembered credentials) and download latest version
+  ansible.builtin.command: "/usr/games/steamcmd \
+    +@sSteamCmdForcePlatformType windows \
+    +force_install_dir /accserver \
+    +login {{ steam.username }} \
+    +app_update 1430110 validate \
+    +quit"
+  become_user: steam
+  failed_when: false
+  changed_when: false
+
+- name: Create dir
+  ansible.builtin.file:
+    path: /home/acc/accweb
+    state: directory
+    owner: acc
+    group: acc
+    mode: "0755"
+
+- name: Download latest version
+  ansible.builtin.unarchive:
+    src: https://github.com/assetto-corsa-web/accweb/releases/download/v{{ accweb.version }}/accweb_v{{ accweb.version }}.zip
+    dest: /tmp/
+    remote_src: true
+    mode: "0755"
+    owner: acc
+    group: acc
+    exclude:
+      - accweb_v{{ accweb.version }}/config.yml
+
+- name: Copy files
+  ansible.builtin.copy:
+    src: /tmp/accweb_v{{ accweb.version }}/
+    dest: /home/acc/accweb/
+    remote_src: true
+    mode: "0755"
+    owner: acc
+    group: acc
+
+- name: Install wine
+  ansible.builtin.apt:
+    name:
+      - wine
+      - wine32
+      - wine64
+      - libwine
+      - libwine:i386
+      - fonts-wine
+
+- name: Copy config template
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: /home/acc/accweb/config.yml
+    owner: acc
+    group: acc
+    mode: "0755"
+
+- name: Copy the systemd file
+  ansible.builtin.copy:
+    src: accweb.service
+    dest: /etc/systemd/system/accweb.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Start server
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: accweb
+    state: restarted
+    enabled: true
+
+
+# - name: Create a volume for accserver content
+#   community.general.docker_volume:
+#     name: data_accweb
+#   loop:
+#     - data_accweb
+#     - data_steamcmd
+
+# # # {{ docker_data_location }}/docker/volumes/data_accweb/_data
+
+# - name: Create accserver config directory
+#   ansible.builtin.file:
+#     path: "{{ item }}"
+#     state: directory
+#     mode: "0755"
+#     owner: "{{ nobody.user }}"
+#     group: "{{ nobody.group }}"
+#   with_items:
+#     - "{{ docker_config_location }}/accweb"
+#     - "{{ docker_config_location }}/accweb/app"
+
+# - name: Create accweb git directory
+#   ansible.builtin.file:
+#     path: "{{ docker_config_location }}/accweb/git"
+#     state: directory
+#     mode: "0755"
+#     owner: root
+#     group: root
+
+# - name: Setup steamcmd container
+#   community.general.docker_container:
+#     name: steamcmd
+#     image: steamcmd/steamcmd:alpine
+#     command: "+@sSteamCmdForcePlatformType windows \
+#       +force_install_dir /download \
+#       +login {{ steam.username }} {{ steam.password }} {{ steam.twofa }}"
+#     networks:
+#       - name: macvlan333
+#     volumes:
+#       - "accweb:/download"
+#       - data_steamcmd:/root/.steam:z
+#     restart: true
+#     restart_policy: always
+#     state: started
+#     pull: true
+#     labels:
+#       traefik.enable: "false"
+#       com.centurylinklabs.watchtower.enable: "false"
+
+# - name: Run download accserver command
+#   community.docker.docker_container_exec:
+#     container: steamcmd
+#     command: "+app_update 1430110 validate"
+
+# - name: Clone git repo to accweb folder
+#   ansible.builtin.git:
+#     repo: https://github.com/assetto-corsa-web/accweb.git
+#     version: master
+#     dest: "{{ docker_config_location }}/accweb/git"
+#     force: true
+#   become: true
+
+# - name: Build image
+#   community.general.docker_image:
+#     name: accweb
+#     build:
+#       path: "{{ docker_config_location }}/accweb/git"
+#     source: build
+
+# - name: Setup accserver docker container
+#   tags: web
+#   community.general.docker_container:
+#     name: accserver
+#     image: accweb:latest
+#     networks:
+#       - name: macvlan333
+#         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.accserver }}"
+#         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.accserver }}"
+#     volumes:
+#       - "accweb:/accserver"
+#       - "{{ docker_config_location }}/accweb/app:/accweb"
+#     env:
+#       ACCWEB_HOST: 0.0.0.0:8080
+#       ACCWEB_ADMIN_PASSWORD: "{{ admin_password }}"
+#       ACCWEB_MOD_PASSWORD: "{{ mod_password }}"
+#       ACCWEB_RO_PASSWORD: ro
+#       ACCWEB_LOGLEVEL: info
+#       ACCWEB_CORS: "*"
+#     restart: true
+#     restart_policy: always
+#     state: started
+#     pull: true
+#     labels:
+#       traefik.http.routers.accserver.rule: "Host(`accserver.frai.se`)"
+#       traefik.http.routers.accserver.tls: "true"
+#       traefik.http.routers.accserver.tls.certresolver: "le"
+#       traefik.http.services.accserver.loadbalancer.server.port: "8080"

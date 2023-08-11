@@ -1,0 +1,8 @@
+---
+- name: Setup ACC Server with accweb
+  hosts: accserver
+  connection: ssh
+  gather_facts: false
+  become: true
+  roles:
+    - accserver

@@ -8,6 +8,9 @@ docker_config_location: /data/docker-config
 docker_data_location: /data/docker
 matrix_base_url: matrix.frai.se
 
+steam:
+  username: buggyfreak2
+
 domains:
   ipv6_proxy: "2a12:4946:4000:333::10"
   fraise:
