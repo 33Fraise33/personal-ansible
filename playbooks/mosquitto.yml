@@ -1,0 +1,7 @@
+---
+- name: Setup mqtt docker container
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - mosquitto

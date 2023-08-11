@@ -1,0 +1,9 @@
+---
+- name: Setup Portainer
+  hosts:
+    - compute
+    - kang
+  connection: ssh
+  become: true
+  roles:
+    - portainer

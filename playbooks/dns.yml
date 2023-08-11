@@ -1,0 +1,40 @@
+---
+- name: Get public ip once
+  hosts: compute,localhost
+  gather_facts: false
+  tasks:
+    - name: Get public ip
+      community.general.ipify_facts:  # generates "ipify_public_ip" var with public ipv4 inside
+  tags: always,ipify
+
+- name: Set Cloudflare DNS Records
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - cloudflare
+  tags: cloudflare
+
+- name: Setup ddclient
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - ddclient
+  tags: ddclient
+
+- name: Setup unbound
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - unbound
+  tags: unbound
+
+- name: Setup adguard
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - adguard
+  tags: adguard

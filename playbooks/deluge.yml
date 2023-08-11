@@ -1,0 +1,7 @@
+---
+- name: Setup Deluge
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - deluge

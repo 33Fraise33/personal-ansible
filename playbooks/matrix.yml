@@ -1,0 +1,7 @@
+---
+- name: Setup Matrix
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - matrix

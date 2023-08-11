@@ -1,0 +1,7 @@
+---
+- name: Setup prometheus with alertmanager
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - prometheus

@@ -1,0 +1,7 @@
+---
+- name: Setup jellyfin docker container
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - jellyfin

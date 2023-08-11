@@ -1,6 +1,0 @@
-- name: setup minecraft
-  hosts: compute
-  connection: ssh
-  become: true
-  roles:
-    - minecraft

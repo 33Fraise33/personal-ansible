@@ -1,0 +1,7 @@
+---
+- name: Setup Nginx
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - nginx

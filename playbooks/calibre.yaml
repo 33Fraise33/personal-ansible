@@ -1,6 +1,0 @@
-- name: Setup Calibre
-  hosts: compute
-  connection: ssh
-  become: true
-  roles:
-    - calibre

@@ -1,0 +1,7 @@
+---
+- name: Setup homeassistant docker container
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - homeassistant

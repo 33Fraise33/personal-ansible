@@ -1,0 +1,8 @@
+---
+- name: Setup wordpress docker container
+  hosts: compute
+  connection: ssh
+  gather_facts: false
+  become: true
+  roles:
+    - wordpress

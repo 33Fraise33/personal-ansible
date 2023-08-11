@@ -1,0 +1,7 @@
+---
+- name: Setup postgresDB
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - postgres

@@ -1,0 +1,7 @@
+---
+- name: Setup Miniflux
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - miniflux

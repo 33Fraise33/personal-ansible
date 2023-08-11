@@ -1,0 +1,7 @@
+---
+- name: Setup Docker
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - docker
