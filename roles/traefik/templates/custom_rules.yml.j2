@@ -13,6 +13,10 @@ http:
       loadBalancer:
         servers:
           - url: "https://172.16.53.2"
+    accweb:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.33.9:8080"
     status:
       loadBalancer:
         servers:
@@ -42,6 +46,13 @@ http:
     unifi-camera:
       rule: "Host(`nvr.frai.se`)"
       service: "unifi-camera"
+      tls:
+        certResolver: le
+        domains:
+          - main: "*.frai.se"
+    accweb:
+      rule: "Host(`accweb.frai.se`)"
+      service: "accweb"
       tls:
         certResolver: le
         domains:

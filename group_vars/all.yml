@@ -18,9 +18,8 @@ domains:
       - name: kingpin
         ipv6: "2a12:4946:4001::1"
         ipv4: "193.148.249.106"
-      - name: kingpin
-        ipv6: "2a12:4946:4001::1"
-        ipv4: "193.148.249.106"
+      - name: acc
+        ipv6: "2a12:4946:4000:33:f032:a6ff:fe7d:2762"
       - name: home
     local: []
 

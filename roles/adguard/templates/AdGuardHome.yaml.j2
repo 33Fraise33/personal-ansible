@@ -1,5 +1,6 @@
-bind_host: 0.0.0.0
-bind_port: 80
+http:
+  address: 0.0.0.0:80
+  session_ttl: 720h
 users:
   - name: fraise
     password: {{ adguard_password }}
@@ -9,7 +10,6 @@ http_proxy: ""
 language: ""
 theme: auto
 debug_pprof: false
-web_session_ttl: 720
 dns:
   bind_hosts:
     - 0.0.0.0
@@ -83,6 +83,10 @@ dns:
       answer: 193.148.249.106
     - domain: wireguard.frai.se
       answer: 2a12:4946:4001:35::1
+    - domain: acc.frai.se
+      answer: 172.16.33.9
+    - domain: acc.frai.se
+      answer: 2a12:4946:4000:33:f032:a6ff:fe7d:2762
     - domain: '*.frai.se'
       answer: {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}
     - domain: '*.frai.se'
@@ -166,8 +170,7 @@ clients:
     dhcp: true
     hosts: true
   persistent:
-    - name: WG RANGE (NO LANCACHE)
-      safe_search:
+    - safe_search:
         enabled: false
         bing: false
         duckduckgo: false
@@ -179,6 +182,7 @@ clients:
         schedule:
           time_zone: UTC
         ids: []
+      name: WG RANGE (NO LANCACHE)
       ids:
         - 10.10.35.0/24
       tags: []
@@ -191,15 +195,16 @@ clients:
       use_global_blocked_services: true
       ignore_querylog: false
       ignore_statistics: false
-log_file: ""
-log_max_backups: 0
-log_max_size: 100
-log_max_age: 3
-log_compress: false
-log_localtime: false
-verbose: false
+log:
+  file: ""
+  max_backups: 0
+  max_size: 100
+  max_age: 3
+  compress: false
+  local_time: false
+  verbose: false
 os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 22
+schema_version: 24
