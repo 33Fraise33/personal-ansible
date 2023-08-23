@@ -63,6 +63,12 @@ sensor:
     postcode: 8490
     streetname: Eernegemweg
     streetnumber: 96
+  - platform: statistics
+    name: "Average power usage 5 min"
+    entity_id: sensor.p1_meter_3c39e7250142_active_power
+    state_characteristic: mean
+    max_age:
+      minutes: 5
 
 binary_sensor:
   - platform: ping

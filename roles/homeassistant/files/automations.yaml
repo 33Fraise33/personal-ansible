@@ -38,7 +38,7 @@
           title: Show Calendar
           uri: /lovelace/default_view
         icon_url: https://i.pinimg.com/originals/86/d9/27/86d92784a2c535e3bd783aec01bd1475.png
-  - service: notify.mobile_app_sm_s901b
+  - service: notify.mobile_app_sm_a546b
     data:
       title: AFVAL
       message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days_until'',
@@ -75,7 +75,7 @@
       data:
         url: /lovelace/default_view
         icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
-  - service: notify.mobile_app_sm_s901b
+  - service: notify.mobile_app_sm_a546b
     data:
       message: Garage has been open for more then 5 minutes!
       title: Garage Open
@@ -128,66 +128,6 @@
         domain: light
     default: []
   mode: single
-- id: '1672756895625'
-  alias: New Automation
-  description: ''
-  trigger:
-  - platform: device
-    domain: mqtt
-    device_id: b6a7367363b2689386e9ee5467f98824
-    type: action
-    subtype: 'on'
-    discovery_id: 0x003c84fffe1fd811 action_on
-  condition: []
-  action:
-  - type: toggle
-    device_id: a09e03e9cf3fd5812272d5c4d2af9a76
-    entity_id: switch.tradfri_outlet_bureau
-    domain: switch
-  mode: single
-- id: '1672865401228'
-  alias: Play Stubru Button
-  description: ''
-  trigger:
-  - platform: device
-    domain: mqtt
-    device_id: b6a7367363b2689386e9ee5467f98824
-    type: action
-    subtype: 'off'
-    discovery_id: 0x003c84fffe1fd811 action_off
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: device
-        device_id: d9a7a94b0909413cd5ebdd78e5656a67
-        domain: media_player
-        entity_id: media_player.nesthubf1f7
-        type: is_playing
-      sequence:
-      - service: media_player.media_stop
-        data: {}
-        target:
-          area_id: b3a8420b41d54c4e9c7ea23f2bf90c0b
-    default:
-    - service: media_player.play_media
-      target:
-        entity_id: media_player.nesthubf1f7
-      data:
-        media_content_id: media-source://radio_browser/9612651b-0601-11e8-ae97-52543be04c81
-        media_content_type: audio/mpeg
-      metadata:
-        title: Studio Brussel
-        thumbnail: https://upload.wikimedia.org/wikipedia/commons/1/19/VRT_Studio_Brussel_logo.png
-        media_class: music
-        children_media_class:
-        navigateIds:
-        - {}
-        - media_content_type: app
-          media_content_id: media-source://radio_browser
-        - media_content_type: music
-          media_content_id: media-source://radio_browser/country/BE
-  mode: single
 - id: '1672914124011'
   alias: Lucifer Button
   description: ''
@@ -215,4 +155,192 @@
         -d http://www.netflix.com/watch/80057918 -f 0x10808000 -e source 30
     target:
       device_id: d6ca95811e63498241d2f3bddb5dd1ad
+  mode: single
+- id: '1676395228339'
+  alias: STYRBAR
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: b6a7367363b2689386e9ee5467f98824
+    type: action
+    subtype: 'on'
+    discovery_id: 0x003c84fffe1fd811 action_on
+    id: '1'
+  - platform: device
+    domain: mqtt
+    device_id: b6a7367363b2689386e9ee5467f98824
+    type: action
+    subtype: 'off'
+    discovery_id: 0x003c84fffe1fd811 action_off
+    id: '2'
+  - platform: device
+    domain: mqtt
+    device_id: b6a7367363b2689386e9ee5467f98824
+    type: action
+    subtype: arrow_right_click
+    discovery_id: 0x003c84fffe1fd811 action_arrow_right_click
+    id: '3'
+  - platform: device
+    domain: mqtt
+    device_id: b6a7367363b2689386e9ee5467f98824
+    type: action
+    subtype: arrow_left_click
+    discovery_id: 0x003c84fffe1fd811 action_arrow_left_click
+    id: '4'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: '1'
+      sequence:
+      - type: toggle
+        device_id: 5a7e24120c207c869bb3bf761cb438df
+        entity_id: switch.licht_voor
+        domain: switch
+    - conditions:
+      - condition: trigger
+        id: '2'
+      sequence:
+      - type: toggle
+        device_id: 5a7e24120c207c869bb3bf761cb438df
+        entity_id: switch.licht_achter
+        domain: switch
+    - conditions:
+      - condition: trigger
+        id: '3'
+      sequence:
+      - service: cover.open_cover
+        data: {}
+        target:
+          entity_id: cover.garage_door
+    - conditions:
+      - condition: trigger
+        id: '4'
+      sequence:
+      - service: cover.close_cover
+        data: {}
+        target:
+          entity_id: cover.garage_door
+  mode: single
+- id: '1682231799093'
+  alias: SET VOLUME
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - media_player.nestmini6634
+    - media_player.nestmini5142
+    - media_player.nesthubf1f7
+    attribute: volume_level
+  condition:
+  - condition: device
+    device_id: e315a7cd5964d5082f2e2f2f3fc077fb
+    domain: media_player
+    entity_id: media_player.living_kitchen
+    type: is_playing
+  action:
+  - service: media_player.volume_set
+    data:
+      volume_level: 0.2
+    target:
+      device_id:
+      - 8c729843fc3141796f3ebd6ceb2d5152
+      - 3c4e87a8d6da8106fff88e88fbbdb28e
+      - d9a7a94b0909413cd5ebdd78e5656a67
+  mode: single
+- id: '1683093433890'
+  alias: Auto Opladen
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.average_power_usage_5_min
+    below: -100
+  condition:
+  - condition: and
+    conditions:
+    - condition: zone
+      entity_id: device_tracker.320e
+      zone: zone.home
+    - type: is_not_charging
+      condition: device
+      device_id: 63b199a1c95a1a99a581388997081792
+      entity_id: binary_sensor.320e_charging_status
+      domain: binary_sensor
+  action:
+  - device_id: 0aacab7aaae31e3839efecd1059c90d7
+    domain: mobile_app
+    type: notify
+    title: Charge Car
+    message: Laten we de auto opladen
+  mode: single
+- id: '1683093764768'
+  alias: Stop Auto Laden
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.average_power_usage_5_min
+    above: 100
+  condition:
+  - condition: and
+    conditions:
+    - condition: zone
+      entity_id: device_tracker.320e
+      zone: zone.home
+    - type: is_charging
+      condition: device
+      device_id: 63b199a1c95a1a99a581388997081792
+      entity_id: binary_sensor.320e_charging_status
+      domain: binary_sensor
+  action:
+  - device_id: 0aacab7aaae31e3839efecd1059c90d7
+    domain: mobile_app
+    type: notify
+    title: Stop Car Charge
+    message: Gemiddeld verbruik stroom boven 100W
+  mode: single
+- id: '1686683677480'
+  alias: Nfc test garage
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: b4bca8cf-e3a4-46b6-8a3c-8b2eedbda5e1
+  condition: []
+  action:
+  - service: cover.toggle
+    data: {}
+    target:
+      entity_id: cover.garage_door
+  mode: single
+- id: '1689091034422'
+  alias: Tag Licht Buiten is scanned
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: 66c4f8be-a681-4913-b2a9-6cc87cb77582
+  condition: []
+  action:
+  - type: toggle
+    device_id: 5a7e24120c207c869bb3bf761cb438df
+    entity_id: b87e6e421ad0896f5896243b85567a30
+    domain: switch
+  mode: single
+- id: '1691999617422'
+  alias: Phone push doorbell
+  description: Phone push doorbell
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.cam_doorbell_doorbell
+    to: 'on'
+  action:
+  - service: notify.mobile_app_pixel6_gianni
+    data:
+      title: Doorbell
+      message: check unifi
+      data:
+        ttl: 0
+        priority: high
+        channel: alarm_stream
   mode: single

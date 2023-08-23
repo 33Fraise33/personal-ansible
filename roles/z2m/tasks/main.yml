@@ -27,7 +27,7 @@
       - "{{ docker_config_location }}/z2m:/app/data"
       - "/run/udev:/run/udev:ro"
     devices:
-      - "/dev/ttyUSB0:/dev/ttyACM0"
+      - "/dev/serial/by-id/usb-Silicon_Labs_Sonoff_Zigbee_3.0_USB_Dongle_Plus_0001-if00-port0:/dev/ttyACM0"
     restart: true
     restart_policy: always
     state: started

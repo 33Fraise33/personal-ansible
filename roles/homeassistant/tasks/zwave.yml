@@ -1,0 +1,26 @@
+---
+# docker run --rm -it -p 8091:8091 -p 3000:3000 --device=/dev/serial/by-id/insert_stick_reference_here:/dev/zwave \
+# --mount source=zwave-js-ui,target=/usr/src/app/store zwavejs/zwave-js-ui:latest
+
+- name: Create a volume for persistent data
+  community.docker.docker_volume:
+    name: "data_zwavejs"
+
+- name: Setup zwavejs docker container
+  community.docker.docker_container:
+    name: zwavejs
+    image: zwavejs/zwave-js-ui:latest
+    networks:
+      - name: macvlan333
+    volumes:
+      - "data_zwavejs:/usr/src/app/store"
+    devices:
+      - "/dev/serial/by-id/usb-0658_0200-if00:/dev/zwave"
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.zwave.tls: "true"
+      traefik.http.routers.zwave.tls.certresolver: "le"
+      traefik.http.services.zwave.loadbalancer.server.port: "8091"

@@ -1,22 +1,23 @@
-- name: copy configuration files to directory
-  copy:
+---
+- name: Copy configuration files to directory
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ docker_config_location }}/homeassistant/{{ item }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   loop:
     - automations.yaml
     - customize.yaml
   notify: restart homeassistant
 
-- name: copy configuration templates to directory
-  template:
+- name: Copy configuration templates to directory
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ docker_config_location }}/homeassistant/{{ item }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   loop:
     - configuration.yaml
     - service_account.json
