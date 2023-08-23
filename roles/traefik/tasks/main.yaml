@@ -40,6 +40,7 @@
       # - --entryPoints.web-secure.http.middlewares=mywhitelist@file
       - --entryPoints.traefik.address=:8080
       - --api=true
+      - --api.dashboard=true
       - --api.insecure=true
       - --log=true
       - --log.level=INFO

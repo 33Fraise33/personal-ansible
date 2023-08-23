@@ -1,16 +1,16 @@
-- name: get uklans github repo
-  git:
+- name: Get uklans github repo
+  ansible.builtin.git:
     repo: https://github.com/uklans/cache-domains
     dest: "{{ docker_config_location }}/unbound/lancache/"
-    force: yes
+    force: true
 
 - name: Install jq package for cache domain script
-  apt:
-    name: 
+  ansible.builtin.apt:
+    name:
       - jq
 
-- name: copy lancache template files
-  template:
+- name: Copy lancache template files
+  ansible.builtin.template:
     src: "{{ item.name }}.j2"
     dest: "{{ docker_config_location }}/unbound/lancache/scripts/{{ item.name }}"
     owner: root
