@@ -1,46 +1,46 @@
-- name: create snmp config directory
-  file:
+- name: Create snmp config directory
+  ansible.builtin.file:
     path: "{{ docker_config_location }}/prometheus_snmp"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: "{{ nobody.group }}"
     group: "{{ nobody.group }}"
 
-- name: copy generator config
-  copy:
+- name: Copy generator config
+  ansible.builtin.copy:
     src: generator.yml
     dest: "{{ docker_config_location }}/prometheus_snmp/generator.yml"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
-    mode: 0755
+    mode: "0755"
 
-- name: copy mibs
-  copy:
+- name: Copy mibs
+  ansible.builtin.copy:
     src: mibs/
     dest: "{{ docker_config_location }}/prometheus_snmp/mibs/"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
-    mode: 0755
+    mode: "0755"
 
-- name: setup prometheus snmp generator
-  docker_container:
+- name: Setup prometheus snmp generator
+  community.docker.docker_container:
     name: prometheus-snmp-generator
     image: prom/snmp-generator:latest
     volumes:
       - "{{ docker_config_location }}/prometheus_snmp:/opt"
-    restart: yes
-    restart_policy: no
+    restart: true
+    restart_policy: false
     state: started
     pull: true
     labels:
       traefik.enable: "false"
 
-- name: wait for generator to have created snmp.yml
-  pause:
+- name: Wait for generator to have created snmp.yml
+  ansible.builtin.pause:
     seconds: 10
 
-- name: setup prometheus snmp exporter
-  docker_container:
+- name: Setup prometheus snmp exporter
+  community.docker.docker_container:
     name: prometheus-snmp
     image: prom/snmp-exporter:latest
     networks:
@@ -50,14 +50,14 @@
     volumes:
       - "{{ docker_config_location }}/prometheus_snmp/snmp.yml:/snmp.yml:ro"
     command: "--config.file=/snmp.yml"
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     pull: true
     labels:
       traefik.enable: "false"
 
-- name: remove generator container
-  docker_container:
+- name: Remove generator container
+  community.docker.docker_container:
     name: prometheus-snmp-generator
-    state: absent   
+    state: absent

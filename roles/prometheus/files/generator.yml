@@ -1,3 +1,8 @@
+auths:
+  fraise_v2:
+    community: frai.se
+    version: 2
+
 modules:
   # Default IF-MIB interfaces table with ifIndex.
   if_mib:
@@ -15,9 +20,6 @@ modules:
     lookups:
       - source_indexes: [ifIndex]
         lookup: ifDescr
-    version: 2
-    auth:
-      community: frai.se
 
 # Mikrotik
   mikrotik:
@@ -41,9 +43,6 @@ modules:
     lookups:
       - source_indexes: [ifIndex]
         lookup: ifDescr
-    version: 2
-    auth:
-      community: frai.se
 
 # Ubiquiti / AirMAX
 # https://dl.ubnt.com/firmwares/airos-ubnt-mib/ubnt-mib.zip

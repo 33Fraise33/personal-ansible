@@ -86,6 +86,8 @@ scrape_configs:
     params:
       module:
         - mikrotik
+      auth: 
+        - fraise_v2
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -104,6 +106,8 @@ scrape_configs:
     params:
       module:
         - if_mib
+      auth: 
+        - fraise_v2
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -120,6 +124,8 @@ scrape_configs:
     params:
       module:
         - if_mib
+      auth: 
+        - fraise_v2
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
