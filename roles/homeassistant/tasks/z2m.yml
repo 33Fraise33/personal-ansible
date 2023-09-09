@@ -11,7 +11,7 @@
 
 - name: Copy config file to docker volume
   ansible.builtin.template:
-    src: configuration.yaml.j2
+    src: z2mconfig.yml.j2
     dest: "{{ docker_config_location }}/z2m/configuration.yaml"
     mode: "0755"
     owner: root

@@ -46,3 +46,7 @@
 - name: Include zwave tasks
   ansible.builtin.import_tasks: zwave.yml
   tags: zwave
+
+- name: Include zigbee tasks
+  ansible.builtin.import_tasks: z2m.yml
+  tags: zigbee,z2m
