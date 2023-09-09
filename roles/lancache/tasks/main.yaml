@@ -20,7 +20,7 @@
       CACHE_DISK_SIZE: "500000m"
       CACHE_MAX_AGE: "365d"
       CACHE_INDEX_SIZE: "500m"
-      CACHE_SLICE_SIZE: "0m"
+      # CACHE_SLICE_SIZE: "0m"  # best at 1m (default), valorant works better at 0m
     volumes:
       - "{{ lancache.dir }}:/data/cache"
     restart: yes
