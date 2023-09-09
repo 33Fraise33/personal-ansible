@@ -1,13 +1,14 @@
+---
 - name: DATE - Set timezone to UTC
-  timezone:
+  ansible.builtin.timezone:
     name: "Etc/UTC"
 
 - name: DATE - Install ntp package
-  apt:
+  ansible.builtin.apt:
     name: ntp
 
 - name: DATE - Enable & start ntp
-  systemd:
+  ansible.builtin.systemd:
     name: ntp
     state: started
-    enabled: yes
+    enabled: true

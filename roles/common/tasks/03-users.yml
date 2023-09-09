@@ -1,17 +1,28 @@
+---
+- name: USER - Add group
+  ansible.builtin.group:
+    name: sudo
+
+- name: USER - install sudo package
+  ansible.builtin.package:
+    name:
+      - sudo
+    state: present
+    update_cache: true
 
 - name: USER - Add to host
-  user:
+  ansible.builtin.user:
     name: "{{ item.user }}"
     comment: "{{ item.name }}"
-    groups: wheel
+    groups: sudo
     shell: /bin/bash
-    append: yes
+    append: true
   loop: "{{ admin_users }}"
   loop_control:
     label: "{{ item.user }}"
 
 - name: USER - Set authorized key taken from file
-  authorized_key:
+  ansible.posix.authorized_key:
     user: "{{ item.user }}"
     state: present
     key: "{{ item.ssh_key }}"
@@ -19,15 +30,15 @@
   loop_control:
     label: "{{ item.user }}"
 
-- name: USER - Allow wheel user group to have passwordless sudo
-  lineinfile:
+- name: USER - Allow sudo user group to have passwordless sudo
+  ansible.builtin.lineinfile:
     dest: /etc/sudoers
     state: present
-    regexp: '^%wheel'
-    line: '%wheel ALL=(ALL:ALL) NOPASSWD:ALL'
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
 
 - name: USER - Change ssh configs
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
@@ -38,7 +49,7 @@
   notify: restart sshd
 
 - name: USER - delete debian user from host
-  user:
+  ansible.builtin.user:
     name: "debian"
     state: absent
   when: ansible_user is not defined or ansible_user != "debian"

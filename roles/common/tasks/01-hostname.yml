@@ -1,9 +1,10 @@
+---
 - name: HOSTNAME - Update hostname
-  hostname:
+  ansible.builtin.hostname:
     name: "{{ inventory_hostname | replace('_', '-') }}"
 
 - name: HOSTNAME - Set in /etc/hosts
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/hosts
     regexp: '^127\.0\.1\.1'
     line: "127.0.1.1	{{ inventory_hostname | replace('_', '-') }}.frai.se {{ inventory_hostname | replace('_', '-') }}"
