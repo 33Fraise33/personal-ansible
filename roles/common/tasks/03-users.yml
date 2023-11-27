@@ -43,13 +43,25 @@
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
   with_items:
-    - { regexp: '^(# *)?PermitRootLogin', line: 'PermitRootLogin no'}
-    - { regexp: '^(# *)?UsePAM ', line: 'UsePAM yes'}
-    - { regexp: '^(# *)?PasswordAuthentication ', line: 'PasswordAuthentication no'}
-  notify: restart sshd
+    - regexp: '^(# *)?PermitRootLogin'
+      line: 'PermitRootLogin no'
+    - regexp: '^(# *)?UsePAM '
+      line: 'UsePAM yes'
+    - regexp: '^(# *)?PasswordAuthentication '
+      line: 'PasswordAuthentication no'
+    - regexp: '^(# *)?PermitEmptyPasswords '
+      line: 'PermitEmptyPasswords no'
+    - regexp: '^(# *)?ChallengeResponseAuthentication '
+      line: 'ChallengeResponseAuthentication no'
+    - regexp: '^(# *)?Port '
+      line: 'Port 1830'
+  notify: Restart sshd
 
 - name: USER - delete debian user from host
   ansible.builtin.user:
     name: "debian"
     state: absent
-  when: ansible_user is not defined or ansible_user != "debian"
+  when: ansible_user|default() != "debian"
+
+- name: USER - Flush handlers
+  ansible.builtin.meta: flush_handlers

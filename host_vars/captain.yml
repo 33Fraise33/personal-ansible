@@ -16,6 +16,14 @@ cloudflared:
     31666565393963633964623339373133393536393130356330633034373566326331653363646237
     36353962383230376465323564323332666239663064333963306364663862383363
 
+mounts:
+  - dir: data
+    disk: scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
+    fs: ext4
+  - dir: lancache
+    disk: scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
+    fs: ext4
+
 lancache:
   dir: /lancache
 

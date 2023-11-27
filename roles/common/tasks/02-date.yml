@@ -1,14 +1,31 @@
 ---
 - name: DATE - Set timezone to UTC
-  ansible.builtin.timezone:
+  community.general.timezone:
     name: "Etc/UTC"
 
-- name: DATE - Install ntp package
-  ansible.builtin.apt:
-    name: ntp
+- name: DATE - Remove unneeded packages
+  ansible.builtin.package:
+    name:
+      - ntp
+      - systemd-timesyncd
+    state: absent
 
-- name: DATE - Enable & start ntp
+- name: DATE - Install chrony
+  ansible.builtin.package:
+    name: chrony
+
+- name: DATE - Enable and start chrony  # 'chronyc tracking' for status
   ansible.builtin.systemd:
-    name: ntp
+    name: chronyd
     state: started
     enabled: true
+
+- name: DATE - Set timeserver to config
+  ansible.builtin.lineinfile:
+    path: "/etc/chrony/chrony.conf"
+    regexp: '^pool'
+    line: "pool {{ ntp }} iburst"
+  notify: Restart chrony
+
+- name: DATE - Flush handlers
+  ansible.builtin.meta: flush_handlers

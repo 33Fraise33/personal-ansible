@@ -1,8 +1,13 @@
 ---
+ansible_python_interpreter: /usr/bin/python3
+ansible_ssh_port: 1830
+
 default_user: gianni
 nobody:
   group: "65534"
   user: "65534"
+
+ntp: time.cloudflare.com
 
 docker_config_location: /data/docker-config
 docker_data_location: /data/docker

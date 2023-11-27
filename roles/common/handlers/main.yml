@@ -1,19 +1,27 @@
-- name: restart node_exporter
-  systemd:
+---
+- name: Restart node_exporter
+  ansible.builtin.systemd:
     daemon_reload: true
     name: node_exporter
     state: restarted
-    enabled: yes
+    enabled: true
   become: true
 
-- name: restart sshd
-  systemd:
+- name: Restart sshd
+  ansible.builtin.systemd:
     name: sshd
     state: restarted
-    enabled: yes
+    enabled: true
   become: true
 
-- name: restart networking
-  systemd:
+- name: Restart networking
+  ansible.builtin.systemd:
     name: networking
     state: restarted
+  become: true
+
+- name: Restart chrony
+  ansible.builtin.systemd:
+    name: chronyd
+    state: restarted
+  become: true

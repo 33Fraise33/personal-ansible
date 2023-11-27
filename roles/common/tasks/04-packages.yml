@@ -1,12 +1,10 @@
 ---
-- name: run debian tasks
+- name: Run debian tasks
+  when: ansible_os_family == "Debian"
   block:
-    - name: PACKAGES - Update all to their latest version
+    - name: PACKAGES - Update apt cache so packages are available to download
       ansible.builtin.apt:
-        name: "*"
-        state: latest
         update_cache: true
-      tags: upgrade
 
     - name: PACKAGES - Install default packages
       ansible.builtin.apt:
@@ -15,14 +13,12 @@
           - fail2ban
           - git
           - htop
-          - ncdu
+          - gdu
           - net-tools
           - nmap
-          - ntp
           - mtr
           - parted
           - python3-pip
           - traceroute
           - tcpdump
           - vim
-  when: ansible_os_family == "Debian"

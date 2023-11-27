@@ -1,6 +1,6 @@
-
+---
 - name: Initial Setup tasks for clean host
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: 00-setup.yml
     apply:
       tags:
@@ -9,30 +9,43 @@
     ansible_port: 22
   when: initial_setup == "yes"
 
-- name: gather host facts
+- name: Gather host facts
   ansible.builtin.setup:
   tags: always
 
-- import_tasks: 01-hostname.yml
+- name: Run hostname tasks
+  ansible.builtin.import_tasks: 01-hostname.yml
   tags: hostname
 
-- import_tasks: 02-date.yml
+- name: Run date tasks
+  ansible.builtin.import_tasks: 02-date.yml
   tags: date
 
-- import_tasks: 03-users.yml
+- name: Run user tasks
+  ansible.builtin.import_tasks: 03-users.yml
   tags: users
 
-- import_tasks: 04-packages.yml
+- name: Run package tasks
+  ansible.builtin.import_tasks: 04-packages.yml
   tags: packages
 
-- import_tasks: 05-dns.yml
+- name: Run dns tasks
+  ansible.builtin.import_tasks: 05-dns.yml
   tags: dns
 
-- import_tasks: 06-node_exporter.yml
+- name: Run node_exporter tasks
+  ansible.builtin.import_tasks: 06-node_exporter.yml
   tags: node_exporter
 
-- import_tasks: 07-networking.yml
+- name: Run networking tasks
+  ansible.builtin.import_tasks: 07-networking.yml
   tags: networking
 
-- import_tasks: 08-mounts.yml
-  tags: mounts
+- name: Run mounts tasks
+  ansible.builtin.include_tasks:
+    file: 08-mounts.yml
+    apply:
+      tags:
+        - mounts
+  tags: always
+  when: mounts is defined

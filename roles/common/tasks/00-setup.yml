@@ -1,8 +1,8 @@
 - name: SETUP - install sudo package
-  apt:
+  ansible.builtin.apt:
     name:
       - sudo
-    state: latest
+    state: present
   vars:
     ansible_become_method: su
 
@@ -10,36 +10,37 @@
   lineinfile:
     dest: /etc/sudoers
     state: present
-    regexp: '^%wheel'
-    line: '%wheel ALL=(ALL:ALL) NOPASSWD:ALL'
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
     validate: '/usr/sbin/visudo -cf %s'
   vars:
     ansible_become_method: su
 
 - name: SETUP - temporarily add debian to the sudo group
-  user:
+  ansible.builtin.user:
     name: debian
-    groups: wheel
-    append: yes
+    groups: sudo
+    append: true
   vars:
     ansible_become_method: su
 
 - name: SETUP - reset connection so sudo permission is recognized
-  meta: reset_connection
+  ansible.builtin.meta: reset_connection
 
 - name: SETUP - Generate random password
-  set_fact:
-    new_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,.,_,! length=15' ) }}"
+  ansible.builtin.set_fact:
+    new_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,.,_,! length=15') }}"
 
 - name: SETUP - Add password to file
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ local_password_location }}"
-    line: "{{ lookup('pipe', 'date -u +%FT%TZ')}};{{ inventory_hostname }};{{new_password}}"
-    create: yes
+    line: "{{ lookup('pipe', 'date -u +%FT%TZ') }};{{ inventory_hostname }};{{ new_password }}"
+    create: true
+    mode: "0755"
   delegate_to: localhost
   become: false
 
 - name: SETUP - Change user password for root
-  user:
+  ansible.builtin.user:
     name: "root"
     password: "{{ new_password | password_hash('sha512', 'mysecretsalt') }}"

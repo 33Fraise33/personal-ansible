@@ -1,7 +1,8 @@
+---
 - name: DNS - Set nameservers
-  template:
+  ansible.builtin.template:
     src: resolv.conf.j2
     dest: /etc/resolv.conf
-    mode: 0644
+    mode: "0644"
     owner: root
     group: root
