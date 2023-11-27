@@ -1,34 +1,33 @@
-- name: create nginx directories
-  file:
+---
+- name: Create nginx directories
+  ansible.builtin.file:
     path: "{{ docker_config_location }}/nginx"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
 
-- name: copy nginx config
-  template:
+- name: Copy nginx config
+  ansible.builtin.template:
     src: nginx.conf.j2
     dest: "{{ docker_config_location }}/nginx/nginx.conf"
-    mode: 0644
+    mode: "0644"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
 
 - name: Start nginx docker container
-  docker_container:
+  community.docker.docker_container:
     name: nginx
     image: nginx:alpine
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.nginx }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.nginx }}"
     volumes:
       - "{{ docker_config_location }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
     user: "{{ nobody.user }}:{{ nobody.group }}"
     env:
       UID: "{{ nobody.user }}"
       GID: "{{ nobody.group }}"
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     pull: true

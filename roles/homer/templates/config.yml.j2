@@ -20,15 +20,6 @@ links:
     url: "https://mail.google.com/a/unitix.be"
 
 services:
-  # - name: "General"
-  #   items: 
-  #     - name: "Weather"
-  #       location: "Snellegem" # your location.
-  #       locationId: "2800931" # Optional: Specify OpenWeatherMap city ID for better accuracy
-  #       apikey: "{{ homer.openweather_api }}" # insert your own API key here. Request one from https://openweathermap.org/api.
-  #       units: "metric" # units to display temperature. Can be one of: metric, imperial, kelvin. Defaults to kelvin.
-  #       background: "square" # choose which type of background you want behind the image. Can be one of: square, cicle, none. Defaults to none.
-  #       type: "OpenWeather"
   - name: "Services"
     icon: "fas fa-layer-group"
     items:
@@ -45,11 +36,6 @@ services:
         logo: "https://upload.wikimedia.org/wikipedia/commons/8/83/SyncthingAugustLogo.png"
         url: "https://syncthing.frai.se"
         subtitle: "Config syncing"
-        tag: wireguard
-      - name: "Maubot Matrix"
-        logo: "https://i.imgur.com/pVCBwJo.png"
-        url: "https://maubot.frai.se/_matrix/maubot"
-        subtitle: "Matrix Assistant Bot"
         tag: wireguard
   - name: "Media"
     icon: "fas fa-photo-video"
@@ -92,22 +78,24 @@ services:
         logo: "https://upload.wikimedia.org/wikipedia/commons/4/48/AdGuard_Logo.png"
         url: "https://adguard.frai.se"
         subtitle: "Network wide ad-blocker"
-        type: "AdGuardHome"
         tag: wireguard
       - name: "Mikrotik"
-        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/MikroTik_Logo_%282022%29.svg/1024px-MikroTik_Logo_%282022%29.svg.png"
+        logo: "https://merch.mikrotik.com/cdn/shop/files/512.png"
         url: "https://ironman.frai.se"
         subtitle: "Web management router"
       - name: "Portainer"
         logo: "https://avatars1.githubusercontent.com/u/22225832"
-        url: "https://portainer.frai.se"
+        url: "https://portainer.frai.se/"
         subtitle: "Container orchestrator"
-        type: "Portainer"
-        apikey: "{{ homer.portainer_api }}"
+        tag: wireguard
+      - name: "Proxmox"
+        logo: "https://static-00.iconduck.com/assets.00/proxmox-icon-512x512-wdyg8x2z.png"
+        url: "https://proxmox.frai.se/"
+        subtitle: "Virtual Environment"
         tag: wireguard
       - name: "Traefik"
         logo: "https://blog.carroarmato0.be/content/images/2019/02/traefik.logo.bright@3x.svg"
-        url: "http://10.33.0.10:8080/"
+        url: "https://traefik.frai.se"
         subtitle: "Reverse proxy"
         tag: wireguard
       - name: "UNMS"
@@ -129,9 +117,9 @@ services:
         tag: wireguard
       - name: "Prometheus"
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Prometheus_software_logo.svg/1200px-Prometheus_software_logo.svg.png"
-        subtitle: "Monitoring metrics database"
+        # subtitle: "Monitoring metrics database"
         tag: wireguard
-        url: "http://10.33.0.23:9090/"
+        url: "https://prometheus.frai.se/"
         type: "Prometheus"
       - name: "Upptime"
         subtitle: "Github Pages powered Monitoring"

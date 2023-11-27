@@ -1,24 +1,21 @@
+---
 # setup portainer with a docker container
 # container from: https://www.portainer.io/installation/
 
-- name: create portainer config directory
-  file:
-    path: "{{ docker_data_location }}/portainer"
-    state: directory
-    mode: 0755
-    owner: root
-    group: root
+- name: Create a volume for portainer config
+  community.docker.docker_volume:
+    name: config_portainer
 
-- name: setup portainer docker container
-  docker_container:
+- name: Setup portainer docker container
+  community.docker.docker_container:
     name: portainer
     image: portainer/portainer-ce:latest
     networks:
       - name: "{{ docker_network.name }}"
     volumes:
-      - "{{ docker_data_location }}/portainer/:/data"
+      - "config_portainer:/data"
       - "/var/run/docker.sock:/var/run/docker.sock"
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     pull: true
@@ -26,3 +23,4 @@
       traefik.http.routers.portainer.tls: "true"
       traefik.http.routers.portainer.tls.certresolver: "le"
       traefik.http.services.portainer.loadbalancer.server.port: "9000"
+      traefik.http.routers.portainer.middlewares: "corsheaders@file"

@@ -1,30 +1,31 @@
+---
 # setup traefik with a docker container
 # container from: https://docs.traefik.io/getting-started/quick-start/
 
-- name: create traefik config directory
-  file:
+- name: Create traefik config directory
+  ansible.builtin.file:
     path: "{{ docker_config_location }}/traefik"
     state: directory
-    mode: 0600
+    mode: "0600"
     owner: root
     group: root
 
-- name: copy Traefik config
-  template:
+- name: Copy Traefik config
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ docker_config_location }}/traefik/{{ item }}"
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   loop:
     - custom_rules.yml
 
 - name: Create a volume for letsencrypt
-  docker_volume:
+  community.docker.docker_volume:
     name: data_traefik_letsencrypt
 
-- name: setup traefik docker container
-  docker_container:
+- name: Setup traefik docker container
+  community.docker.docker_container:
     name: traefik
     image: traefik:latest
     networks:
@@ -37,7 +38,6 @@
       - --entryPoints.web.http.redirections.entryPoint.to=web-secure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entryPoints.web-secure.address=:443
-      # - --entryPoints.web-secure.http.middlewares=mywhitelist@file
       - --entryPoints.traefik.address=:8080
       - --api=true
       - --api.dashboard=true
@@ -63,13 +63,14 @@
     env:
       CF_API_EMAIL: "{{ cloudflare_api_email }}"
       CF_API_KEY: "{{ cloudflare_api_token }}"
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     pull: true
     labels:
-      traefik.enable: "false"
+      traefik.enable: "true"
       traefik.http.routers.api.rule: Host(`traefik.frai.se`)
       traefik.http.routers.api.tls: "true"
       traefik.http.routers.api.tls.certresolver: "le"
       traefik.http.routers.api.service: "api@internal"
+      traefik.http.services.api.loadbalancer.server.port: "8080"

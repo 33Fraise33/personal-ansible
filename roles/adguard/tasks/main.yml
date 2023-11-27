@@ -1,29 +1,29 @@
+---
 # container from: https://hub.docker.com/r/adguard/adguardhome
 
 - name: Create a volume for adguard data
-  docker_volume:
+  community.docker.docker_volume:
     name: data_adguard
 
-
-- name: create adguard config directory
-  file:
+- name: Create adguard config directory
+  ansible.builtin.file:
     path: "{{ docker_config_location }}/adguard"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
 
-- name: copy config file
-  template: 
+- name: Copy config file
+  ansible.builtin.template:
     src: AdGuardHome.yaml.j2
     dest: "{{ docker_config_location }}/adguard/AdGuardHome.yaml"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   tags: config
 
-- name: setup adguard docker container
-  docker_container:
+- name: Setup adguard docker container
+  community.docker.docker_container:
     name: adguard
     image: adguard/adguardhome:latest
     networks:
@@ -33,11 +33,11 @@
     volumes:
       - "data_adguard:/opt/adguardhome/work"
       - "{{ docker_config_location }}/adguard:/opt/adguardhome/conf"
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     labels:
       traefik.http.routers.adguard.tls: "true"
       traefik.http.routers.adguard.tls.certresolver: "le"
       traefik.http.services.adguard.loadbalancer.server.port: "80"
-
+      traefik.http.routers.adguard.middlewares: "corsheaders@file"
