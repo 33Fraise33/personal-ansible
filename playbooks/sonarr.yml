@@ -1,0 +1,7 @@
+---
+- name: Setup sonarr
+  hosts: compute
+  connection: ssh
+  become: true
+  roles:
+    - sonarr

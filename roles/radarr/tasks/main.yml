@@ -1,12 +1,13 @@
+---
 # install Radarr movie info
 # https://hub.docker.com/r/linuxserver/radarr
 
 - name: Create a volume for radarr config
-  docker_volume:
+  community.docker.docker_volume:
     name: config_radarr
 
-- name: setup radarr docker container
-  docker_container:
+- name: Setup radarr docker container
+  community.docker.docker_container:
     name: radarr
     image: linuxserver/radarr:latest
     networks:
@@ -22,7 +23,7 @@
       TZ: "Etc/UTC"
     state: started
     restart_policy: always
-    restart: yes
+    restart: true
     pull: true
     labels:
       traefik.http.routers.radarr.tls: "true"
