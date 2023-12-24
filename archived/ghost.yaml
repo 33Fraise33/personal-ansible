@@ -1,6 +1,0 @@
-- name: setup ghost docker container
-  hosts: compute
-  connection: ssh
-  become: true
-  roles:
-    - ghost

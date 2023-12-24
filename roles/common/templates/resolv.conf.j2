@@ -2,3 +2,4 @@
 {% for server in dns.servers %}
 nameserver {{ server }}
 {% endfor %}
+search {{ dns.domain }}

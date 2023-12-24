@@ -10,13 +10,13 @@
 
 - name: MOUNTS - Read device information (always use unit when probing)
   community.general.parted:
-    device: /dev/disk/by-id/{{ item.disk }}
+    device: "{{ item.disk }}"
   register: item_info
   loop: "{{ mounts }}"
 
 - name: MOUNTS - Partition harddrives if needed
   community.general.parted:
-    device: /dev/disk/by-id/{{ item.disk }}
+    device: "{{ item.disk }}"
     number: 1
     state: present
   when: item_info.results[item_index].partitions|length<=0
@@ -27,7 +27,7 @@
 - name: MOUNTS - Initiate filesystem on partitions if needed
   community.general.filesystem:
     fstype: "{{ item.fs }}"
-    dev: /dev/disk/by-id/{{ item.disk }}-part1
+    dev: "{{ item.disk }}-part1"
     force: true
   when: item_info.results[item_index].partitions|length<=0
   loop: "{{ mounts }}"
@@ -37,7 +37,7 @@
 - name: MOUNTS - Mount partitions to directories
   ansible.posix.mount:
     name: /{{ item.dir }}
-    src: /dev/disk/by-id/{{ item.disk }}-part1
+    src: "{{ item.disk }}-part1"
     fstype: ext4
     state: mounted
   loop: "{{ mounts }}"

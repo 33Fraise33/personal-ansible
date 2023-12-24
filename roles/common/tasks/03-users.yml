@@ -14,10 +14,11 @@
   ansible.builtin.user:
     name: "{{ item.user }}"
     comment: "{{ item.name }}"
-    groups: sudo
+    groups: "{{ item.groups | default(omit) }}"
     shell: /bin/bash
-    append: true
-  loop: "{{ admin_users }}"
+    create_home: "{{ item.home | default(omit) }}"
+    append: "{{ true if item.groups is defined else false }}"
+  loop: "{{ users }}"
   loop_control:
     label: "{{ item.user }}"
 
@@ -26,7 +27,8 @@
     user: "{{ item.user }}"
     state: present
     key: "{{ item.ssh_key }}"
-  loop: "{{ admin_users }}"
+  loop: "{{ users }}"
+  when: item.ssh_key is defined
   loop_control:
     label: "{{ item.user }}"
 

@@ -1,6 +1,0 @@
-:80 {
-root * /var/www/app/public
-php_fastcgi {{ docker_network.invoiceninja }}:9000
-encode zstd gzip
-file_server browse
-}

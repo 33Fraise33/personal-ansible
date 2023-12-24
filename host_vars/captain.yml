@@ -18,62 +18,65 @@ cloudflared:
 
 mounts:
   - dir: data
-    disk: scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
+    disk: "/dev/disk/by-path/pci-0000:00:07.0"
     fs: ext4
-  - dir: lancache
-    disk: scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
-    fs: ext4
+  # - dir: lancache
+  #   disk: scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
+  #   fs: ext4
 
 lancache:
   dir: /lancache
 
-docker_network:
-  ipv4_prefix: "10.33.0."
-  ipv6_prefix: "2a12:4946:4000:333::"
-  name: macvlan333
-  hosts:
-    traefik: 10
-    plex: 11
-    netbox: 12
-    deluge: 13
-    graylog: 14 # TODO
-    grafana: 15
-    portainer: 16
-    wordpress: 17
-    unms: 18
-    cloudflared: 19
-    mariadb: 20
-    syncthing: 22
-    prometheus: 23
-    prometheus_snmp_exporter: 24
-    prometheus_blackbox: 25
-    prometheus_speedtest: 26
-    prometheus_alertmanager: 27
-    homer: 28
-    homeassistant: 29
-    jackett: 30
-    jellyfin: 32
-    redis: 33
-    postgres: 34
-    nginx: 35
-    unbound: 37
-    synapse: 41
-    mautrix_telegram: 42
-    mautrix_whatsapp: 43
-    solaredge_exporter: 44
-    radarr: 47
-    lancache_monolitic: 48
-    calibre: 49
-    calibre_web: 50
-    ddclient: 51
-    netboot: 54
-    coturn: 55
-    maubot: 56
-    flaresolverr: 57
-    adguard: 60
-    minecraft: 62
-    rustdesk_hbbs: 63
-    rustdesk_hbbr: 64
+docker:
+  login:
+    username: 33fraise33
+    password: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      63386364353039316338663264323864386562623236626634303964663836333363643638313361
+      3562383039653538373831326161643638666135613063390a306631313461623232336665303038
+      34633766366634663666326465383465353965646266363234303630626563633436383134666631
+      3435346632373465660a373262376663373331393364646637653534333663333934636530353661
+      66333163386631303431663861373963373961346361343430323036626230653937
+  users:
+    - fraise
+  dir:
+    config: /data/docker-config
+    data: /data/docker
+  network:
+    ipv4_prefix: "10.33.0."
+    ipv6_prefix: "2a12:4946:4000:333::"
+    name: macvlan333
+    hosts:
+      traefik: 10
+      netbox: 12
+      graylog: 14 # TODO
+      grafana: 15
+      portainer: 16
+      wordpress: 17
+      unms: 18
+      cloudflared: 19
+      mariadb: 20
+      syncthing: 22
+      prometheus: 23
+      prometheus_snmp_exporter: 24
+      prometheus_blackbox: 25
+      prometheus_speedtest: 26
+      prometheus_alertmanager: 27
+      homer: 28
+      homeassistant: 29
+      redis: 33
+      postgres: 34
+      nginx: 35
+      unbound: 37
+      synapse: 41
+      solaredge_exporter: 44
+      lancache_monolitic: 48
+      ddclient: 51
+      netboot: 54
+      coturn: 55
+      adguard: 60
+
+matrix_base_url: matrix.frai.se
 
 postgres_user: db_admin
 postgres_password: !vault |

@@ -1,6 +1,0 @@
-- hosts: compute
-  connection: ssh
-  become: true
-  roles:
-    - docker
-    - teamspeak

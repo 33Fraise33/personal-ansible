@@ -30,8 +30,8 @@
     src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
     dest: "/usr/local/bin/node_exporter"
     mode: "0755"
-    owner: root
-    group: root
+    owner: prometheus
+    group: prometheus
   notify: Restart node_exporter
 
 - name: NODE_EXPORTER - Flush handlers

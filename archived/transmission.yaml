@@ -1,6 +1,0 @@
-- name: Setup Transmission
-  hosts: compute
-  connection: ssh
-  become: true
-  roles:
-    - transmission

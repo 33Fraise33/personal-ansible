@@ -1,8 +1,0 @@
-#!/bin/bash
-cd {{ docker_data_location }}/pihole/lancache/
-git pull
-cd {{ docker_data_location }}/pihole/lancache/scripts
-./create-dnsmasq.sh
-cp {{ docker_data_location }}/pihole/lancache/scripts/output/dnsmasq/lancache.conf {{ docker_data_location }}/pihole/dnsmasq.d/lancache.conf
-cp -r {{ docker_data_location }}/pihole/lancache/scripts/output/dnsmasq/hosts/ {{ docker_data_location }}/pihole/dnsmasq/
-docker restart pihole

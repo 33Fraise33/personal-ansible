@@ -5,9 +5,10 @@
     state: present
   vars:
     ansible_become_method: su
+    ansible_ssh_port: 22
 
 - name: SETUP - Allow wheel user group to have passwordless sudo
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/sudoers
     state: present
     regexp: '^%sudo'
@@ -15,6 +16,7 @@
     validate: '/usr/sbin/visudo -cf %s'
   vars:
     ansible_become_method: su
+    ansible_ssh_port: 22
 
 - name: SETUP - temporarily add debian to the sudo group
   ansible.builtin.user:
@@ -23,6 +25,28 @@
     append: true
   vars:
     ansible_become_method: su
+    ansible_ssh_port: 22
+
+- name: SETUP - Set ssh port to 1830
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: '^(# *)?Port '
+      line: 'Port 1830'
+  vars:
+    ansible_become_method: su
+    ansible_ssh_port: 22
+
+- name: Restart sshd
+  ansible.builtin.systemd:
+    name: sshd
+    state: restarted
+    enabled: true
+  vars:
+    ansible_become_method: su
+    ansible_ssh_port: 22
 
 - name: SETUP - reset connection so sudo permission is recognized
   ansible.builtin.meta: reset_connection
@@ -43,4 +67,4 @@
 - name: SETUP - Change user password for root
   ansible.builtin.user:
     name: "root"
-    password: "{{ new_password | password_hash('sha512', 'mysecretsalt') }}"
+    password: "{{ new_password | password_hash('sha512', passwordsalt ) }}"

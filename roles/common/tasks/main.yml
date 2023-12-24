@@ -5,8 +5,6 @@
     apply:
       tags:
         - setup
-  vars:
-    ansible_port: 22
   when: initial_setup == "yes"
 
 - name: Gather host facts

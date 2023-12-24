@@ -1,0 +1,111 @@
+---
+- name: Debian based Setup
+  when: ansible_os_family == "Debian"
+  tags: install
+  block:
+    - name: Install docker dependency packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+    - name: Install docker gpg key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
+        state: present
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+        update_cache: true
+    - name: Install docker
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+- name: Create systemd config directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/docker.service.d/
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Change docker startup command
+  ansible.builtin.template:
+    src: "{{ item.file }}.j2"
+    dest: "{{ item.location }}{{ item.file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - file: override.conf
+      location: /etc/systemd/system/docker.service.d/
+  notify: Restart docker
+
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+# - name: Install docker ansible dependencies
+#   ansible.builtin.pip:
+#     name: ['pip', 'docker']
+#     state: latest
+#   tags: pip, install
+
+- name: Create docker macvlan333 network
+  community.docker.docker_network:
+    name: macvlan333
+    driver: macvlan
+    enable_ipv6: true
+    driver_options:
+      parent: "{{ ansible_default_ipv4.interface }}.333"
+    ipam_config:
+      - subnet: '10.33.0.0/24'
+        gateway: '10.33.0.1'
+      - subnet: "{{ docker.network.ipv6_prefix }}/64"
+        gateway: "{{ docker.network.ipv6_prefix }}1"
+
+- name: Create docker macvlan50 network
+  community.docker.docker_network:
+    name: macvlan50
+    driver: macvlan
+    driver_options:
+      parent: "{{ ansible_default_ipv4.interface }}.50"
+    ipam_config:
+      - subnet: '172.16.50.0/24'
+        gateway: '172.16.50.1'
+        iprange: 172.16.50.64/29
+
+- name: Change docker vars (including default subnet)
+  ansible.builtin.copy:
+    src: "{{ item.file }}"
+    dest: "{{ item.location }}{{ item.file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - file: daemon.json
+      location: /etc/docker/
+  notify: Restart docker
+
+- name: Log into DockerHub
+  community.docker.docker_login:
+    username: "{{ docker.login.username }}"
+    password: "{{ docker.login.password }}"
+  tags: docker_login
+
+- name: Ddd default_user to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ docker.users }}"

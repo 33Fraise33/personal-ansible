@@ -1,4 +1,4 @@
 ansible
 ansible-lint
 yamllint
-passlib # needed for macos hashing and encryption
+passlib  # needed for macos hashing and encryption

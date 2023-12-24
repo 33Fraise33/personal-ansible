@@ -7,4 +7,4 @@
   ansible.builtin.lineinfile:
     path: /etc/hosts
     regexp: '^127\.0\.1\.1'
-    line: "127.0.1.1	{{ inventory_hostname | replace('_', '-') }}.frai.se {{ inventory_hostname | replace('_', '-') }}"
+    line: "127.0.1.1	{{ inventory_hostname | replace('_', '-') }}.{{ dns.domain }} {{ inventory_hostname | replace('_', '-') }}"

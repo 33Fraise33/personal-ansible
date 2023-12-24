@@ -2,19 +2,28 @@
 ansible_python_interpreter: /usr/bin/python3
 ansible_ssh_port: 1830
 
-default_user: gianni
+passwordsalt: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  31323833383465653439326666366362386264623239366536653936653766356432343439386331
+  3634643165323233633362613430333963346363323432350a333539636637613733623330663661
+  37663735333635333364653836356362373231663937393735633432326534333034336432636261
+  3036343765623562300a656436376264393364656531613238616364396235376362636231626630
+  37626238336330663466323831353933633466363335626439376634656431383530
+
+users:
+  - user: fraise
+    groups: sudo
+    name: "Gianni Stubbe"
+    ssh_key: "https://github.com/33Fraise33.keys"
+  - user: prometheus
+    name: "Node Exporter User"
+    home: false
+
 nobody:
   group: "65534"
   user: "65534"
 
 ntp: time.cloudflare.com
-
-docker_config_location: /data/docker-config
-docker_data_location: /data/docker
-matrix_base_url: matrix.frai.se
-
-steam:
-  username: buggyfreak2
 
 domains:
   ipv6_proxy: "2a12:4946:4000:333::10"
