@@ -16,16 +16,18 @@ cloudflared:
     31666565393963633964623339373133393536393130356330633034373566326331653363646237
     36353962383230376465323564323332666239663064333963306364663862383363
 
-mounts:
-  - dir: data
-    disk: "/dev/disk/by-path/pci-0000:00:07.0"
-    fs: ext4
-  # - dir: lancache
-  #   disk: scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
-  #   fs: ext4
+mounts: []
 
 lancache:
   dir: /lancache
+
+interfaces:
+  - name: ens3
+    description: vlan33
+    mode: dhcp
+  - name: ens4
+    description: vlan333
+    mode: manual  # no ip, just bring it up for docker
 
 docker:
   login:
@@ -42,6 +44,26 @@ docker:
   dir:
     config: /data/docker-config
     data: /data/docker
+  networks:
+    - name: macvlan333
+      type: ipvlan
+      ipam:
+        - subnet: '10.33.0.0/24'
+          gateway: '10.33.0.1'
+          iprange: 10.33.0.128/25
+        - subnet: "2a12:4946:4000:333::/64"
+          gateway: "2a12:4946:4000:333::1"
+      ipv6: true
+      driver_options:
+        parent: ens4
+    # - name: docker50
+    #   type: ipvlan
+    #   ipam:
+    #     - subnet: '172.16.50.0/24'
+    #       gateway: '172.16.50.1'
+    #       iprange: 172.16.50.64/29
+    #   driver_options:
+    #     parent: ens5
   network:
     ipv4_prefix: "10.33.0."
     ipv6_prefix: "2a12:4946:4000:333::"
@@ -67,14 +89,13 @@ docker:
       redis: 33
       postgres: 34
       nginx: 35
-      unbound: 37
+      unbound: 37  # NEEDED FOR ADGUARD
       synapse: 41
       solaredge_exporter: 44
-      lancache_monolitic: 48
-      ddclient: 51
+      lancache_monolitic: 48  # NEEDED FOR UNBOUND
       netboot: 54
       coturn: 55
-      adguard: 60
+      adguard: 60  # NEEDED FOR DHCP
 
 matrix_base_url: matrix.frai.se
 

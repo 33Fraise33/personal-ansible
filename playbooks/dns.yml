@@ -16,7 +16,7 @@
   tags: cloudflare
 
 - name: Setup ddclient
-  hosts: compute
+  hosts: captain
   connection: ssh
   become: true
   roles:
@@ -24,7 +24,7 @@
   tags: ddclient
 
 - name: Setup unbound
-  hosts: compute
+  hosts: captain
   connection: ssh
   become: true
   roles:
@@ -32,7 +32,7 @@
   tags: unbound
 
 - name: Setup adguard
-  hosts: compute
+  hosts: captain
   connection: ssh
   become: true
   roles:

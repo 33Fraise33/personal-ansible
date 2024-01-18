@@ -11,12 +11,16 @@
           - gnupg
         state: present
     - name: Install docker gpg key
-      ansible.builtin.apt_key:
+      ansible.builtin.get_url:
         url: https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
-        state: present
-    - name: Add Docker repository
+        dest: /etc/apt/trusted.gpg.d/docker.asc
+        mode: "0644"
+    - name: Add docker repo
       ansible.builtin.apt_repository:
-        repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.asc] \
+          https://download.docker.com/linux/\
+          {{ ansible_distribution | lower }} \
+          {{ ansible_distribution_release }} stable"
         update_cache: true
     - name: Install docker
       ansible.builtin.apt:
@@ -61,29 +65,14 @@
 #     state: latest
 #   tags: pip, install
 
-- name: Create docker macvlan333 network
+- name: Create docker networks
   community.docker.docker_network:
-    name: macvlan333
-    driver: macvlan
-    enable_ipv6: true
-    driver_options:
-      parent: "{{ ansible_default_ipv4.interface }}.333"
-    ipam_config:
-      - subnet: '10.33.0.0/24'
-        gateway: '10.33.0.1'
-      - subnet: "{{ docker.network.ipv6_prefix }}/64"
-        gateway: "{{ docker.network.ipv6_prefix }}1"
-
-- name: Create docker macvlan50 network
-  community.docker.docker_network:
-    name: macvlan50
-    driver: macvlan
-    driver_options:
-      parent: "{{ ansible_default_ipv4.interface }}.50"
-    ipam_config:
-      - subnet: '172.16.50.0/24'
-        gateway: '172.16.50.1'
-        iprange: 172.16.50.64/29
+    name: "{{ item.name }}"
+    driver: "{{ item.type | default('bridge') }}"
+    enable_ipv6: "{{ item.ipv6 | default(false) }}"
+    driver_options: "{{ item.driver_options | default(omit) }}"
+    ipam_config: "{{ item.ipam | default(omit) }}"
+  loop: "{{ docker.networks }}"
 
 - name: Change docker vars (including default subnet)
   ansible.builtin.copy:

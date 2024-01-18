@@ -1,41 +1,39 @@
 # install ddclient
 # https://hub.docker.com/r/linuxserver/ddclient
-
-- name: create ddclient config directory
-  file:
+---
+- name: Create ddclient config directory
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
-    mode: 0775
-  with_items:
-    - "{{ docker_config_location }}/ddclient"
+    mode: "0775"
+  loop:
+    - "{{ docker.dir.config }}/ddclient"
 
-- name: copy ddclient config
-  template:
+- name: Copy ddclient config
+  ansible.builtin.template:
     src: ddclient.conf.j2
-    dest: "{{ docker_config_location }}/ddclient/ddclient.conf"
+    dest: "{{ docker.dir.config }}/ddclient/ddclient.conf"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
-    mode: 0664
+    mode: "0664"
 
-- name: setup ddclient docker container
-  docker_container:
+- name: Setup ddclient docker container
+  community.docker.docker_container:
     name: ddclient
     image: linuxserver/ddclient:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.ddclient }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.ddclient }}"
     volumes:
-      - "{{ docker_config_location }}/ddclient:/config"
+      - "{{ docker.dir.config }}/ddclient:/config"
     env:
       PUID: "{{ nobody.user }}"
       PGID: "{{ nobody.group }}"
       TZ: "Etc/UTC"
     state: started
     restart_policy: always
-    restart: yes
+    restart: true
     pull: true
     labels:
       traefik.enable: "false"

@@ -7,7 +7,7 @@
 
 - name: Create adguard config directory
   ansible.builtin.file:
-    path: "{{ docker_config_location }}/adguard"
+    path: "{{ docker.dir.config }}/adguard"
     state: directory
     mode: "0755"
     owner: root
@@ -16,7 +16,7 @@
 - name: Copy config file
   ansible.builtin.template:
     src: AdGuardHome.yaml.j2
-    dest: "{{ docker_config_location }}/adguard/AdGuardHome.yaml"
+    dest: "{{ docker.dir.config }}/adguard/AdGuardHome.yaml"
     owner: root
     group: root
     mode: "0644"
@@ -28,11 +28,11 @@
     image: adguard/adguardhome:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.adguard }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.adguard }}"
+        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.adguard }}"
+        ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.adguard }}"
     volumes:
       - "data_adguard:/opt/adguardhome/work"
-      - "{{ docker_config_location }}/adguard:/opt/adguardhome/conf"
+      - "{{ docker.dir.config }}/adguard:/opt/adguardhome/conf"
     restart: true
     restart_policy: always
     state: started

@@ -1,48 +1,48 @@
 # install lancache from: http://lancache.net/docs/containers/monolithic/
-    
-- name: create lancache directory
-  file:
+---
+- name: Create lancache directory
+  ansible.builtin.file:
     path: "{{ lancache.dir }}"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
 
-- name: setup lancache docker container
-  docker_container:
+- name: Setup lancache docker container
+  community.docker.docker_container:
     name: lancache
     image: lancachenet/monolithic:latest
     networks:
-      - name: "{{ docker_network.name }}"
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache_monolitic }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.lancache_monolitic }}"
+      - name: "{{ docker.network.name }}"
+        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.lancache_monolitic }}"
+        ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.lancache_monolitic }}"
     env:
-      CACHE_DISK_SIZE: "500000m"
+      CACHE_DISK_SIZE: "500000m"  # 500G
       CACHE_MAX_AGE: "365d"
       CACHE_INDEX_SIZE: "500m"
       # CACHE_SLICE_SIZE: "0m"  # best at 1m (default), valorant works better at 0m
     volumes:
       - "{{ lancache.dir }}:/data/cache"
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     pull: true
     labels:
       traefik.enable: "false"
 
-- name: setup lancache-dns docker container
-  docker_container:
+- name: Setup lancache-dns docker container
+  community.docker.docker_container:
     name: lancache-dns
     image: lancachenet/lancache-dns:latest
     networks:
-      - name: "{{ docker_network.name }}"
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache_dns }}"
+      - name: "{{ docker.network.name }}"
+        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.lancache_dns }}"
     # network_mode: host
     env:
       UPSTREAM_DNS: 1.1.1.1
-      USE_GENERIC_CACHE: "true" 
-      LANCACHE_IP: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.lancache }}"
-    restart: yes
+      USE_GENERIC_CACHE: "true"
+      LANCACHE_IP: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.lancache }}"
+    restart: true
     restart_policy: always
     state: started
     pull: true

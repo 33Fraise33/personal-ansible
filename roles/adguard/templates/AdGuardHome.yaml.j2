@@ -23,7 +23,7 @@ dns:
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
-    - {{ docker_network.ipv4_prefix }}{{ docker_network.hosts.unbound }}
+    - {{ docker.network.ipv4_prefix }}{{ docker.network.hosts.unbound }}
   upstream_dns_file: ""
   bootstrap_dns:
     - 1.1.1.1
@@ -67,6 +67,7 @@ dns:
   dns64_prefixes: []
   serve_http3: false
   use_http3_upstreams: false
+  serve_plain_dns: true
 tls:
   enabled: true
   server_name: ""
@@ -84,13 +85,13 @@ tls:
   strict_sni_check: false
 querylog:
   ignored: []
-  interval: 2160h
+  interval: 24h
   size_memory: 1000
   enabled: true
   file_enabled: true
 statistics:
   ignored: []
-  interval: 168h
+  interval: 720h
   enabled: true
 filters:
   - enabled: true
@@ -192,6 +193,8 @@ clients:
       tags: []
       upstreams:
         - 1.1.1.1
+      upstreams_cache_size: 0
+      upstreams_cache_enabled: false
       use_global_settings: true
       filtering_enabled: false
       parental_enabled: false

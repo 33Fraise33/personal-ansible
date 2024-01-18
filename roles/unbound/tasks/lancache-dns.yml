@@ -1,7 +1,14 @@
-- name: Get uklans github repo
+---
+- name: Set unbound lancache directory permissions
+  ansible.builtin.file:
+    path: "{{ docker.dir.config }}/unbound/lancache"
+    state: directory
+    mode: "0755"
+
+- name: Get uklans github repo  # noqa: latest
   ansible.builtin.git:
     repo: https://github.com/uklans/cache-domains
-    dest: "{{ docker_config_location }}/unbound/lancache/"
+    dest: "{{ docker.dir.config }}/unbound/lancache/"
     force: true
 
 - name: Install jq package for cache domain script
@@ -12,7 +19,7 @@
 - name: Copy lancache template files
   ansible.builtin.template:
     src: "{{ item.name }}.j2"
-    dest: "{{ docker_config_location }}/unbound/lancache/scripts/{{ item.name }}"
+    dest: "{{ docker.dir.config }}/unbound/lancache/scripts/{{ item.name }}"
     owner: root
     group: root
     mode: "{{ item.mode }}"
@@ -27,4 +34,4 @@
     name: "update lancache domains"
     minute: "15"
     hour: "4"
-    job: " {{ docker_config_location }}/unbound/lancache/scripts/copy-files.sh"
+    job: " {{ docker.dir.config }}/unbound/lancache/scripts/copy-files.sh"
