@@ -20,6 +20,9 @@ mounts:
   - mountpoint: /data/media
     source: 172.16.33.3:/mnt/main/media
     fs: nfs
+  - mountpoint: /data/files
+    source: 172.16.33.3:/mnt/main/files
+    fs: nfs
 
 lancache:
   dir: /lancache
@@ -82,7 +85,7 @@ docker:
       unms: 18
       cloudflared: 19
       mariadb: 20
-      syncthing: 22
+      syncthing: 22  # needed for port forwared 22000
       prometheus: 23
       prometheus_snmp_exporter: 24
       prometheus_blackbox: 25

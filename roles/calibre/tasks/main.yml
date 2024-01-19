@@ -1,21 +1,21 @@
 # install calibre, book db
 # https://registry.hub.docker.com/r/linuxserver/calibre
-
+---
 - name: Create a volume for calibre config
-  docker_volume:
+  community.docker.docker_volume:
     name: "{{ item }}"
   loop:
     - config_calibre
     - config_calibre-web
 
-- name: setup calibre docker container
-  docker_container:
+- name: Setup calibre docker container
+  community.docker.docker_container:
     name: calibre
     image: linuxserver/calibre:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.calibre }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.calibre }}"
+        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.calibre }}"
+        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.calibre }}"
     volumes:
       - "config_calibre:/config"
       - "/data/media:/media"
@@ -27,22 +27,22 @@
       GUAC_PASS: "{{ guac_password }}"
     state: started
     restart_policy: always
-    restart: yes
+    restart: true
     pull: true
     labels:
       traefik.http.routers.calibre.tls: "true"
       traefik.http.routers.calibre.tls.certresolver: "le"
       traefik.http.services.calibre.loadbalancer.server.port: "8080"
-  tags: calibre-base
+  tags: calibre-base,base
 
-- name: setup calibre_web docker container
-  docker_container:
+- name: Setup calibre_web docker container
+  community.docker.docker_container:
     name: calibre-web
     image: linuxserver/calibre-web:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.calibre_web }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.calibre_web }}"
+        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.calibre_web }}"
+        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.calibre_web }}"
     volumes:
       - "config_calibre-web:/config"
       - "/data/media/books:/books"
@@ -53,11 +53,11 @@
       DOCKER_MODS: "linuxserver/calibre-web:calibre"
     state: started
     restart_policy: always
-    restart: yes
+    restart: true
     pull: true
     labels:
       traefik.http.routers.books.rule: "Host(`books.frai.se`)"
       traefik.http.routers.books.tls: "true"
       traefik.http.routers.books.tls.certresolver: "le"
       traefik.http.services.books.loadbalancer.server.port: "8083"
-  tags: calibre-web
+  tags: calibre-web,web

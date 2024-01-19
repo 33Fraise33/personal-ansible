@@ -3,8 +3,8 @@
   ansible.builtin.file:
     state: directory
     path: "{{ item.mountpoint }}"
-    owner: nobody
-    group: nogroup
+    # owner: nobody
+    # group: nogroup
     mode: "0775"
   loop: "{{ mounts }}"
 

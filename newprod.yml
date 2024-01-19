@@ -1,0 +1,40 @@
+---
+all:
+  children:
+    servers:
+      children:
+        remote:
+          hosts:
+            kingpin:
+              ansible_host: 193.148.249.106
+            blackwidow:
+              ansible_host: 130.61.252.239
+        asgard:
+          children:
+            truenas:
+        truenas:
+          hosts:
+            captain:
+              ansible_host: 172.16.33.5
+        proxmox:
+          hosts:
+            falcon:
+              ansible_python_interpreter: /usr/bin/python3
+              ansible_host: 172.16.33.7
+        unraid:
+          hosts:
+            kang:
+              ansible_python_interpreter: /usr/bin/python3
+              ansible_host: 10.33.1.6
+              ansible_user: root
+        acc:
+          hosts:
+            accserver:
+              ansible_host: 172.16.33.9
+    routers:
+      children:
+        mikrotik:
+          hosts:
+            ironman:
+              ansible_python_interpreter: /usr/bin/python3
+              ansible_host: 172.16.33.1
