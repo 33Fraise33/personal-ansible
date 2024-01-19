@@ -14,7 +14,7 @@
       - name: macvlan333
     volumes:
       - "config_sonarr:/config"
-      - "/data/media:/data"
+      - "/data/media:/media"
     env:
       PUID: "{{ nobody.user }}"
       PGID: "{{ nobody.group }}"

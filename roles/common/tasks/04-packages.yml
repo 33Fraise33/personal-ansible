@@ -11,10 +11,11 @@
         name:
           - curl
           - fail2ban
+          - gdu
           - git
           - htop
-          - gdu
           - net-tools
+          - nfs-common
           - nmap
           - mtr
           - parted

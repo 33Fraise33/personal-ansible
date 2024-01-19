@@ -12,11 +12,11 @@
     image: linuxserver/radarr:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.radarr }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.radarr }}"
+        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.radarr }}"
+        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.radarr }}"
     volumes:
       - "config_radarr:/config"
-      - "/data/media:/data"
+      - "/data/media:/media"
     env:
       PUID: "{{ nobody.user }}"
       PGID: "{{ nobody.group }}"

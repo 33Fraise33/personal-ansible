@@ -13,6 +13,9 @@ iface lo inet loopback
 {%  endif%}
 auto {{ intf.name }}
 iface {{ intf.name }} inet {{ intf.mode }}
+{%  if intf.mode == "dhcp" %}
+iface {{ intf.name }} inet6 auto
+{%  endif %}
 {%  if intf.mode == "static" %}
 	address {{ intf.ip }}
 	gateway {{ intf.gateway }}
@@ -25,6 +28,10 @@ iface {{ intf.name }} inet {{ intf.mode }}
 {%    if intf.mac is defined %}
 	hw-address {{ intf.mac }}
 {%    endif%}
+{%  endif%}
+{%  if intf.mode == "manual" %}
+	pre-up ifconfig $IFACE up
+	post-down ifconfig $IFACE down
 {%  endif%}
 
 {% endfor %}

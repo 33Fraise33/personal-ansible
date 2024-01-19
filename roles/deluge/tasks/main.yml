@@ -1,31 +1,31 @@
 # install Deluge torrent client
 # https://hub.docker.com/r/linuxserver/deluge
-
+---
 - name: Create a volume for deluge config
-  docker_volume:
+  community.docker.docker_volume:
     name: "{{ item }}"
-  loop: 
+  loop:
     - config_deluge
     - data_deluge_watch
 
-- name: set permissions on docker volume
-  file:
+- name: Set permissions on docker volume
+  ansible.builtin.file:
     path: /data/docker/docker/volumes/data_deluge_watch/_data
-    mode: 0755
+    mode: "0755"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
 
-- name: setup Deluge docker container
-  docker_container:
+- name: Setup Deluge docker container
+  community.docker.docker_container:
     name: deluge
     image: linuxserver/deluge:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.deluge }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.deluge }}"
+        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.deluge }}"
+        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.deluge }}"
     volumes:
       - "config_deluge:/config"
-      - "/data/media:/data"
+      - "/data/media:/media"
       - "data_deluge_watch:/watch"
     env:
       PUID: "{{ nobody.user }}"
@@ -33,7 +33,7 @@
       TZ: "Etc/UTC"
     state: started
     restart_policy: always
-    restart: yes
+    restart: true
     pull: true
     labels:
       traefik.http.routers.deluge.tls: "true"

@@ -1,18 +1,18 @@
 # setup jackett with a docker container
 # container from: https://hub.docker.com/r/linuxserver/jackett/
-
+---
 - name: Create a volume for jackett config
-  docker_volume:
+  community.docker.docker_volume:
     name: config_jackett
 
-- name: setup jackett docker container
-  docker_container:
+- name: Setup jackett docker container
+  community.docker.docker_container:
     name: jackett
     image: linuxserver/jackett:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.jackett }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.jackett }}"
+        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.jackett }}"
+        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.jackett }}"
     volumes:
       - "config_jackett:/config"
       - "data_deluge_watch:/downloads"
@@ -21,7 +21,7 @@
       PUID: "65534"
       PGID: "65534"
       PASSWORD: "{{ jackett_pass }}"
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     pull: true
@@ -30,18 +30,17 @@
       traefik.http.routers.jackett.tls.certresolver: "le"
       traefik.http.services.jackett.loadbalancer.server.port: "9117"
 
-- name: setup flaresolverr docker container
-  docker_container:
+- name: S flaresolverr docker container
+  community.docker.docker_container:
     name: flaresolverr
     image: flaresolverr/flaresolverr:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.flaresolverr }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.flaresolverr }}"
-    restart: yes
+        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.flaresolverr }}"
+        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.flaresolverr }}"
+    restart: true
     restart_policy: always
     state: started
     pull: true
     labels:
       traefik.enable: "false"
-

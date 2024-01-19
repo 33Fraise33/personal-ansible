@@ -1,15 +1,16 @@
+---
 - name: Create a volume for plex config
-  docker_volume:
+  community.docker.docker_volume:
     name: config_plex
 
-- name: setup plex docker container
-  docker_container:
+- name: Setup plex docker container
+  community.docker.docker_container:
     name: plex
     image: linuxserver/plex:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.plex }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.plex }}"
+        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.plex }}"
+        ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.plex }}"
     volumes:
       - "config_plex:/config"
       - "/data/media/movies:/movies"
@@ -19,11 +20,11 @@
       PGID: "{{ nobody.group }}"
       VERSION: "docker"
       # first time only
-      # PLEX_CLAIM: CLAIMCODEHERE
-    devices:
-      - /dev/dri:/dev/dri
+      PLEX_CLAIM: claim-4GowV-_3QSuPH5bpwfvZ
+    # devices:
+    #   - /dev/dri:/dev/dri
     state: started
-    restart: yes
+    restart: true
     restart_policy: always
     pull: true
     labels:

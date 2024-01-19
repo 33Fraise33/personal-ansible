@@ -16,7 +16,10 @@ cloudflared:
     31666565393963633964623339373133393536393130356330633034373566326331653363646237
     36353962383230376465323564323332666239663064333963306364663862383363
 
-mounts: []
+mounts:
+  - mountpoint: /data/media
+    source: 172.16.33.3:/mnt/main/media
+    fs: nfs
 
 lancache:
   dir: /lancache
@@ -70,6 +73,7 @@ docker:
     name: macvlan333
     hosts:
       traefik: 10
+      plex: 11  # needed for port forward 32000
       netbox: 12
       graylog: 14 # TODO
       grafana: 15

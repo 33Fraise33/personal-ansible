@@ -1,6 +1,6 @@
 ---
 - name: Setup sonarr
-  hosts: compute
+  hosts: captain
   connection: ssh
   become: true
   roles:
