@@ -1,8 +1,7 @@
 ---
 - name: Setup Portainer
   hosts:
-    - compute
-    - kang
+    - captain
   connection: ssh
   become: true
   roles:

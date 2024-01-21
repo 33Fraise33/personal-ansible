@@ -1,46 +1,45 @@
 # setup wordpress with a docker container
 # container from: https://hub.docker.com/_/wordpress
-
-- import_tasks: mariadb.yml
+---
+- name: Setup mariadb
+  ansible.builtin.import_tasks: mariadb.yml
   tags: mariadb
 
 - name: Create a volume for wordpress content
-  docker_volume:
+  community.docker.docker_volume:
     name: data_wordpress
 
-- name: create wordpress config directory
-  file:
-    path: "{{ docker_config_location }}/wordpress"
+- name: Create wordpress config directory
+  ansible.builtin.file:
+    path: "{{ docker.dir.config }}/wordpress"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
 
-- name: copy wordpress ini file
-  copy:
+- name: Copy wordpress ini file
+  ansible.builtin.copy:
     src: wordpress.ini
-    dest: "{{ docker_config_location }}/wordpress/wordpress.ini"
-    mode: 0644
+    dest: "{{ docker.dir.config }}/wordpress/wordpress.ini"
+    mode: "0644"
     owner: root
     group: root
 
-- name: setup wordpress docker container
-  docker_container:
+- name: Setup wordpress docker container
+  community.docker.docker_container:
     name: wordpress
     image: wordpress:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.wordpress }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.wordpress }}"
     env:
-      WORDPRESS_DB_HOST: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.mariadb }}"
+      WORDPRESS_DB_HOST: "mariadb"
       WORDPRESS_DB_NAME: wordpress
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: "{{ mysql_user_password }}"
     volumes:
       - "data_wordpress:/var/www/html/wp-content"
-      - "{{ docker_config_location }}/wordpress/wordpress.ini:/usr/local/etc/php/conf.d/wordpress.ini:ro"
-    restart: yes
+      - "{{ docker.dir.config }}/wordpress/wordpress.ini:/usr/local/etc/php/conf.d/wordpress.ini:ro"
+    restart: true
     restart_policy: always
     state: started
     pull: true

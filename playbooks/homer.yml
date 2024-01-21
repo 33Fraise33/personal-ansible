@@ -1,6 +1,6 @@
 ---
 - name: Setup homer docker container
-  hosts: compute
+  hosts: captain
   connection: ssh
   gather_facts: false
   become: true

@@ -1,19 +1,19 @@
 # redis from: https://hub.docker.com/_/redis
-
-- name: set overcommit_memory to 1 for redis
+---
+- name: Set overcommit_memory to 1 for redis
   ansible.posix.sysctl:
     name: vm.overcommit_memory
     value: '1'
     state: present
-    reload: yes
+    reload: true
 
 - name: Start redis docker container
-  docker_container:
+  community.docker.docker_container:
     name: redis
     image: redis:alpine
     networks:
       - name: macvlan333
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     pull: true

@@ -1,7 +1,7 @@
 ---
 - name: Setup Unms
-  hosts: compute
+  hosts: captain
   connection: ssh
   become: true
   roles:
-    - unms
+    - uisp

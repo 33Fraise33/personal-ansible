@@ -85,31 +85,11 @@ docker:
     hosts:
       traefik: 10
       plex: 11  # needed for port forward 32000
-      netbox: 12
       graylog: 14 # TODO
-      grafana: 15
-      portainer: 16
-      wordpress: 17
-      unms: 18
-      cloudflared: 19
-      mariadb: 20
       syncthing: 22  # needed for port forwared 22000
-      prometheus: 23
-      prometheus_snmp_exporter: 24
-      prometheus_blackbox: 25
-      prometheus_speedtest: 26
-      prometheus_alertmanager: 27
-      homer: 28
-      homeassistant: 29
-      redis: 33
-      postgres: 34
-      nginx: 35
+      homeassistant: 29  # needed for?
       unbound: 37  # NEEDED FOR ADGUARD
-      synapse: 41
-      solaredge_exporter: 44
       lancache_monolitic: 48  # NEEDED FOR UNBOUND
-      netboot: 54
-      coturn: 55
       adguard: 60  # NEEDED FOR DHCP
 
 matrix_base_url: matrix.frai.se

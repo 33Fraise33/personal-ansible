@@ -1,24 +1,22 @@
 # setup openvpn with a docker container
 # container from: http://docs.grafana.org/installation/docker/
-
+---
 - name: Create a volume for grafana content
-  docker_volume:
+  community.docker.docker_volume:
     name: data_grafana
 
-- name: setup grafana docker container
-  docker_container:
+- name: Setup grafana docker container
+  community.docker.docker_container:
     name: grafana
     image: grafana/grafana:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.grafana }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.grafana }}"
     volumes:
       - "data_grafana:/var/lib/grafana"
     env:
       GF_SERVER_ROOT_URL: "https://grafana.frai.se"
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
-    restart: yes
+    restart: true
     state: started
     restart_policy: always
     pull: true

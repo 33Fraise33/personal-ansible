@@ -29,6 +29,7 @@ all:
         captain:
         blackwidow:
     asgard:
+      children:
+        truenas
       hosts:
-        truenas:
         ironman:

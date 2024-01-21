@@ -1,41 +1,38 @@
 # https://hub.docker.com/_/postgres
 # update take backup: pg_dumpall -U db_admin -W -f /var/lib/postgresql/data/backup14.sql
 # import: psql -U db_admin < /old_data/backup14.sql
-
+---
 - name: Create a volume for postgres data
-  docker_volume:
+  community.docker.docker_volume:
     name: data_postgres_15
 
-- name: setup postgres
-  docker_container:
+- name: Setup postgres
+  community.docker.docker_container:
     name: postgres
     image: postgres:{{ postgres_major_version }}-alpine
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.postgres }}"
     volumes:
     #  - "data_postgres:/old_data"
       - "data_postgres_15:/var/lib/postgresql/data"
     env:
       POSTGRES_USER: "{{ postgres_user }}"
       POSTGRES_PASSWORD: "{{ postgres_password }}"
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     pull: true
     labels:
       traefik.enable: "false"
 
-- name: install postgres host dependencies
-  pacman:
-    update_cache: yes
+- name: Install postgres host dependencies
+  community.general.pacman:
+    update_cache: true
     name: ['postgresql-libs']
     state: latest
   when: ansible_os_family == "Archlinux"
 
-- name: install postgres ansible dependencies
-  pip:
-    name: ['pip', 'psycopg2-binary']
-    state: latest
-  tags: pip
+- name: Install postgres ansible dependencies
+  ansible.builtin.package:
+    name: python3-psycopg2
+    state: present

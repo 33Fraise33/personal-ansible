@@ -4,7 +4,7 @@
 
 - name: Create homer config directory
   ansible.builtin.file:
-    path: "{{ docker_config_location }}/homer"
+    path: "{{ docker.dir.config }}/homer"
     state: directory
     mode: "0755"
     owner: "{{ nobody.user }}"
@@ -13,7 +13,7 @@
 - name: Copy config file
   ansible.builtin.template:
     src: config.yml.j2
-    dest: "{{ docker_config_location }}/homer/config.yml"
+    dest: "{{ docker.dir.config }}/homer/config.yml"
     mode: "0644"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
@@ -26,7 +26,7 @@
     networks:
       - name: macvlan333
     volumes:
-      - "{{ docker_config_location }}/homer:/www/assets"
+      - "{{ docker.dir.config }}/homer:/www/assets"
     user: "{{ nobody.user }}:{{ nobody.group }}"
     env:
       UID: "{{ nobody.user }}"

@@ -1,26 +1,30 @@
-# https://hub.docker.com/r/matrixdotorg/synapse
+# https://hub.docker.com/r/matrixdotorg/dendrite
+---
+- name: Get postgres container ip
+  community.docker.docker_container_info:
+    name: postgres
+  register: result_containerip
 
-- name: create dendrite config directories
-  file:
+- name: Create dendrite config directories
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
-    recurse: yes
   loop:
-    - "{{ docker_config_location }}/dendrite"
+    - "{{ docker.dir.config }}/dendrite"
   tags: dendrite
 
 - name: Copy config template to server
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ docker_config_location }}/dendrite/{{ item }}"
+    dest: "{{ docker.dir.config }}/dendrite/{{ item }}"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
-    mode: 0755
+    mode: "0755"
   tags: dendrite, config
-  loop: 
+  loop:
     - matrix_key.pem
     - server.crt
     - server.key
@@ -30,7 +34,7 @@
 - name: Create a new database with name "dendrite"
   community.general.postgresql_db:
     name: dendrite
-    login_host: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.macvlan333.IPAddress }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
     encoding: UTF-8
@@ -40,17 +44,17 @@
   tags: dendrite
 
 - name: Create a volume for persistent media and jetstream
-  docker_volume:
+  community.docker.docker_volume:
     name: "{{ item }}"
   loop:
     - data_dendrite_media
     - data_dendrite_jetstream
 
-- name: set permissions to data volume for jetstream
-  file:
-    path: "{{ docker_data_location }}/docker/volumes/{{ item }}/_data"
+- name: Set permissions to data volume for jetstream
+  ansible.builtin.file:
+    path: "{{ docker.dir.data }}/docker/volumes/{{ item }}/_data"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
   loop:
@@ -58,20 +62,20 @@
     - data_dendrite_jetstream
 
 - name: Start dendrite docker container
-  docker_container:
+  community.docker.docker_container:
     name: matrix
     image: matrixdotorg/dendrite-monolith:latest
     networks:
       - name: macvlan333
     volumes:
-      - "{{ docker_config_location }}/dendrite:/etc/dendrite"
+      - "{{ docker.dir.config }}/dendrite:/etc/dendrite"
       - "data_dendrite_media:/var/dendrite/media"
       - "data_dendrite_jetstream:/jetstream"
     user: "{{ nobody.user }}:{{ nobody.group }}"
-    command: 
+    command:
       - "--tls-cert=server.crt"
       - "--tls-key=server.key"
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     pull: true
@@ -93,14 +97,14 @@
 #     group: "{{ nobody.group }}"
 #     recurse: yes
 #   loop:
-#     - "{{ docker_config_location }}/synapse"
-#     - "{{ docker_config_location }}/matrix-bridges"
+#     - "{{ docker.dir.config }}/synapse"
+#     - "{{ docker.dir.config }}/matrix-bridges"
 #   tags: synapse
 
 # - name: Copy config template to server
 #   template:
 #     src: homeserver.yaml.j2
-#     dest: "{{ docker_config_location }}/synapse/homeserver.yaml"
+#     dest: "{{ docker.dir.config }}/synapse/homeserver.yaml"
 #     owner: "{{ nobody.user }}"
 #     group: "{{ nobody.group }}"
 #     mode: 0755
@@ -109,7 +113,7 @@
 # - name: Copy logging config to server
 #   copy:
 #     src: frai.se.log.config
-#     dest: "{{ docker_config_location }}/synapse/fpostgresrai.se.log.config"
+#     dest: "{{ docker.dir.config }}/synapse/fpostgresrai.se.log.config"
 #     owner: "{{ nobody.user }}"
 #     group: "{{ nobody.group }}"
 #     mode: 0755
@@ -118,7 +122,7 @@
 # - name: Create a new database with name "synapse"
 #   community.general.postgresql_db:
 #     name: synapse
-#     login_host: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.postgres }}"
+#     login_host: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.postgres }}"
 #     login_password: "{{ postgres_password }}"
 #     login_user: "{{ postgres_user }}"
 #     encoding: UTF-8
@@ -132,17 +136,17 @@
 #     name: data_synapse
 
 # - name: Start synapse docker container
-#   docker_container:
+#   community.docker.docker_container:
 #     name: synapse
 #     image: matrixdotorg/synapse:latest
 #     networks:
 #       - name: macvlan333
-#         ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.synapse}}"
-#         ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.synapse}}"
+#         ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.synapse}}"
+#         ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.synapse}}"
 ##     volumes:
-#       - "{{ docker_config_location }}/synapse:/config"
+#       - "{{ docker.dir.config }}/synapse:/config"
 #       - "data_synapse:/data"
-#       - "{{ docker_config_location }}/matrix-bridges:/bridges"
+#       - "{{ docker.dir.config }}/matrix-bridges:/bridges"
 #     user: "{{ nobody.user }}:{{ nobody.group }}"
 #     env:
 #       SYNAPSE_CONFIG_DIR: "/config"
@@ -164,7 +168,8 @@
 #   tags: synapse
 
 # - name: create admin user
-#   command: docker exec synapse bash -l -c "register_new_matrix_user -c /config/homeserver.yaml -u {{ synapse_admin }} -p {{ synapse_admin_password }} -a https://{{ matrix_base_url }}"
+#   command: docker exec synapse bash -l -c "register_new_matrix_user -c \
+# /config/homeserver.yaml -u {{ synapse_admin }} -p {{ synapse_admin_password }} -a https://{{ matrix_base_url }}"
 #   tags: synapse
 #   ignore_errors: true
 

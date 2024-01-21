@@ -11,7 +11,7 @@
     name: portainer
     image: portainer/portainer-ce:latest
     networks:
-      - name: "{{ docker_network.name }}"
+      - name: "{{ docker.network.name }}"
     volumes:
       - "config_portainer:/data"
       - "/var/run/docker.sock:/var/run/docker.sock"

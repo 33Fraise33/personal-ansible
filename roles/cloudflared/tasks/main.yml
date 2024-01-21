@@ -1,17 +1,18 @@
+---
 - name: Set buffer size for quic # https://github.com/lucas-clemente/quic-go/wiki/UDP-Receive-Buffer-Size
-  sysctl:
+  ansible.posix.sysctl:
     name: "net.core.rmem_max"
     value: "2500000"
     state: present
 
 - name: Start cloudflared docker container
-  docker_container:
+  community.docker.docker_container:
     name: cloudflared
     image: cloudflare/cloudflared:latest
     networks:
-      - name: "{{ docker_network.name }}"
+      - name: "{{ docker.network.name }}"
     command: tunnel --no-autoupdate run --token {{ cloudflared.service_token }}
-    restart: yes
+    restart: true
     restart_policy: always
     state: started
     pull: true

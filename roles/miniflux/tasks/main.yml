@@ -1,5 +1,6 @@
-- name: Get postgres container ip 
-  docker_container_info:
+---
+- name: Get postgres container ip
+  community.docker.docker_container_info:
     name: postgres
   register: result_containerip
 
@@ -14,14 +15,14 @@
     lc_ctype: C
     template: template0
 
-- name: setup miniflux docker container
-  docker_container:
+- name: Setup miniflux docker container
+  community.docker.docker_container:
     name: miniflux
     image: miniflux/miniflux:latest
     networks:
       - name: macvlan333
     env:
-      DATABASE_URL: 'postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#","%23") }}@postgres/miniflux?sslmode=disable'
+      DATABASE_URL: 'postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#", "%23") }}@postgres/miniflux?sslmode=disable'
       RUN_MIGRATIONS: "1"
       CREATE_ADMIN: "1"
       ADMIN_USERNAME: "{{ miniflux.user }}"
@@ -29,7 +30,7 @@
       FETCH_YOUTUBE_WATCH_TIME: "1"
       BASE_URL: "https://rss.frai.se"
     state: started
-    restart: yes
+    restart: true
     restart_policy: always
     pull: true
     labels:

@@ -1,0 +1,26 @@
+# setup uisp with a docker container
+# container from: https://hub.docker.com/r/nico640/docker-unms
+---
+- name: Create a volume for uisp content
+  community.docker.docker_volume:
+    name: data_uisp
+
+- name: Setup uisp docker container
+  community.docker.docker_container:
+    name: uisp
+    image: nico640/docker-unms:latest
+    networks:
+      - name: macvlan333
+    volumes:
+      - "data_uisp:/config"
+    env:
+      TZ: Europe/Brussels
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.uisp.tls: "true"
+      traefik.http.routers.uisp.tls.certresolver: "le"
+      traefik.http.services.uisp.loadbalancer.server.port: "443"
+      traefik.http.services.uisp.loadbalancer.server.scheme: "https"

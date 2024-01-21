@@ -1,6 +1,6 @@
 ---
 - name: Setup Grafana
-  hosts: compute
+  hosts: captain
   connection: ssh
   become: true
   roles:
