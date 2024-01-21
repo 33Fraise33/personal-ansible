@@ -1,8 +1,9 @@
+---
 groups:
-- name: home.rules
-  rules:
-  - alert: Solar panels broken
-    expr: AC_Power * 10^AC_Power_SF == 0
-    for: 3d
-    annotations:
-      summary: "Check solar panel production"
+  - name: home.rules
+    rules:
+      - alert: Solar panels broken
+        expr: homeassistant_sensor_power_w{entity="sensor.solaredge_ac_power"} == 0
+        for: 3d
+        annotations:
+          summary: "Check solar panel production"

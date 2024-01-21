@@ -1,0 +1,67 @@
+---
+- labels:
+    site: "Asgard"
+    node_name: "UISP"
+  targets:
+    - https://unms.frai.se
+- labels:
+    site: "Asgard"
+    node_name: "Portainer"
+  targets:
+    - https://portainer.frai.se
+- labels:
+    site: "Asgard"
+    node_name: "Plex"
+  targets:
+    - https://plex.frai.se/web/index.html
+- labels:
+    site: "Asgard"
+    node_name: "Adguard"
+  targets:
+    - https://adguard.frai.se/login.html
+- labels:
+    site: "Asgard"
+    node_name: "Jackett"
+  targets:
+    - https://jackett.frai.se
+- labels:
+    site: "Asgard"
+    node_name: "Unitix"
+  targets:
+    - https://unitix.be
+- labels:
+    site: "Asgard"
+    node_name: "Homer"
+  targets:
+    - https://frai.se
+- labels:
+    site: "Asgard"
+    node_name: "Deluge"
+  targets:
+    - https://deluge.frai.se
+- labels:
+    site: "Asgard"
+    node_name: "Grafana"
+  targets:
+    - https://grafana.frai.se
+- labels:
+    site: "Asgard"
+    node_name: "Home Assistant"
+  targets:
+    - https://ha.frai.se
+- labels:
+    site: "Asgard"
+    node_name: "Netbox"
+  targets:
+    - https://netbox.frai.se
+- labels:
+    site: "Asgard"
+    node_name: "matrix"
+  targets:
+    - https://matrix.frai.se/_matrix/static/
+
+- labels:
+    site: "Github"
+    node_name: "Status"
+  targets:
+    - https://status.frai.se

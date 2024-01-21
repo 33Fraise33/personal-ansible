@@ -1,0 +1,6 @@
+## Asgard
+- labels:
+    site: "Asgard"
+    node_name: "captain"
+  targets:
+    - 172.16.33.5

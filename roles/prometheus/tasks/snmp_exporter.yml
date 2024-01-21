@@ -1,6 +1,6 @@
 - name: Create snmp config directory
   ansible.builtin.file:
-    path: "{{ docker_config_location }}/prometheus_snmp"
+    path: "{{ docker.dir.config }}/prometheus_snmp"
     state: directory
     mode: "0755"
     owner: "{{ nobody.group }}"
@@ -9,7 +9,7 @@
 - name: Copy generator config
   ansible.builtin.copy:
     src: generator.yml
-    dest: "{{ docker_config_location }}/prometheus_snmp/generator.yml"
+    dest: "{{ docker.dir.config }}/prometheus_snmp/generator.yml"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
     mode: "0755"
@@ -17,7 +17,7 @@
 - name: Copy mibs
   ansible.builtin.copy:
     src: mibs/
-    dest: "{{ docker_config_location }}/prometheus_snmp/mibs/"
+    dest: "{{ docker.dir.config }}/prometheus_snmp/mibs/"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
     mode: "0755"
@@ -27,7 +27,7 @@
     name: prometheus-snmp-generator
     image: prom/snmp-generator:latest
     volumes:
-      - "{{ docker_config_location }}/prometheus_snmp:/opt"
+      - "{{ docker.dir.config }}/prometheus_snmp:/opt"
     restart: true
     restart_policy: false
     state: started
@@ -41,14 +41,12 @@
 
 - name: Setup prometheus snmp exporter
   community.docker.docker_container:
-    name: prometheus-snmp
+    name: prometheus-snmp_exporter
     image: prom/snmp-exporter:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}"
     volumes:
-      - "{{ docker_config_location }}/prometheus_snmp/snmp.yml:/snmp.yml:ro"
+      - "{{ docker.dir.config }}/prometheus_snmp/snmp.yml:/snmp.yml:ro"
     command: "--config.file=/snmp.yml"
     restart: true
     restart_policy: always

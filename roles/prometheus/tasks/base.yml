@@ -1,0 +1,63 @@
+---
+- name: Create a volume for prometheus data
+  community.docker.docker_volume:
+    name: data_prometheus
+
+- name: Create prometheus config directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ nobody.group }}"
+    group: "{{ nobody.group }}"
+    recurse: true
+  with_items:
+    - "{{ docker.dir.config }}/prometheus"
+  tags: config
+
+- name: Copy prometheus config
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ docker.dir.config }}/prometheus/{{ item }}"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: "0755"
+  loop:
+    - prometheus.yml
+  tags: config
+
+- name: Copy prometheus files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ docker.dir.config }}/prometheus/{{ item }}"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: "0755"
+  loop:
+    - file_sd/
+    - alerts.d/
+  tags: config,targets
+
+- name: Setup prometheus docker container
+  community.docker.docker_container:
+    name: prometheus
+    image: prom/prometheus:latest
+    networks:
+      - name: macvlan333
+    volumes:
+      - "{{ docker.dir.config }}/prometheus:/config:ro"
+      - "data_prometheus:/prometheus"
+    command:
+      - "--config.file=/config/prometheus.yml"
+      - "--storage.tsdb.retention.time=3000d"
+      - "--web.enable-admin-api"
+      - "--web.external-url=https://prometheus.frai.se"
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.prometheus.tls: "true"
+      traefik.http.routers.prometheus.tls.certresolver: "le"
+      traefik.http.services.prometheus.loadbalancer.server.port: "9090"
+  tags: config

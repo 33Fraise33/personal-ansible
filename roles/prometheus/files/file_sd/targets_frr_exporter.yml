@@ -1,0 +1,6 @@
+---
+- labels:
+    site: "Vormir"
+    node_name: "kingpin"
+  targets:
+    - 10.10.33.1

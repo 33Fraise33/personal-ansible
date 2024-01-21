@@ -1,30 +1,29 @@
-- name: create alertmanager config directory
-  file:
-    path: "{{ docker_config_location }}/prometheus_alertmanager"
+---
+- name: Create alertmanager config directory
+  ansible.builtin.file:
+    path: "{{ docker.dir.config }}/prometheus_alertmanager"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: "{{ nobody.group }}"
     group: "{{ nobody.group }}"
 
-- name: copy alertmanager config
-  template:
+- name: Copy alertmanager config
+  ansible.builtin.template:
     src: alertmanager.yml.j2
-    dest: "{{ docker_config_location }}/prometheus_alertmanager/alertmanager.yml"
+    dest: "{{ docker.dir.config }}/prometheus_alertmanager/alertmanager.yml"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
-    mode: 0755
+    mode: "0755"
 
-- name: setup prometheus alertmanager
-  docker_container:
+- name: Setup prometheus alertmanager
+  community.docker.docker_container:
     name: prometheus-alertmanager
     image: prom/alertmanager:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_alertmanager }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_alertmanager }}"
     volumes:
-      - "{{ docker_config_location }}/prometheus_alertmanager:/etc/alertmanager"
-    restart: yes
+      - "{{ docker.dir.config }}/prometheus_alertmanager:/etc/alertmanager"
+    restart: true
     restart_policy: always
     state: started
     pull: true

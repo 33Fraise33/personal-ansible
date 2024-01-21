@@ -1,17 +1,15 @@
-# global:
-#   telegram_api_url: "https://api.telegram.org"
-
+---
 route:
   receiver: telegram
   group_wait: 15s
   group_interval: 2m
-  group_by: ['tenant']
+  group_by: ['site']
   repeat_interval: 10000h
 
 receivers:
   - name: telegram
     telegram_configs:
-    - api_url: "https://api.telegram.org"
-      bot_token: {{ alertmanager.telegram.bot_token }}
-      chat_id: -{{ alertmanager.telegram.chat_id }}
-      parse_mode: "HTML"
+      - api_url: "https://api.telegram.org"
+        bot_token: {{ alertmanager.telegram.bot_token }}
+        chat_id: -{{ alertmanager.telegram.chat_id }}
+        parse_mode: "HTML"

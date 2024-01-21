@@ -27,6 +27,14 @@ mounts:
 lancache:
   dir: /lancache
 
+prometheus:
+  features:
+    blackbox: true
+    snmp: true
+    graphite: true
+    speedtest: true
+    alertmanager: true
+
 interfaces:
   - name: ens3
     description: vlan33

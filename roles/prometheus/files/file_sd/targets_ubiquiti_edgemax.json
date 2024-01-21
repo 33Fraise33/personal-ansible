@@ -1,9 +1,0 @@
-[
-  {
-    "labels": {
-      "tenant": "ASGARD",
-      "node_name": "SW_JARVIS"
-    },
-    "targets": ["172.16.33.21"]
-  }
-]

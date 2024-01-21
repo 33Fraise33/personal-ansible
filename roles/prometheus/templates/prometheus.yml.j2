@@ -1,13 +1,14 @@
+---
 global:
-  scrape_interval:     15s 
+  scrape_interval: 15s
   evaluation_interval: 15s
-  scrape_timeout:      10s 
+  scrape_timeout: 10s
 
 alerting:
   alertmanagers:
-  - static_configs:
-    - targets:
-      - "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_alertmanager }}]:9093"
+    - static_configs:
+        - targets:
+            - "prometheus-alertmanager:9093"
 
 rule_files:
   - "alerts.d/*.yml"
@@ -18,20 +19,18 @@ scrape_configs:
     params:
       module: [icmp]
     file_sd_configs:
-    - files:
-      - '/config/file_sd/targets_blackbox_icmp.json'
-      - '/config/file_sd/targets_mikrotik.json'
-      - '/config/file_sd/targets_ruckus.json'
-      - '/config/file_sd/targets_ubiquiti_edgemax.json'
-      - '/config/file_sd/targets_juniper.json'
-      - '/config/file_sd/targets_aruba.json'
+      - files:
+          - '/config/file_sd/targets_blackbox_icmp.yml'
+          - '/config/file_sd/targets_mikrotik.yml'
+          - '/config/file_sd/targets_snmp_generic.yml'
+          - '/config/file_sd/targets_node_exporter.yml'
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_blackbox }}]:9115"  # This is your blackbox exporter.
+        replacement: "prometheus-blackbox_exporter:9115"
 
   - job_name: 'blackbox_http'
     scrape_interval: 5m
@@ -39,54 +38,84 @@ scrape_configs:
     params:
       module: [http_2xx]
     file_sd_configs:
-    - files:
-      - '/config/file_sd/targets_blackbox_http.json'
+      - files:
+          - '/config/file_sd/targets_blackbox_http.yml'
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_blackbox }}]:9115"  # This is your blackbox exporter.
+        replacement: "prometheus-blackbox_exporter:9115"
 
   - job_name: 'node_exporter'
     file_sd_configs:
-    - files:
-      - '/config/file_sd/targets_node_exporter.json'
+      - files:
+          - '/config/file_sd/targets_node_exporter.yml'
+    relabel_configs:
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__address__]
+        regex: (.*)
+        replacement: '$1:9100'
+        target_label: __address__
 
   - job_name: 'frr_exporter'
     file_sd_configs:
-    - files:
-      - '/config/file_sd/targets_frr_exporter.json'
-
-#  - job_name: 'windows_exporter'
-#    file_sd_configs:
-#    - files:
-#      - '/config/file_sd/targets_windows.json'
+      - files:
+          - '/config/file_sd/targets_frr_exporter.yml'
+    relabel_configs:
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__address__]
+        regex: (.*)
+        replacement: '$1:9342'
+        target_label: __address__
 
   - job_name: 'speedtest'
     metrics_path: /probe
     scrape_interval: 5h
-    scrape_timeout: 2m
+    scrape_timeout: 3m
     static_configs:
-    - targets:
-      - "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.prometheus_speedtest }}:9516"
+      - targets:
+          - "prometheus-speedtest_exporter:9516"
 
-  - job_name: 'solaredge'
-    metrics_path: /metrics
+  - job_name: 'graphite'
     static_configs:
-    - targets:
-      - "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.solaredge_exporter}}]:2112"
+      - targets:
+          - "prometheus-graphite_exporter:9108"
+
+  - job_name: 'docker'
+    file_sd_configs:
+      - files:
+          - '/config/file_sd/targets_docker.yml'
+    relabel_configs:
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__address__]
+        regex: (.*)
+        replacement: '$1:9323'
+        target_label: __address__
+
+  - job_name: "hass"
+    metrics_path: /api/prometheus
+    authorization:
+      credentials: "{{ home_assistant_access_token }}"
+    scheme: https
+    static_configs:
+      - targets: ['ha.frai.se']
+
+### SNMP
 
   - job_name: 'mikrotik-snmp'
     file_sd_configs:
-    - files:
-      - '/config/file_sd/targets_mikrotik.json'
+      - files:
+          - '/config/file_sd/targets_mikrotik.yml'
     metrics_path: /snmp
     params:
       module:
         - mikrotik
-      auth: 
+      auth:
         - fraise_v2
     relabel_configs:
       - source_labels: [__address__]
@@ -94,19 +123,18 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}]:9116"  # The SNMP exporter's real hostname:port.
+        replacement: "prometheus-snmp_exporter:9116"
 
   - job_name: 'generic-snmp'
     file_sd_configs:
-    - files:
-      - '/config/file_sd/targets_ubiquiti_edgemax.json'
-      - '/config/file_sd/targets_juniper.json'
-      - '/config/file_sd/targets_aruba.json'
+      - files:
+          - '/config/file_sd/targets_mikrotik.yml'
+          - '/config/file_sd/targets_snmp_generic.yml'
     metrics_path: /snmp
     params:
       module:
         - if_mib
-      auth: 
+      auth:
         - fraise_v2
     relabel_configs:
       - source_labels: [__address__]
@@ -114,34 +142,4 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}]:9116"  # The SNMP exporter's real hostname:port.
-
-  - job_name: 'ruckus-snmp'
-    file_sd_configs:
-    - files:
-      - '/config/file_sd/targets_ruckus.json'
-    metrics_path: /snmp
-    params:
-      module:
-        - if_mib
-      auth: 
-        - fraise_v2
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: "[{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.prometheus_snmp_exporter }}]:9116"  # The SNMP exporter's real hostname:port.
-
-  - job_name: 'docker'
-    scrape_interval: 2m
-    static_configs:
-      - targets: ['172.16.33.8:9323']
-
-  - job_name: "hass"
-    metrics_path: /api/prometheus
-    bearer_token: "{{ home_assistant_access_token }}"
-    scheme: https
-    static_configs:
-      - targets: ['ha.frai.se']
+        replacement: "prometheus-snmp_exporter:9116"

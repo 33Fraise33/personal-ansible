@@ -1,22 +1,21 @@
+---
 groups:
-- name: generic.rules
-  rules:
-  - alert: Device offline
-    expr: up{offline!="true"} == 0
-    for: 10m
-    annotations:
-      summary: "Device {{ $labels.node_name }} down (exporter: {{ $labels.job }})"
+  - name: generic.rules
+    rules:
+      - alert: Device offline
+        expr: up{offline!="true"} == 0
+        for: 10m
+        annotations:
+          summary: "Device {{ $labels.node_name }} down (exporter: {{ $labels.job }})"
 
-  - alert: High latency
-    expr: probe_icmp_duration_seconds{phase="rtt"} *1000 > 100
-    for: 10m
-    annotations:
-      summary: "Endpoint {{ $labels.node_name }} has high latency: {{ $value }}"
+      - alert: High latency
+        expr: probe_icmp_duration_seconds{phase="rtt"} *1000 > 100
+        for: 10m
+        annotations:
+          summary: "Endpoint {{ $labels.node_name }} has high latency: {{ $value }}"
 
-  - alert: Running containers
-    expr: engine_daemon_container_states_containers{state="running"} > 40 OR engine_daemon_container_states_containers{state="running"} < 35
-    for: 5m
-    annotations:
-      summary: "The amount of containers running is incorrect, amount: {{ $value }}"
-
-  
+      - alert: Non running containers
+        expr: engine_daemon_container_states_containers{state!="running"} > 0
+        for: 5m
+        annotations:
+          summary: "There are some containers not running, amount: {{ $value }}"

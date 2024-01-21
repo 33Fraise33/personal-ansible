@@ -4,19 +4,18 @@ auths:
     version: 2
 
 modules:
-  # Default IF-MIB interfaces table with ifIndex.
   if_mib:
-    walk: 
+    walk:
       - sysDescr
       - sysUpTime
-      - ifDescr #interfaces
-      - ifAdminStatus #interfaces
-      - ifOperStatus #interfaces
-      - ifLastChange #interfaces
-      - ifHCInOctets #ifXTable
-      - ifHCOutOctets #ifXTable
-      - ifName #ifXTable
-      - ifAlias #ifXTable
+      - ifDescr  # interfaces
+      - ifAdminStatus  # interfaces
+      - ifOperStatus  # interfaces
+      - ifLastChange  # interfaces
+      - ifHCInOctets  # ifXTable
+      - ifHCOutOctets  # ifXTable
+      - ifName  # ifXTable
+      - ifAlias  # ifXTable
     lookups:
       - source_indexes: [ifIndex]
         lookup: ifDescr
@@ -24,88 +23,9 @@ modules:
 # Mikrotik
   mikrotik:
     walk:
-      - sysDescr
-      - sysUpTime
-      - ifDescr #interfaces
-      - ifAdminStatus #interfaces
-      - ifOperStatus #interfaces
-      - ifLastChange #interfaces
-      - ifHCInOctets #ifXTable
-      - ifHCOutOctets #ifXTable
-      - ifName #ifXTable
-      - ifAlias #ifXTable
       - hrProcessorLoad
       - hrStorageSize
       - hrStorageUsed
       - mtxrFirmwareVersion
       - mtxrLicVersion
       - mtxrHealth
-    lookups:
-      - source_indexes: [ifIndex]
-        lookup: ifDescr
-
-# Ubiquiti / AirMAX
-# https://dl.ubnt.com/firmwares/airos-ubnt-mib/ubnt-mib.zip
-  # ubiquiti_airmax:
-  #   version: 1
-  #   walk:
-  #     #- sysDescr
-  #     #- sysUpTime
-  #     #- interfaces
-  #     #- ifXTable
-  #     - 1.3.6.1.4.1.41112.1.4 # ubntAirMAX
-  #   overrides:
-  #     ifType:
-  #       type: EnumAsInfo
-  #   auth:
-  #     community: frai.se
-
-# Ruckus AP
-  # ruckus_ap:
-  #   walk:
-  #     - sysDescr
-  #     - sysUpTime
-  #     - interfaces
-  #     - ifXTable
-  #     - 1.3.6.1.4.1.25053.1.1.11.1.1.1.1 # ruckusSystemCPUUtil
-  #     - 1.3.6.1.4.1.25053.1.1.11.1.1.1.2 # ruckusSystemMemoryUtil
-  #     - 1.3.6.1.4.1.25053.1.1.6.1.1.1.1.1.1 # ruckusWLANSSID
-  #     - 1.3.6.1.4.1.25053.1.1.6.1.1.1.4.1.4 # ruckusWLANStatsNumAuthSta
-  #   version: 2
-  #   lookups:
-  #     - source_indexes: [ifIndex]
-  #       lookup: ifDescr
-  #   auth:
-  #     community: frai.se
-
-# Juniper
-  # juniper:
-  #   lookups:
-  #     - source_indexes: [ifIndex]
-  #       lookup: ifDescr
-  #     - source_indexes: [hrStorageIndex]
-  #       lookup: hrStorageDescr
-  #     - source_indexes: [bgpPeerRemoteAddr]
-  #       lookup: bgpPeerRemoteAs
-  #   walk:
-  #     - jnxBoxDescr
-  #     - jnxBoxSerialNo
-  #     - jnxBoxInstalled
-  #     - jnxOperatingTable
-  #     - jnxCraftAlarms
-  #     - jnxOperatingState
-  #     - hrStorage
-  #     - hrSystem
-  #     - interfaces
-  #     - sysLocation
-  #     - sysName
-  #     - sysContact
-  #     - sysDescr # software version
-  #     - sysUpTime # snmp uptime
-  #     - hrSystemUptime # system Uptime
-  #     - interfaces
-  #     - hrStorageTable # disks and ram
-  #     - hrProcessorLoad # cpu usage
-  #   version: 2
-  #   auth:
-  #     community: frai.se

@@ -1,6 +1,6 @@
 ---
 - name: Setup prometheus with alertmanager
-  hosts: compute
+  hosts: monitoring
   connection: ssh
   become: true
   roles:

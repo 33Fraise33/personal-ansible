@@ -1,0 +1,32 @@
+# setup prometheus with a docker container
+# container from: https://prometheus.io/docs/prometheus/latest/installation/
+---
+
+- name: Setup blackbox exporter
+  ansible.builtin.import_tasks: blackbox_exporter.yml
+  tags: blackbox, blackbox_exporter, blackbox-exporter
+  when: prometheus.features.blackbox | default (true)
+
+- name: Setup snmp exporter
+  ansible.builtin.import_tasks: snmp_exporter.yml
+  tags: snmp, snmp_exporter, snmp-exporter
+  when: prometheus.features.snmp | default (false)
+
+- name: Setup speedtest exporter
+  ansible.builtin.import_tasks: speedtest_exporter.yml
+  tags: speedtest, speedtest_exporter, speedtest-exporter
+  when: prometheus.features.speedtest | default (false)
+
+- name: Setup graphite exporter
+  ansible.builtin.import_tasks: graphite_exporter.yml
+  tags: graphite, graphite_exporter, graphite-exporter
+  when: prometheus.features.graphite | default (false)
+
+- name: Setup alertmanager
+  ansible.builtin.import_tasks: alertmanager.yml
+  tags: alertmanager, alerts, alert
+  when: prometheus.features.alertmanager | default (false)
+
+- name: Setup prometheus
+  ansible.builtin.import_tasks: base.yml
+  tags: prometheus,base
