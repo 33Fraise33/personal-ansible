@@ -1,9 +1,9 @@
 # setup mosquitto with a docker container
 # container from: https://hub.docker.com/_/eclipse-mosquitto
-
+---
 - name: Create mqtt config directory
   ansible.builtin.file:
-    path: "{{ docker_config_location }}/mqtt"
+    path: "{{ docker.dir.config }}/mqtt"
     state: directory
     mode: "0755"
     owner: root
@@ -12,7 +12,7 @@
 - name: Copy config file
   ansible.builtin.copy:
     src: mosquitto.conf
-    dest: "{{ docker_config_location }}/mqtt/mosquitto.conf"
+    dest: "{{ docker.dir.config }}/mqtt/mosquitto.conf"
     owner: root
     group: root
     mode: "0755"
@@ -29,7 +29,7 @@
       - name: macvlan333
     volumes:
       - "data_mqtt:/mosquitto/data"
-      - "{{ docker_config_location }}/mqtt:/mosquitto/config"
+      - "{{ docker.dir.config }}/mqtt:/mosquitto/config"
     restart: true
     restart_policy: always
     state: started

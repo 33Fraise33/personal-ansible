@@ -1,5 +1,9 @@
 http:
   services:
+    accweb:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.33.9:8080"
     ironman:
       loadBalancer:
         servers:
@@ -9,19 +13,26 @@ http:
       loadBalancer:
         servers:
           - url: "https://172.16.33.7:8006/"
-    unifi-camera:
-      loadBalancer:
-        servers:
-          - url: "https://172.16.53.2"
-    accweb:
-      loadBalancer:
-        servers:
-          - url: "http://172.16.33.9:8080"
     status:
       loadBalancer:
         servers:
           - url: "https://33fraise33.github.io"
+    truenas:
+      loadBalancer:
+        servers:
+          - url: "https://172.16.33.3/"
+    unifi:
+      loadBalancer:
+        servers:
+          - url: "https://172.16.53.10"
   routers:
+    accweb:
+      rule: "Host(`accweb.frai.se`)"
+      service: "accweb"
+      tls:
+        certResolver: le
+        domains:
+          - main: "*.frai.se"
     ironman:
       rule: "Host(`ironman.frai.se`)"
       service: "ironman"
@@ -43,16 +54,16 @@ http:
         certResolver: le
         domains:
           - main: "*.frai.se"
-    unifi-camera:
-      rule: "Host(`nvr.frai.se`)"
-      service: "unifi-camera"
+    truenas:
+      rule: "Host(`truenas.frai.se`)"
+      service: "truenas"
       tls:
         certResolver: le
         domains:
           - main: "*.frai.se"
-    accweb:
-      rule: "Host(`accweb.frai.se`)"
-      service: "accweb"
+    unifi:
+      rule: "Host(`unifi.frai.se`)"
+      service: "unifi"
       tls:
         certResolver: le
         domains:

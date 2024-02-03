@@ -4,7 +4,7 @@
 
 - name: Create traefik config directory
   ansible.builtin.file:
-    path: "{{ docker_config_location }}/traefik"
+    path: "{{ docker.dir.config }}/traefik"
     state: directory
     mode: "0600"
     owner: root
@@ -13,7 +13,7 @@
 - name: Copy Traefik config
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ docker_config_location }}/traefik/{{ item }}"
+    dest: "{{ docker.dir.config }}/traefik/{{ item }}"
     owner: root
     group: root
     mode: "0755"
@@ -30,8 +30,8 @@
     image: traefik:latest
     networks:
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.traefik }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.traefik }}"
+        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.traefik }}"
+        ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}"
     command:
       - --global.sendAnonymousUsage
       - --entryPoints.web.address=:80
@@ -58,7 +58,7 @@
       - --serversTransport.insecureSkipVerify=true
     volumes:
       - "data_traefik_letsencrypt:/letsencrypt"
-      - "{{ docker_config_location }}/traefik/custom_rules.yml:/etc/traefik/custom_rules.yml:ro"
+      - "{{ docker.dir.config }}/traefik/custom_rules.yml:/etc/traefik/custom_rules.yml:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
     env:
       CF_API_EMAIL: "{{ cloudflare_api_email }}"

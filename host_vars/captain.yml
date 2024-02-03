@@ -64,33 +64,27 @@ docker:
       ipam:
         - subnet: '10.33.0.0/24'
           gateway: '10.33.0.1'
-          iprange: 10.33.0.128/25
+          iprange: 10.33.0.0/24
         - subnet: "2a12:4946:4000:333::/64"
           gateway: "2a12:4946:4000:333::1"
+          # iprange: "2a12:4946:4000:333:8000::/65"  # lots of errors
       ipv6: true
       driver_options:
         parent: ens4
-    # - name: docker50
-    #   type: ipvlan
-    #   ipam:
-    #     - subnet: '172.16.50.0/24'
-    #       gateway: '172.16.50.1'
-    #       iprange: 172.16.50.64/29
-    #   driver_options:
-    #     parent: ens5
   network:
     ipv4_prefix: "10.33.0."
     ipv6_prefix: "2a12:4946:4000:333::"
     name: macvlan333
     hosts:
-      traefik: 10
-      plex: 11  # needed for port forward 32000
+      # use a high number to prevent boot conflicts
+      traefik: 245
+      plex: 246  # needed for port forward 32000
       graylog: 14 # TODO
-      syncthing: 22  # needed for port forwared 22000
-      homeassistant: 29  # needed for?
-      unbound: 37  # NEEDED FOR ADGUARD
-      lancache_monolitic: 48  # NEEDED FOR UNBOUND
-      adguard: 60  # NEEDED FOR DHCP
+      syncthing: 247  # needed for port forwared 22000
+      homeassistant: 248  # needed for shelly coloit
+      unbound: 249  # NEEDED FOR ADGUARD
+      lancache_monolitic: 250  # NEEDED FOR UNBOUND
+      adguard: 254 # NEEDED FOR DHCP
 
 matrix_base_url: matrix.frai.se
 

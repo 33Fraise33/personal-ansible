@@ -4,8 +4,8 @@ default_config:
 http:
   use_x_forwarded_for: true
   trusted_proxies:
-    - "{{ docker_network.ipv4_prefix }}0/24"
-    - "{{ docker_network.ipv6_prefix }}/64"
+    - "{{ docker.network.ipv4_prefix }}0/24"
+    - "{{ docker.network.ipv6_prefix }}/64"
     
 # Text to speech
 tts:
@@ -30,25 +30,25 @@ cover:
         friendly_name: "Garage Door"
         open_cover:
           - condition: state
-            entity_id: binary_sensor.shelly_garagedoor_input
-            state: "on"
+            entity_id: binary_sensor.fibaro_door_window_sensor_2_window_door_is_open
+            state: "off"
           - service: switch.toggle
             target:
-              entity_id: switch.shelly_garagedoor
+              entity_id: switch.node_31
         close_cover:
           service: switch.toggle
           target:
-            entity_id: switch.shelly_garagedoor
+            entity_id: switch.node_31
         stop_cover:
           service: switch.toggle
           target:
-            entity_id: switch.shelly_garagedoor
+            entity_id: switch.node_31
         {% raw -%}
         value_template: >- 
-          {% if is_state('binary_sensor.shelly_garagedoor_input', 'on') %}
-            closed
-          {% else %}
+          {% if is_state('binary_sensor.fibaro_door_window_sensor_2_window_door_is_open', 'on') %}
             open
+          {% else %}
+            closed
           {% endif %}
         {% endraw %}
 
@@ -63,37 +63,39 @@ sensor:
     postcode: 8490
     streetname: Eernegemweg
     streetnumber: 96
-  - platform: statistics
-    name: "Average power usage 5 min"
-    entity_id: sensor.p1_meter_3c39e7250142_active_power
-    state_characteristic: mean
-    max_age:
-      minutes: 5
 
-binary_sensor:
-  - platform: ping
-    host: 172.16.50.10
-    name: "PC_FRAISE"
-    count: 1
-    scan_interval: 30
-  - platform: ping
-    host: 172.16.50.11
-    name: "PC_AMELLE"
-    count: 1
-    scan_interval: 30
+{% raw %}
+alarm_control_panel:
+  - platform: template
+    panels:
+      ultrasync_alarm:
+        code_format: no_code
+        value_template: >
+          {% if is_state('sensor.ultrasync_alarm_area2state', 'Armed Away') %}
+            armed_away
+          {% elif is_state('sensor.ultrasync_alarm_area2state', 'Armed Stay') %}
+            armed_home
+          {% else %}
+            disarmed
+          {% endif %}
+        disarm:
+          - service: ultrasync.disarm
+{% endraw %}
     
 prometheus:
   namespace: "homeassistant"
   filter:
     include_entity_globs:
-      - sensor.*power
-      - sensor.*energy
+      - sensor.*power*
+      - sensor.*energy*
+      - sensor.*gas*
 
 google_assistant:
   project_id: ha-assistant-57f43
   service_account: !include service_account.json
   report_state: true
 
-# google:
-#   client_id: "952331592172-5oqlke7d2apl5s5740tk41lpph865fod.apps.googleusercontent.com"
-#   client_secret: "{{ ha.google_client_secret }}"
+spotcast:
+  sp_dc: {{ ha.spotify_dc }}
+  sp_key: {{ ha.spotify_key }}
+  country: BE

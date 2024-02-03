@@ -1,6 +1,6 @@
 ---
 - name: Setup mqtt docker container
-  hosts: compute
+  hosts: captain
   connection: ssh
   become: true
   roles:

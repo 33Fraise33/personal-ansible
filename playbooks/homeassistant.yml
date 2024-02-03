@@ -1,6 +1,6 @@
 ---
 - name: Setup homeassistant docker container
-  hosts: compute
+  hosts: captain
   connection: ssh
   become: true
   roles:

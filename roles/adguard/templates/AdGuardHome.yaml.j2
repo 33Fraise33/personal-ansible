@@ -146,17 +146,17 @@ filtering:
     - domain: acc.frai.se
       answer: 172.16.33.9
     - domain: '*.frai.se'
-      answer: 10.33.0.10
+      answer: {{ docker.network.ipv4_prefix }}{{ docker.network.hosts.traefik }}
     - domain: '*.frai.se'
-      answer: 2a12:4946:4000:333::10
+      answer: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}"
     - domain: frai.se
-      answer: 10.33.0.10
+      answer: {{ docker.network.ipv4_prefix }}{{ docker.network.hosts.traefik }}
     - domain: frai.se
-      answer: 2a12:4946:4000:333::10
+      answer: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}"
     - domain: '*.unitix.be'
-      answer: 10.33.0.10
+      answer: {{ docker.network.ipv4_prefix }}{{ docker.network.hosts.traefik }}
     - domain: '*.unitix.be'
-      answer: 2a12:4946:4000:333::10
+      answer: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}"
   safebrowsing_cache_size: 1048576
   safesearch_cache_size: 1048576
   parental_cache_size: 1048576

@@ -1,9 +1,9 @@
 # setup homeassistant with a docker container
 # container from: https://www.home-assistant.io/docs/installation/docker/
-
+---
 - name: Create homeassistant config directory
   ansible.builtin.file:
-    path: "{{ docker_config_location }}/homeassistant"
+    path: "{{ docker.dir.config }}/homeassistant"
     state: directory
     mode: "0755"
     owner: root
@@ -18,13 +18,13 @@
     name: homeassistant
     image: ghcr.io/home-assistant/home-assistant:stable
     networks:
-      - name: macvlan50
-        ipv4_address: 172.16.50.65
+      # - name: macvlan50
+      #   ipv4_address: 172.16.50.65
       - name: macvlan333
-        ipv4_address: "{{ docker_network.ipv4_prefix }}{{ docker_network.hosts.homeassistant }}"
-        ipv6_address: "{{ docker_network.ipv6_prefix }}{{ docker_network.hosts.homeassistant }}"
+        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.homeassistant }}"
+        ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.homeassistant }}"
     volumes:
-      - "{{ docker_config_location }}/homeassistant:/config"
+      - "{{ docker.dir.config }}/homeassistant:/config"
       - "data_homeassistant_media:/media"
       - /etc/localtime:/etc/localtime:ro
     env:
@@ -45,7 +45,7 @@
 
 - name: Include zwave tasks
   ansible.builtin.import_tasks: zwave.yml
-  tags: zwave
+  tags: zwave,zwavejs
 
 - name: Include zigbee tasks
   ansible.builtin.import_tasks: z2m.yml

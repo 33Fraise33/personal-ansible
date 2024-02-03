@@ -73,6 +73,8 @@
     driver_options: "{{ item.driver_options | default(omit) }}"
     ipam_config: "{{ item.ipam | default(omit) }}"
   loop: "{{ docker.networks }}"
+  tags: networks,network,ipam
+  notify: Restart docker
 
 - name: Change docker vars (including default subnet)
   ansible.builtin.copy:

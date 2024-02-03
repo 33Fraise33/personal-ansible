@@ -1,5 +1,5 @@
 - id: '1578943797763'
-  alias: Send Garbage Notification
+  alias: 'Notification: Garbage Collection'
   description: ''
   trigger:
   - at: '18:45:00'
@@ -23,7 +23,7 @@
       above: '0'
       entity_id: sensor.recycleapp_papier
   action:
-  - service: notify.mobile_app_pixel6_gianni
+  - service: notify.notify
     data:
       title: AFVAL
       message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days_until'',
@@ -33,29 +33,10 @@
 
         '
       data:
-        actions:
-        - action: URI
-          title: Show Calendar
-          uri: /lovelace/default_view
-        icon_url: https://i.pinimg.com/originals/86/d9/27/86d92784a2c535e3bd783aec01bd1475.png
-  - service: notify.mobile_app_sm_a546b
-    data:
-      title: AFVAL
-      message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days_until'',
-        1) %} Restafval {% endif %} {% if is_state_attr(''sensor.recycleapp_pmd'',
-        ''Days_until'', 1) %} PMD {% endif %} {% if is_state_attr(''sensor.recycleapp_papier'',
-        ''Days_until'', 1) %} Papier {% endif %}
-
-        '
-      data:
-        actions:
-        - action: URI
-          title: Show Calendar
-          uri: /lovelace/default_view
         icon_url: https://i.pinimg.com/originals/86/d9/27/86d92784a2c535e3bd783aec01bd1475.png
   mode: single
 - id: '1617014339885'
-  alias: Garage Open Timer
+  alias: 'Notification: Garage Open'
   description: ''
   trigger:
   - platform: state
@@ -68,93 +49,12 @@
       seconds: 0
   condition: []
   action:
-  - service: notify.mobile_app_pixel6_gianni
+  - service: notify.notify
     data:
       message: Garage has been open for more then 5 minutes!
       title: Garage Open
       data:
-        url: /lovelace/default_view
         icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
-  - service: notify.mobile_app_sm_a546b
-    data:
-      message: Garage has been open for more then 5 minutes!
-      title: Garage Open
-      data:
-        url: /lovelace/default_view
-        icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
-  mode: single
-- id: '1635756544900'
-  alias: Change Ledstrip PC State
-  description: ''
-  trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.pc_fraise
-    to: 'on'
-  - platform: state
-    entity_id:
-    - binary_sensor.pc_fraise
-    to: 'off'
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.pc_fraise
-        state: 'on'
-      - condition: device
-        type: is_off
-        device_id: fc0ccf3780e821bbae16cdb570b91f99
-        entity_id: light.iot_shelly_bureau
-        domain: light
-      sequence:
-      - type: turn_on
-        device_id: fc0ccf3780e821bbae16cdb570b91f99
-        entity_id: light.iot_shelly_bureau
-        domain: light
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.pc_fraise
-        state: 'off'
-      - condition: device
-        type: is_on
-        device_id: fc0ccf3780e821bbae16cdb570b91f99
-        entity_id: light.iot_shelly_bureau
-        domain: light
-      sequence:
-      - type: turn_off
-        device_id: fc0ccf3780e821bbae16cdb570b91f99
-        entity_id: light.iot_shelly_bureau
-        domain: light
-    default: []
-  mode: single
-- id: '1672914124011'
-  alias: Lucifer Button
-  description: ''
-  trigger:
-  - platform: device
-    domain: mqtt
-    device_id: b6a7367363b2689386e9ee5467f98824
-    type: action
-    subtype: arrow_right_click
-    discovery_id: 0x003c84fffe1fd811 action_arrow_right_click
-  condition: []
-  action:
-  - service: media_player.turn_on
-    data: {}
-    target:
-      device_id: d6ca95811e63498241d2f3bddb5dd1ad
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 5
-      milliseconds: 0
-  - service: androidtv.adb_command
-    data:
-      command: am start -n com.netflix.ninja/.MainActivity -a android.intent.action.VIEW
-        -d http://www.netflix.com/watch/80057918 -f 0x10808000 -e source 30
-    target:
-      device_id: d6ca95811e63498241d2f3bddb5dd1ad
   mode: single
 - id: '1676395228339'
   alias: STYRBAR
@@ -211,7 +111,7 @@
       - condition: trigger
         id: '3'
       sequence:
-      - service: cover.open_cover
+      - service: cover.close_cover
         data: {}
         target:
           entity_id: cover.garage_door
@@ -219,44 +119,19 @@
       - condition: trigger
         id: '4'
       sequence:
-      - service: cover.close_cover
+      - service: cover.open_cover
         data: {}
         target:
           entity_id: cover.garage_door
   mode: single
-- id: '1682231799093'
-  alias: SET VOLUME
-  description: ''
-  trigger:
-  - platform: state
-    entity_id:
-    - media_player.nestmini6634
-    - media_player.nestmini5142
-    - media_player.nesthubf1f7
-    attribute: volume_level
-  condition:
-  - condition: device
-    device_id: e315a7cd5964d5082f2e2f2f3fc077fb
-    domain: media_player
-    entity_id: media_player.living_kitchen
-    type: is_playing
-  action:
-  - service: media_player.volume_set
-    data:
-      volume_level: 0.2
-    target:
-      device_id:
-      - 8c729843fc3141796f3ebd6ceb2d5152
-      - 3c4e87a8d6da8106fff88e88fbbdb28e
-      - d9a7a94b0909413cd5ebdd78e5656a67
-  mode: single
 - id: '1683093433890'
-  alias: Auto Opladen
+  alias: 'Notification: Auto Opladen'
   description: ''
   trigger:
   - platform: numeric_state
-    entity_id: sensor.average_power_usage_5_min
-    below: -100
+    entity_id:
+    - sensor.average_power_5min
+    below: -500
   condition:
   - condition: and
     conditions:
@@ -276,11 +151,12 @@
     message: Laten we de auto opladen
   mode: single
 - id: '1683093764768'
-  alias: Stop Auto Laden
+  alias: 'Notification: Stop Auto Laden'
   description: ''
   trigger:
   - platform: numeric_state
-    entity_id: sensor.average_power_usage_5_min
+    entity_id:
+    - sensor.average_power_5min
     above: 100
   condition:
   - condition: and
@@ -301,7 +177,7 @@
     message: Gemiddeld verbruik stroom boven 100W
   mode: single
 - id: '1686683677480'
-  alias: Nfc test garage
+  alias: 'NFC: Toggle Garage'
   description: ''
   trigger:
   - platform: tag
@@ -314,7 +190,7 @@
       entity_id: cover.garage_door
   mode: single
 - id: '1689091034422'
-  alias: Tag Licht Buiten is scanned
+  alias: 'NFC: light outside'
   description: ''
   trigger:
   - platform: tag
@@ -327,15 +203,15 @@
     domain: switch
   mode: single
 - id: '1691999617422'
-  alias: Phone push doorbell
+  alias: 'Notification: Doorbell Ring'
   description: Phone push doorbell
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.cam_doorbell_doorbell
+    - binary_sensor.cam02_doorbell_doorbell
     to: 'on'
   action:
-  - service: notify.mobile_app_pixel6_gianni
+  - service: notify.mobile_app_pixel_6
     data:
       title: Doorbell
       message: check unifi
@@ -343,4 +219,100 @@
         ttl: 0
         priority: high
         channel: alarm_stream
+  mode: single
+- id: '1693896260197'
+  alias: 'PIR: Light Garage'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.motion_sensor_motion_detection_2
+    to:
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.motion_sensor_motion_detection_2
+        state: 'on'
+      sequence:
+      - type: turn_on
+        device_id: 5a7e24120c207c869bb3bf761cb438df
+        entity_id: 83e7a8a998a7dbd377351e18b3b3e703
+        domain: switch
+      - type: turn_on
+        device_id: 5a7e24120c207c869bb3bf761cb438df
+        entity_id: c7ac4270d47c95be72e39e25e9e646f2
+        domain: switch
+    default:
+    - type: turn_off
+      device_id: 5a7e24120c207c869bb3bf761cb438df
+      entity_id: 83e7a8a998a7dbd377351e18b3b3e703
+      domain: switch
+    - type: turn_off
+      device_id: 5a7e24120c207c869bb3bf761cb438df
+      entity_id: c7ac4270d47c95be72e39e25e9e646f2
+      domain: switch
+  mode: single
+- id: '1695750254929'
+  alias: 'Automation: Lights off outside'
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunrise
+    id: '1'
+  - platform: time
+    at: '22:30:00'
+    id: '2'
+  - platform: time
+    at: 08:00:00
+    id: '3'
+  - platform: state
+    entity_id:
+    - binary_sensor.motion_sensor_motion_detection
+    to: 'off'
+    id: '4'
+  condition:
+  - condition: or
+    conditions:
+    - condition: and
+      conditions:
+      - condition: trigger
+        id:
+        - '4'
+      - condition: time
+        after: '22:30:00'
+        before: 06:00:00
+    - condition: trigger
+      id:
+      - '1'
+      - '2'
+      - '3'
+  action:
+  - type: turn_off
+    device_id: 5a7e24120c207c869bb3bf761cb438df
+    entity_id: b87e6e421ad0896f5896243b85567a30
+    domain: switch
+  mode: single
+- id: '1699559709033'
+  alias: 'Automation: Light On Outside'
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunset
+  - platform: time
+    at: 06:30:00
+  - platform: state
+    entity_id:
+    - binary_sensor.motion_sensor_motion_detection
+    to: 'on'
+  condition:
+  - condition: sun
+    before: sunrise
+    after: sunset
+  action:
+  - type: turn_on
+    device_id: 5a7e24120c207c869bb3bf761cb438df
+    entity_id: b87e6e421ad0896f5896243b85567a30
+    domain: switch
   mode: single
