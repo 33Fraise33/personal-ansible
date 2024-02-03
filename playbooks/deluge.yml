@@ -1,7 +1,0 @@
----
-- name: Setup Deluge
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - deluge

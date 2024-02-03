@@ -1,7 +1,0 @@
----
-- name: Setup Calibre
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - calibre

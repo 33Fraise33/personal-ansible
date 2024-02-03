@@ -1,7 +1,0 @@
----
-- name: Setup sonarr
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - sonarr

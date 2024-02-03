@@ -1,0 +1,26 @@
+---
+# install overseerr
+# https://docs.overseerr.dev/getting-started/installation
+
+- name: Create a volume for overseerr config
+  community.docker.docker_volume:
+    name: config_overseerr
+
+- name: Setup overseerr docker container
+  community.docker.docker_container:
+    name: overseerr
+    image: sctx/overseerr:latest
+    networks:
+      - name: macvlan333
+    volumes:
+      - "config_overseerr:/app/config"
+    env:
+      TZ: "Etc/UTC"
+    state: started
+    restart_policy: always
+    restart: true
+    pull: true
+    labels:
+      traefik.http.routers.overseerr.tls: "true"
+      traefik.http.routers.overseerr.tls.certresolver: "le"
+      traefik.http.services.overseerr.loadbalancer.server.port: "5055"

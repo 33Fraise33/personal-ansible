@@ -1,7 +1,0 @@
----
-- name: Setup jackett docker container
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - jackett

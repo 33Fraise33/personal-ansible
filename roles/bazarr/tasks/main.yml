@@ -1,0 +1,29 @@
+---
+# install bazarr sub getter
+# https://hub.docker.com/r/linuxserver/bazarr
+
+- name: Create a volume for bazarr config
+  community.docker.docker_volume:
+    name: config_bazarr
+
+- name: Setup bazarr docker container
+  community.docker.docker_container:
+    name: bazarr
+    image: linuxserver/bazarr:latest
+    networks:
+      - name: macvlan333
+    volumes:
+      - "config_bazarr:/config"
+      - "/data/media:/media"
+    env:
+      PUID: "{{ nobody.user }}"
+      PGID: "{{ nobody.group }}"
+      TZ: "Etc/UTC"
+    state: started
+    restart_policy: always
+    restart: true
+    pull: true
+    labels:
+      traefik.http.routers.bazarr.tls: "true"
+      traefik.http.routers.bazarr.tls.certresolver: "le"
+      traefik.http.services.bazarr.loadbalancer.server.port: "6767"

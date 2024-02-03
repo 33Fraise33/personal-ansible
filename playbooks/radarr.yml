@@ -1,7 +1,0 @@
----
-- name: Setup radarr
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - radarr

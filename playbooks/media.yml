@@ -1,0 +1,67 @@
+---
+- name: Setup Deluge
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - deluge
+  tags: deluge
+
+- name: Setup jackett docker container
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - jackett
+  tags: jackett
+
+- name: Setup Plex
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - plex
+  tags: plex
+
+
+#### ARR
+- name: Setup radarr
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - radarr
+  tags: radarr,arr
+
+- name: Setup sonarr
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - sonarr
+  tags: sonarr,arr
+
+- name: Setup bazarr
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - bazarr
+  tags: bazarr,arr
+
+- name: Setup overseerr
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - overseerr
+  tags: overseerr,overseer,arr
+
+#### BOOKS
+- name: Setup Calibre
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - calibre
+  tags: calibre, books

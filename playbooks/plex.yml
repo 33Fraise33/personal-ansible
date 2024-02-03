@@ -1,7 +1,0 @@
----
-- name: Setup Plex
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - plex
