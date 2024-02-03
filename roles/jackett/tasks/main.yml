@@ -11,8 +11,6 @@
     image: linuxserver/jackett:latest
     networks:
       - name: macvlan333
-        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.jackett }}"
-        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.jackett }}"
     volumes:
       - "config_jackett:/config"
       - "data_deluge_watch:/downloads"
@@ -36,8 +34,6 @@
     image: flaresolverr/flaresolverr:latest
     networks:
       - name: macvlan333
-        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.flaresolverr }}"
-        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.flaresolverr }}"
     restart: true
     restart_policy: always
     state: started

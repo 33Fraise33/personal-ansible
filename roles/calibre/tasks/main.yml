@@ -14,8 +14,6 @@
     image: linuxserver/calibre:latest
     networks:
       - name: macvlan333
-        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.calibre }}"
-        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.calibre }}"
     volumes:
       - "config_calibre:/config"
       - "/data/media:/media"
@@ -41,8 +39,6 @@
     image: linuxserver/calibre-web:latest
     networks:
       - name: macvlan333
-        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.calibre_web }}"
-        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.calibre_web }}"
     volumes:
       - "config_calibre-web:/config"
       - "/data/media/books:/books"

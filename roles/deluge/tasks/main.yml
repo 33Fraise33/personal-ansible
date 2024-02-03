@@ -21,8 +21,6 @@
     image: linuxserver/deluge:latest
     networks:
       - name: macvlan333
-        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.deluge }}"
-        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.deluge }}"
     volumes:
       - "config_deluge:/config"
       - "/data/media:/media"

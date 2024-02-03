@@ -1,7 +1,0 @@
----
-- name: Setup netboot
-  hosts: compute
-  connection: ssh
-  become: true
-  roles:
-    - netboot
