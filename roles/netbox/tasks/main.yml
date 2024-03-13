@@ -1,5 +1,10 @@
 # netbox from : https://hub.docker.com/r/linuxserver/netbox
 ---
+- name: Stop netbox services for possible changed config
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker.dir.config }}/netbox"
+    state: stopped
+
 - name: Get postgres container ip
   community.docker.docker_container_info:
     name: postgres
@@ -17,37 +22,112 @@
     path: "{{ item }}"
     state: directory
     mode: "0755"
-    owner: "911"
-    group: "911"
   with_items:
     - "{{ docker.dir.config }}/netbox/"
 
-- name: Start netbox docker container
-  community.docker.docker_container:
-    name: netbox
-    image: linuxserver/netbox:latest
-    networks:
-      - name: macvlan333
-    volumes:
-      - "{{ docker.dir.config }}/netbox:/config"
-    env:
-      ALLOWED_HOST: "netbox.frai.se"
-      SUPERUSER_EMAIL: "{{ netbox_superuser_email }}"
-      SUPERUSER_PASSWORD: "{{ netbox_superuser_password }}"
-      DB_NAME: netbox
-      DB_USER: "{{ postgres_user }}"
-      DB_PASSWORD: "{{ postgres_password }}"
-      DB_HOST: "postgres"
-      REDIS_HOST: "redis"
-      TZ: "Europe/Brussels"
-    restart: true
-    restart_policy: always
-    state: started
-    pull: true
-    labels:
-      traefik.http.routers.netbox.tls: "true"
-      traefik.http.routers.netbox.tls.certresolver: "le"
-      traefik.http.services.netbox.loadbalancer.server.port: "8000"
+- name: Clone git repo
+  ansible.builtin.git:
+    repo: https://github.com/netbox-community/netbox-docker.git
+    dest: "{{ docker.dir.config }}/netbox/"
+    version: "{{ netbox.docker_version }}"
+    force: true
+
+- name: Copy files to create custom docker image with plugins
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ docker.dir.config }}/netbox/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - Dockerfile-Plugins
+    - plugin_requirements.txt
+
+- name: Set netbox plugins
+  ansible.builtin.lineinfile:
+    dest: "{{ docker.dir.config }}/netbox/configuration/plugins.py"
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  loop:
+    - regexp: "^(# *)?PLUGINS ="
+      line: 'PLUGINS = ["netbox_prometheus_sd"]'
+
+- name: Copy docker-compose.override template
+  ansible.builtin.template:
+    src: docker-compose.override.yml.j2
+    dest: "{{ docker.dir.config }}/netbox/docker-compose.override.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Change netbox env
+  ansible.builtin.lineinfile:
+    dest: "{{ docker.dir.config }}/netbox/env/netbox.env"
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  loop:
+    - regexp: "^DB_USER="
+      line: "DB_USER={{ postgres_user }}"
+    - regexp: "^DB_PASSWORD="
+      line: "DB_PASSWORD={{ postgres_password }}"
+    - regexp: "^REDIS_CACHE_HOST="
+      line: "REDIS_CACHE_HOST=redis"
+    - regexp: "^REDIS_CACHE_PASSWORD="
+      line: "REDIS_CACHE_PASSWORD=''"
+    - regexp: "^REDIS_PASSWORD="
+      line: "REDIS_PASSWORD=''"
+    - regexp: "^SECRET_KEY="
+      line: "SECRET_KEY='{{ netbox.secret_key }}'"
+    - regexp: "^CHANGELOG_RETENTION="
+      line: "CHANGELOG_RETENTION=0"
+    - regexp: "^LOGIN_REQUIRED="
+      line: "LOGIN_REQUIRED=true"
+    - regexp: "^EMAIL_FROM="
+      line: "EMAIL_FROM=netbox@frai.se"
+    - regexp: "^EMAIL_USERNAME="
+      line: "EMAIL_USERNAME={{ gsuite_smtp_user }}"
+    - regexp: "^EMAIL_PASSWORD="
+      line: "EMAIL_PASSWORD={{ gsuite_smtp_pass }}"
+    - regexp: "^EMAIL_PORT="
+      line: "EMAIL_PORT=465"
+    - regexp: "^EMAIL_SERVER="
+      line: "EMAIL_SERVER=smtp-relay.gmail.com"
+    - regexp: "^EMAIL_USE_TLS="
+      line: "EMAIL_USE_TLS=true"
+
+- name: Start netbox with docker compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker.dir.config }}/netbox"
+    pull: always
+
+# - name: Start netbox docker container
+#   community.docker.docker_container:
+#     name: netbox
+#     image: linuxserver/netbox:latest
+#     networks:
+#       - name: macvlan333
+#     volumes:
+#       - "{{ docker.dir.config }}/netbox:/config"
+#     env:
+#       ALLOWED_HOST: "netbox.frai.se"
+#       SUPERUSER_EMAIL: "{{ netbox_superuser_email }}"
+#       SUPERUSER_PASSWORD: "{{ netbox_superuser_password }}"
+#       DB_NAME: netbox
+#       DB_USER: "{{ postgres_user }}"
+#       DB_PASSWORD: "{{ postgres_password }}"
+#       DB_HOST: "postgres"
+#       REDIS_HOST: "redis"
+#       TZ: "Europe/Brussels"
+#     restart: true
+#     restart_policy: always
+#     state: started
+#     pull: true
+#     labels:
+#       traefik.http.routers.netbox.tls: "true"
+#       traefik.http.routers.netbox.tls.certresolver: "le"
+#       traefik.http.services.netbox.loadbalancer.server.port: "8000"
 
 # - name: Set prometheus plugin
 #   lineinfile:

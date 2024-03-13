@@ -1,0 +1,34 @@
+version: '3.4'
+services:
+  netbox: 
+    depends_on: !reset null
+    image: netbox:latest-plugins
+    build:
+      context: .
+      dockerfile: Dockerfile-Plugins
+    labels:
+      traefik.http.routers.netbox.rule: "Host(`netbox.frai.se`)"
+      traefik.http.routers.netbox.tls: "true"
+      traefik.http.routers.netbox.tls.certresolver: "le"
+      traefik.http.services.netbox.loadbalancer.server.port: "8080"
+  netbox-worker:
+    image: netbox:latest-plugins
+    build:
+      context: .
+      dockerfile: Dockerfile-Plugins
+  netbox-housekeeping:
+    image: netbox:latest-plugins
+    build:
+      context: .
+      dockerfile: Dockerfile-Plugins
+  postgres: !reset null
+  redis: !reset null
+  redis-cache: !reset null
+volumes: 
+  netbox-postgres-data: !reset null
+  netbox-redis-cache-data: !reset null
+  netbox-redis-data: !reset null
+networks:
+  default:
+    name: macvlan333
+    external: true
