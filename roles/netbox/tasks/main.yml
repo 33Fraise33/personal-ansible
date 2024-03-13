@@ -43,6 +43,8 @@
     - Dockerfile-Plugins
     - plugin_requirements.txt
 
+# https://github.com/netbox-community/netbox-docker/wiki/Using-Netbox-Plugins
+# https://github.com/FlxPeters/netbox-plugin-prometheus-sd
 - name: Set netbox plugins
   ansible.builtin.lineinfile:
     dest: "{{ docker.dir.config }}/netbox/configuration/plugins.py"
