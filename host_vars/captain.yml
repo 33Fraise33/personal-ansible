@@ -18,7 +18,7 @@ cloudflared:
 
 mounts:
   - mountpoint: /data/media
-    source: 172.16.33.3:/mnt/main/media
+    source: 172.16.33.3:/mnt/data/media
     fs: nfs
   - mountpoint: /data/files
     source: 172.16.33.3:/mnt/main/files

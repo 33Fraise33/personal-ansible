@@ -15,6 +15,7 @@
     - jackett
   tags: jackett
 
+#### PLEX
 - name: Setup Plex
   hosts: captain
   connection: ssh
@@ -23,6 +24,13 @@
     - plex
   tags: plex
 
+- name: Setup Tautulli
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - tautulli
+  tags: tautulli
 
 #### ARR
 - name: Setup radarr

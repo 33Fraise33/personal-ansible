@@ -4,8 +4,8 @@ After=network-online.target
 
 [Service]
 Type=simple
-User=prometheus
-Group=prometheus
+User=root
+Group=root
 ExecStart={% if node_exporter_vrf is defined %}/usr/bin/ip vrf exec {{ node_exporter_vrf }} {% endif %}/usr/local/bin/node_exporter
 SyslogIdentifier=node_exporter
 Restart=always
