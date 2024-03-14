@@ -21,8 +21,6 @@ scrape_configs:
     file_sd_configs:
       - files:
           - '/config/file_sd/targets_blackbox_icmp.yml'
-          - '/config/file_sd/targets_mikrotik.yml'
-          - '/config/file_sd/targets_snmp_generic.yml'
           - '/config/file_sd/targets_node_exporter.yml'
     relabel_configs:
       - source_labels: [__address__]
@@ -108,9 +106,12 @@ scrape_configs:
 ### SNMP
 
   - job_name: 'mikrotik-snmp'
-    file_sd_configs:
-      - files:
-          - '/config/file_sd/targets_mikrotik.yml'
+    http_sd_configs:
+      - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
     metrics_path: /snmp
     params:
       module:
@@ -118,18 +119,28 @@ scrape_configs:
       auth:
         - fraise_v2
     relabel_configs:
-      - source_labels: [__address__]
+      - source_labels: [__meta_netbox_primary_ip]
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
+      - source_labels: [__meta_netbox_name]
+        target_label: node_name
+      - source_labels: [__meta_netbox_site]
+        target_label: site
+      - source_labels: [__meta_netbox_tenant]
+        target_label: tenant
+      - source_labels: [__meta_netbox_role_slug]
+        target_label: device_role
       - target_label: __address__
         replacement: "prometheus-snmp_exporter:9116"
 
   - job_name: 'generic-snmp'
-    file_sd_configs:
-      - files:
-          - '/config/file_sd/targets_mikrotik.yml'
-          - '/config/file_sd/targets_snmp_generic.yml'
+    http_sd_configs:
+      - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
     metrics_path: /snmp
     params:
       module:
@@ -137,9 +148,17 @@ scrape_configs:
       auth:
         - fraise_v2
     relabel_configs:
-      - source_labels: [__address__]
+      - source_labels: [__meta_netbox_primary_ip]
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
+      - source_labels: [__meta_netbox_name]
+        target_label: node_name
+      - source_labels: [__meta_netbox_site]
+        target_label: site
+      - source_labels: [__meta_netbox_tenant]
+        target_label: tenant
+      - source_labels: [__meta_netbox_role_slug]
+        target_label: device_role
       - target_label: __address__
         replacement: "prometheus-snmp_exporter:9116"

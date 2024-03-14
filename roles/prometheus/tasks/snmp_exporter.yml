@@ -53,7 +53,10 @@
     state: started
     pull: true
     labels:
-      traefik.enable: "false"
+      labels:
+      traefik.http.routers.snmp.tls: "true"
+      traefik.http.routers.snmp.tls.certresolver: "le"
+      traefik.http.services.snmp.loadbalancer.server.port: "9116"
 
 - name: Remove generator container
   community.docker.docker_container:
