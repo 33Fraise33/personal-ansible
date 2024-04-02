@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-Plugins
+    restart: always
     labels:
       traefik.http.routers.netbox.rule: "Host(`netbox.frai.se`)"
       traefik.http.routers.netbox.tls: "true"
@@ -16,11 +17,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-Plugins
+    restart: always
   netbox-housekeeping:
     image: netbox:latest-plugins
     build:
       context: .
       dockerfile: Dockerfile-Plugins
+    restart: always
   postgres: !reset null
   redis: !reset null
   redis-cache: !reset null

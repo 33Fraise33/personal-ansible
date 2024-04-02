@@ -1,5 +1,13 @@
 # netbox from : https://hub.docker.com/r/linuxserver/netbox
 ---
+- name: Copy docker-compose.override template
+  ansible.builtin.template:
+    src: docker-compose.override.yml.j2
+    dest: "{{ docker.dir.config }}/netbox/docker-compose.override.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: Stop netbox services for possible changed config
   community.docker.docker_compose_v2:
     project_src: "{{ docker.dir.config }}/netbox"
@@ -55,14 +63,6 @@
     - regexp: "^(# *)?PLUGINS ="
       line: 'PLUGINS = ["netbox_prometheus_sd"]'
 
-- name: Copy docker-compose.override template
-  ansible.builtin.template:
-    src: docker-compose.override.yml.j2
-    dest: "{{ docker.dir.config }}/netbox/docker-compose.override.yml"
-    owner: root
-    group: root
-    mode: "0644"
-
 - name: Change netbox env
   ansible.builtin.lineinfile:
     dest: "{{ docker.dir.config }}/netbox/env/netbox.env"
@@ -99,10 +99,19 @@
     - regexp: "^EMAIL_USE_TLS="
       line: "EMAIL_USE_TLS=true"
 
+- name: Copy docker-compose.override template
+  ansible.builtin.template:
+    src: docker-compose.override.yml.j2
+    dest: "{{ docker.dir.config }}/netbox/docker-compose.override.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: Start netbox with docker compose
   community.docker.docker_compose_v2:
     project_src: "{{ docker.dir.config }}/netbox"
     pull: always
+    build: always
 
 # - name: Start netbox docker container
 #   community.docker.docker_container:
