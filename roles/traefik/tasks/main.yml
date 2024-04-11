@@ -33,7 +33,7 @@
         ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.traefik }}"
         ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}"
     command:
-      - --global.sendAnonymousUsage
+      - --global.sendAnonymousUsage=false
       - --entryPoints.web.address=:80
       - --entryPoints.web.http.redirections.entryPoint.to=web-secure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https

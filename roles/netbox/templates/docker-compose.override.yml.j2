@@ -18,12 +18,16 @@ services:
       context: .
       dockerfile: Dockerfile-Plugins
     restart: always
+    labels:
+      traefik.enable: "false"
   netbox-housekeeping:
     image: netbox:latest-plugins
     build:
       context: .
       dockerfile: Dockerfile-Plugins
     restart: always
+    labels:
+      traefik.enable: "false"
   postgres: !reset null
   redis: !reset null
   redis-cache: !reset null
