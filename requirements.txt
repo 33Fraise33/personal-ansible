@@ -2,3 +2,4 @@ ansible
 ansible-lint
 yamllint
 passlib  # needed for macos hashing and encryption
+pymongo  # needed to create databases

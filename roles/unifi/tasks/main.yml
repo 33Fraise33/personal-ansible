@@ -1,0 +1,55 @@
+---
+- name: Get mongo container ip
+  community.docker.docker_container_info:
+    name: mongo
+  register: result_containerip
+
+- name: Create unifi databases
+  community.mongodb.mongodb_user:
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.macvlan333.IPAddress }}"
+    login_user: root
+    login_password: "{{ mongo_root_password }}"
+    database: admin
+    user: unifiuser
+    password: "{{ unifi_mongo_password }}"
+    state: present
+    roles:
+      - db: unifi
+        role: dbOwner
+      - db: unifi_stat
+        role: dbOwner
+  delegate_to: localhost
+  become: false
+
+- name: Create a volume for unifi config
+  community.docker.docker_volume:
+    name: config_unifi
+
+- name: Setup unifi docker container
+  community.docker.docker_container:
+    name: unifi
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    networks:
+      - name: macvlan333
+        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.unifi }}"
+        ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.unifi }}"
+    volumes:
+      - "config_unifi:/config"
+    env:
+      TZ: Etc/UTC
+      MONGO_USER: unifiuser
+      MONGO_PASS: "{{ unifi_mongo_password }}"
+      MONGO_HOST: mongo
+      MONGO_PORT: "27017"
+      MONGO_DBNAME: unifi
+      MONGO_AUTHSOURCE: admin
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.unifi.rule: "Host(`unifi-controller.frai.se`)"
+      traefik.http.routers.unifi.tls: "true"
+      traefik.http.routers.unifi.tls.certresolver: "le"
+      traefik.http.services.unifi.loadbalancer.server.port: "8443"
+      traefik.http.services.unifi.loadbalancer.server.scheme: "https"

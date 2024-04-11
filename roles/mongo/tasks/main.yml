@@ -1,0 +1,23 @@
+---
+# https://hub.docker.com/_/mongo
+- name: Create a volume for mongo data
+  community.docker.docker_volume:
+    name: data_mongo_{{ mongo_major_version }}
+
+- name: Setup Mongo
+  community.docker.docker_container:
+    name: mongo
+    image: mongo:{{ mongo_major_version }}
+    networks:
+      - name: macvlan333
+    volumes:
+      - "data_mongo_{{ mongo_major_version }}:/data/db"
+    env:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: "{{ mongo_root_password }}"
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"
