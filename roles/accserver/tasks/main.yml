@@ -1,0 +1,115 @@
+---
+# steamcmd download should only be run the first time, self updating
+# - name: Download steamcmd zip
+#   ansible.windows.win_get_url:
+#     url: https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip
+#     dest: C:\Users\Administrator\Downloads\steamcmd.zip
+#     force: true
+
+# - name: Create directory structure
+#   ansible.windows.win_file:
+#     path: C:\{{ item }}
+#     state: directory
+#   loop:
+#     - steamcmd
+#     - accweb
+
+# - name: Unzip steamcmd
+#   community.windows.win_unzip:
+#     src: C:\Users\Administrator\Downloads\steamcmd.zip
+#     dest: C:\steamcmd
+
+## Manually Login Here (not sure how to automate)
+## steamcmd.exe +force_install_dir C:\steamcmd\accserver +login buggyfreak2 +app_update 1430110 validate +quit
+## USER ACCOUNT NEEDS TO OWN ACC TO RUN ACCSERVER
+
+- name: Login & download/validate game (cached credentials)
+  ansible.windows.win_command:
+    cmd: '.\steamcmd.exe +force_install_dir C:\steamcmd\accserver +login {{ steam.user }} +app_update 1430110 validate +quit'
+    chdir: C:\steamcmd
+
+- name: Download accweb zip
+  ansible.windows.win_get_url:
+    url: https://github.com/assetto-corsa-web/accweb/releases/download/v{{ accweb.version }}/accweb_v{{ accweb.version }}.zip
+    dest: C:\Users\Administrator\Downloads\accweb-{{ accweb.version }}.zip
+    force: false
+
+- name: Unzip accweb
+  community.windows.win_unzip:
+    src: C:\Users\Administrator\Downloads\accweb-{{ accweb.version }}.zip
+    dest: C:\accweb
+
+- name: Copy version folder to main folder
+  ansible.windows.win_copy:
+    src: C:\accweb\accweb_v{{ accweb.version }}\
+    dest: C:\accweb
+    remote_src: true
+
+- name: Remove release folder
+  ansible.windows.win_file:
+    path: C:\accweb\accweb_v{{ accweb.version }}
+    state: absent
+
+- name: Template accweb config
+  ansible.windows.win_template:
+    src: config.yml.j2
+    dest: C:\accweb\config.yml
+
+- name: Set Firewall rules for acc
+  community.windows.win_firewall_rule:
+    name: "{{ item.name }}"
+    localport: "{{ item.port }}"
+    action: allow
+    direction: in
+    protocol: "{{ item.protocol }}"
+    state: present
+    enabled: true
+  loop:
+    - name: accweb
+      port: 80
+      protocol: tcp
+    - name: acc0
+      port: 9600
+      protocol: udp
+    - name: acc0-tcp
+      port: 9600
+      protocol: tcp
+    - name: acc1
+      port: 9601
+      protocol: udp
+    - name: acc1-tcp
+      port: 9601
+      protocol: tcp
+    - name: acc2
+      port: 9602
+      protocol: udp
+    - name: acc2-tcp
+      port: 9602
+      protocol: tcp
+    - name: acc3
+      port: 9603
+      protocol: udp
+    - name: acc3-tcp
+      port: 9603
+      protocol: tcp
+    - name: acc4
+      port: 9604
+      protocol: udp
+    - name: acc4-tcp
+      port: 9604
+      protocol: tcp
+    - name: acc5
+      port: 9605
+      protocol: udp
+    - name: acc5-tcp
+      port: 9605
+      protocol: tcp
+  tags: firewall
+
+- name: Install Visual C thingy
+  ansible.windows.win_package:
+    path: https://aka.ms/vs/16/release/vc_redist.x64.exe
+    arguments:
+      - /install
+      - /passive
+      - /norestart

@@ -1,0 +1,59 @@
+# accweb server and application configuration.
+# https://github.com/assetto-corsa-web/accweb
+
+webserver:
+  # Sets the host and port.
+  # Port 80 is the default port for web servers and might be blocked on your maschine.
+  # If that is the case you can use anything else like 8080 for example.
+  # 0.0.0.0 exposes accweb on the internet.
+  host: 0.0.0.0:80
+
+  # Set tls to true and provide paths to the key files in order to enable SSL.
+  # This is highly recommended as otherwise your passwords and all other traffic won't be encrypted!
+  # accweb will probably support automatic Letsencrypt certificates in the future.
+  tls: false
+  cert: path to ssl certificate
+  private_key: path to ssl private key
+
+  # http write/read timeouts
+  # technical stuff you shouldn't mess around with
+  write_timeout: 5
+  read_timeout: 5
+
+auth:
+  # Set the session duration (Default value is 20 minutes).
+  # duration documentation can be found at https://pkg.go.dev/time#ParseDuration
+  timeout: 60m
+
+  # Set the admin, moderator and read only user password.
+  # accweb won't start without an admin password.
+  admin_password: {{ accweb.users.admin }}
+  moderator_password: {{ accweb.users.moderator }}
+  read_only_password: {{ accweb.users.ro }}
+
+  # Optional path to public and private token key files. If you need to store the private/public keys used to
+  # sign the session token (the JWT) in a specific location (or have existing keys in a specific location), you
+  # can define those here.
+  #
+  # accweb now generate these with a default path if not configured.
+  #
+  # public_key_path: secrets/token.public
+  # private_key_path: secrets/token.private
+
+acc:
+  # Path to ACC server installation directory.
+  # Use forward slashes (even if you're on Windows!). The example path is for Linux.
+  server_path: "C:/steamcmd/accserver/server"
+
+  # Name of the server executable within the server installation directory.
+  # You don't need to change this (except the ACC devs change its name for some reason).
+  server_exe: accServer.exe
+
+# TECHNICAL STUFF FROM HERE ON
+
+config_path: config/
+dev: false
+loglevel: info
+cors:
+  origins: "*"
+  loglevel: info
