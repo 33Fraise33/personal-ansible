@@ -24,15 +24,3 @@
     pull: true
     labels:
       traefik.enable: "false"
-
-- name: Install postgres host dependencies
-  community.general.pacman:
-    update_cache: true
-    name: ['postgresql-libs']
-    state: latest
-  when: ansible_os_family == "Archlinux"
-
-- name: Install postgres ansible dependencies
-  ansible.builtin.package:
-    name: python3-psycopg2
-    state: present

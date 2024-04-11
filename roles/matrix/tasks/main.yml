@@ -41,6 +41,8 @@
     lc_collate: C
     lc_ctype: C
     template: template0
+  delegate_to: localhost
+  become: false
   tags: dendrite
 
 - name: Create a volume for persistent media and jetstream

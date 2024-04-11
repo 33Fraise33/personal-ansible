@@ -24,6 +24,8 @@
     login_host: "{{ result_containerip.container.NetworkSettings.Networks.macvlan333.IPAddress }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
+  delegate_to: localhost
+  become: false
 
 - name: Create netbox config directory
   ansible.builtin.file:

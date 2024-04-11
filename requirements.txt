@@ -3,3 +3,4 @@ ansible-lint
 yamllint
 passlib  # needed for macos hashing and encryption
 pymongo  # needed to create databases
+psycopg2-binary  # needed to create postgres database
