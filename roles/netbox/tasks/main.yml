@@ -50,7 +50,6 @@
     group: root
     mode: "0644"
   loop:
-    - Dockerfile-Plugins
     - plugin_requirements.txt
 
 # https://github.com/netbox-community/netbox-docker/wiki/Using-Netbox-Plugins
@@ -103,11 +102,14 @@
 
 - name: Copy docker-compose.override template
   ansible.builtin.template:
-    src: docker-compose.override.yml.j2
-    dest: "{{ docker.dir.config }}/netbox/docker-compose.override.yml"
+    src: "{{ item }}.j2"
+    dest: "{{ docker.dir.config }}/netbox/{{ item }}"
     owner: root
     group: root
     mode: "0644"
+  loop:
+    - docker-compose.override.yml
+    - Dockerfile-Plugins
 
 - name: Start netbox with docker compose
   community.docker.docker_compose_v2:
