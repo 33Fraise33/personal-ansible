@@ -25,21 +25,18 @@
     node_name: "Citymesh"
   targets:
     - 31.31.132.249
-- labels:
-    site: "Cloud"
-    node_name: "Valorant"
-  targets:
-    - euc.pp.riotgames.com
 
 ## Sites
 - labels:
-    site: "Dad"
+    site: "BELPMDAD"
     node_name: "Dad PUB IP"
+    tenant: "Louis Stubbe"
   targets:
-    - 968a0904d914.sn.mynetname.net
+    - hfm09s3ywha.sn.mynetname.net
 - labels:
-    site: "Mom"
+    site: "BELPMMOM"
     node_name: "Mom PUB IP"
+    tenant: "Mieke Vanmaele"
   targets:
     - 8b010aa79be4.sn.mynetname.net
 - labels:

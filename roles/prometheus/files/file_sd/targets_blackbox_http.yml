@@ -3,7 +3,7 @@
     site: "Asgard"
     node_name: "UISP"
   targets:
-    - https://unms.frai.se
+    - https://uisp.frai.se
 - labels:
     site: "Asgard"
     node_name: "Portainer"

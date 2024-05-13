@@ -136,6 +136,11 @@ scrape_configs:
 
   - job_name: 'generic-snmp'
     http_sd_configs:
+      - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
       - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch
         refresh_interval: 5m
         authorization: 
