@@ -31,8 +31,7 @@ dns:
     - 2606:4700:4700::1111
     - 2606:4700:4700::1001
   fallback_dns: []
-  all_servers: true
-  fastest_addr: false
+  upstream_mode: parallel
   fastest_timeout: 1s
   allowed_clients: []
   disallowed_clients: []
@@ -61,13 +60,14 @@ dns:
   bootstrap_prefer_ipv6: false
   upstream_timeout: 10s
   private_networks: []
-  use_private_ptr_resolvers: true
+  use_private_ptr_resolvers: false
   local_ptr_upstreams: []
   use_dns64: false
   dns64_prefixes: []
   serve_http3: false
   use_http3_upstreams: false
   serve_plain_dns: true
+  hostsfile_enabled: true
 tls:
   enabled: true
   server_name: ""
@@ -84,23 +84,46 @@ tls:
   private_key_path: ""
   strict_sni_check: false
 querylog:
+  dir_path: ""
   ignored: []
   interval: 24h
   size_memory: 1000
   enabled: true
   file_enabled: true
 statistics:
+  dir_path: ""
   ignored: []
   interval: 720h
   enabled: true
 filters:
   - enabled: true
-    url: https://abp.oisd.nl/
-    name: OISD Blocklist
-    id: 3
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_27.txt
+    name: OISD Blocklist Big
+    id: 1712253466
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_23.txt
+    name: WindowsSpyBlocker - Hosts spy rules
+    id: 1712253467
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_50.txt
+    name: uBlock₀ filters – Badware risks
+    id: 1712253468
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_30.txt
+    name: Phishing URL Blocklist (PhishTank and OpenPhish)
+    id: 1712253469
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_12.txt
+    name: Dandelion Sprout's Anti-Malware List
+    id: 1712253470
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_44.txt
+    name: HaGeZi's Threat Intelligence Feeds
+    id: 1712253471
 whitelist_filters: []
 user_rules:
   - '@@||tweakers.net^$important'
+  - '@@||ewrc-results.com^$important'
   - ""
 dhcp:
   enabled: false
@@ -140,7 +163,7 @@ filtering:
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
     - domain: wireguard.frai.se
-      answer: 193.148.249.106
+      answer: 31.24.249.70
     - domain: wireguard.frai.se
       answer: 2a12:4946:4001:35::1
     - domain: acc.frai.se
@@ -148,15 +171,11 @@ filtering:
     - domain: '*.frai.se'
       answer: {{ docker.network.ipv4_prefix }}{{ docker.network.hosts.traefik }}
     - domain: '*.frai.se'
-      answer: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}"
+      answer: {{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}
     - domain: frai.se
       answer: {{ docker.network.ipv4_prefix }}{{ docker.network.hosts.traefik }}
     - domain: frai.se
-      answer: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}"
-    - domain: '*.unitix.be'
-      answer: {{ docker.network.ipv4_prefix }}{{ docker.network.hosts.traefik }}
-    - domain: '*.unitix.be'
-      answer: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}"
+      answer: {{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}
   safebrowsing_cache_size: 1048576
   safesearch_cache_size: 1048576
   parental_cache_size: 1048576
@@ -193,6 +212,7 @@ clients:
       tags: []
       upstreams:
         - 1.1.1.1
+      uid: 018d7efe-3e55-7790-a51f-d501dfc91112
       upstreams_cache_size: 0
       upstreams_cache_enabled: false
       use_global_settings: true
@@ -214,4 +234,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 27
+schema_version: 28

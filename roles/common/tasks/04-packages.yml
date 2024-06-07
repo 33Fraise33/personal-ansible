@@ -14,6 +14,7 @@
           - gdu
           - git
           - htop
+          - ifupdown2
           - net-tools
           - nfs-common
           - nmap
@@ -23,3 +24,11 @@
           - traceroute
           - tcpdump
           - vim
+
+    - name: PACKAGES - uninstall cloud-init
+      ansible.builtin.apt:
+        state: absent
+        name:
+          - cloud-init
+          - netplan.io
+        purge: true

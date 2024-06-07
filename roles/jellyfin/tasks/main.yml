@@ -1,0 +1,63 @@
+---
+- name: Debian based Setup
+  when: ansible_os_family == "Debian"
+  tags: install
+  block:
+    - name: Install jellyfin gpg key
+      ansible.builtin.get_url:
+        url: https://repo.jellyfin.org/jellyfin_team.gpg.key
+        dest: /etc/apt/trusted.gpg.d/jellyfin.asc
+        mode: "0644"
+    - name: Add jellyfin repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/jellyfin.asc] \
+          https://repo.jellyfin.org/\
+          {{ ansible_distribution | lower }} \
+          {{ ansible_distribution_release }} main"
+        update_cache: true
+    - name: Install dependency packages
+      ansible.builtin.apt:
+        name:
+          - jellyfin-ffmpeg5  # arc drivers
+          - intel-gpu-tools
+          - firmware-linux-free
+          - firmware-misc-nonfree  # firmware for intel arc
+          - firmware-linux-nonfree  # firmware for intel arc
+          - linux-image-amd64  # kernel needs to be 6.2 or higher for intel arc
+          - linux-headers-amd64
+          - intel-opencl-icd
+          - intel-media-va-driver-non-free
+        default_release: bookworm-backports
+        state: latest
+
+- name: Create a volume for jellyfin config
+  community.docker.docker_volume:
+    name: "{{ item }}"
+  loop:
+    - config_jellyfin
+    - cache_jellyfin
+
+- name: Setup jellyfin docker container
+  community.docker.docker_container:
+    name: jellyfin
+    image: jellyfin/jellyfin:latest
+    networks:
+      - name: macvlan333
+        # ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.jellyfin }}"
+        # ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.jellyfin }}"
+    volumes:
+      - "config_jellyfin:/config"
+      - "cache_jellyfin:/cache"
+      - "/data/media/movies:/movies"
+      - "/data/media/series:/series"
+    user: "{{ nobody.user }}:{{ nobody.group }}"
+    env:
+      JELLYFIN_PublishedServerUrl: https://jellyfin.frai.se
+    state: started
+    restart: true
+    restart_policy: always
+    pull: true
+    labels:
+      traefik.http.routers.jellyfin.tls: "true"
+      traefik.http.routers.jellyfin.tls.certresolver: "le"
+      traefik.http.services.jellyfin.loadbalancer.server.port: "8096"

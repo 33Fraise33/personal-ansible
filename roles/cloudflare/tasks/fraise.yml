@@ -1,0 +1,104 @@
+- name: Set non proxied a records
+  community.general.cloudflare_dns:
+    zone: frai.se
+    type: A
+    record: "{{ item.name }}"
+    value: "{{ item.ipv4 | default(ipify_public_ip) }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+    solo: true
+  loop: "{{ domains.fraise.direct }}"
+
+- name: Set non proxied aaaa records
+  community.general.cloudflare_dns:
+    zone: frai.se
+    type: AAAA
+    record: "{{ item.name }}"
+    value: "{{ item.ipv6 }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+    solo: true
+  loop: "{{ domains.fraise.direct }}"
+  when: item.ipv6 is defined
+
+- name: Set proxied cname records
+  community.general.cloudflare_dns:
+    zone: frai.se
+    type: CNAME
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    proxied: true
+    state: present
+    solo: true
+  with_items:
+    - record: 'calendar'
+      value: 'ghs.googlehosted.com'
+    - record: 'drive'
+      value: 'ghs.googlehosted.com'
+    - record: 'mail'
+      value: 'ghs.googlehosted.com'
+    - record: 'status'
+      value: '33fraise33.github.io'
+
+- name: Set non proxied cname records
+  community.general.cloudflare_dns:
+    zone: frai.se
+    type: CNAME
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+    solo: true
+  with_items: []
+
+- name: Create TXT records
+  community.general.cloudflare_dns:
+    zone: frai.se
+    type: TXT
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - record: '@'
+      value: 'v=spf1 include:_spf.google.com ~all'
+    - record: '@'
+      value: 'google-site-verification=oqKYMwGek5PSBAxJw6uvZKK9Zkc6mrx9fwwkfocDWpU'
+    - record: '_dmarc'
+      value: "v=DMARC1; p=quarantine; rua=mailto:e699fa84d7b84b44bb0c453e1c3ebe00@dmarc-reports.cloudflare.net,\
+        mailto:re+m4vhpkax8co@dmarc.postmarkapp.com,mailto:f52757bb@mxtoolbox.dmarc-report.com; \
+        ruf=mailto:f52757bb@forensics.dmarc-report.com"
+    - record: 'google._domainkey'
+      value: "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiaS81r\
+        Gr7+59D8EocCmoI9sZEAaggwqq9lOQ5jtqTD7Wc7iEPcxyb4uIJ6MNuS6yh9Wip/uzdGc0toPr\
+        H9grzGTeBFJlvCPc3NGffCV1WAW80NzoqToD+NU7/PjS0Nb/G+B5Bn1ksaRcX8grMZ0EIyk+c5\
+        tqf+n/sKdmUcA6ebPbZDePdxUEtw/+Q98tS1kguxyZdBNKRHrNTezsNsMEziLEJKz5EAWCwU5l\
+        bpWXXXLh6l0uCAPxXOFch0ONVQY8+CRYUz8qtV1o7RjGW40lh3R3L36xVy8Ys113wgDCEmZJJ5\
+        y5rm5FNHW802GjibaAaWc66zwJLSbaxATnTv0KiwIDAQAB"
+
+- name: Create MX records
+  community.general.cloudflare_dns:
+    zone: frai.se
+    type: MX
+    priority: "{{ item.priority }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - priority: 1
+      value: 'aspmx.l.google.com'
+    - priority: 5
+      value: 'alt1.aspmx.l.google.com'
+    - priority: 5
+      value: 'alt2.aspmx.l.google.com'
+    - priority: 10
+      value: 'alt3.aspmx.l.google.com'
+    - priority: 10
+      value: 'alt4.aspmx.l.google.com'

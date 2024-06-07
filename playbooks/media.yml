@@ -32,6 +32,14 @@
     - tautulli
   tags: tautulli
 
+- name: Setup jellyfin
+  hosts: captain
+  connection: ssh
+  become: true
+  roles:
+    - jellyfin
+  tags: jellyfin
+
 #### ARR
 - name: Setup radarr
   hosts: captain

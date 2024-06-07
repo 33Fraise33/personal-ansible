@@ -1,0 +1,16 @@
+---
+- name: Cloudflare - Run fraise domain
+  ansible.builtin.include_tasks:
+    file: fraise.yml
+    apply:
+      tags: fraise
+  tags:
+    - always
+
+- name: Cloudflare - Run unitix domain
+  ansible.builtin.include_tasks:
+    file: unitix.yml
+    apply:
+      tags: unitix
+  tags:
+    - always

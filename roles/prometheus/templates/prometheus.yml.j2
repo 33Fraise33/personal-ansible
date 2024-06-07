@@ -21,12 +21,77 @@ scrape_configs:
     file_sd_configs:
       - files:
           - '/config/file_sd/targets_blackbox_icmp.yml'
-          - '/config/file_sd/targets_node_exporter.yml'
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
+      - target_label: __address__
+        replacement: "prometheus-blackbox_exporter:9115"
+  
+  - job_name: 'general-icmp'
+    http_sd_configs:
+      - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
+      - url: http://netbox:8080/api/plugins/prometheus-sd/virtual-machines/?status=active
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
+    metrics_path: /probe
+    params:
+      module:
+        - icmp
+    relabel_configs:
+      - source_labels: [__meta_netbox_primary_ip]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__meta_netbox_name]
+        target_label: node_name
+      - source_labels: [__meta_netbox_site]
+        target_label: site
+      - source_labels: [__meta_netbox_tenant]
+        target_label: tenant
+      - source_labels: [__meta_netbox_role_slug]
+        target_label: device_role
+      - target_label: __address__
+        replacement: "prometheus-blackbox_exporter:9115"
+  
+  - job_name: 'public-icmp'
+    http_sd_configs:
+      - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&cf_dyndns=.
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
+      - url: http://netbox:8080/api/plugins/prometheus-sd/virtual-machines/?status=active&cf_dyndns=.
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
+    metrics_path: /probe
+    params:
+      module:
+        - icmp
+    relabel_configs:
+      - source_labels: [__meta_netbox_custom_field_dyndns]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__meta_netbox_name]
+        regex: (.*)
+        replacement: 'PUB - $1'
+        target_label: node_name
+      - source_labels: [__meta_netbox_site]
+        target_label: site
+      - source_labels: [__meta_netbox_tenant]
+        target_label: tenant
+      - source_labels: [__meta_netbox_role_slug]
+        target_label: device_role
       - target_label: __address__
         replacement: "prometheus-blackbox_exporter:9115"
 
@@ -47,27 +112,72 @@ scrape_configs:
         replacement: "prometheus-blackbox_exporter:9115"
 
   - job_name: 'node_exporter'
-    file_sd_configs:
-      - files:
-          - '/config/file_sd/targets_node_exporter.yml'
+    http_sd_configs:
+      - url: http://netbox:8080/api/plugins/prometheus-sd/virtual-machines/?status=active&platform=debian-12
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
     relabel_configs:
-      - source_labels: [__param_target]
+      - source_labels: [__meta_netbox_primary_ip]
         target_label: instance
-      - source_labels: [__address__]
+      - source_labels: [__meta_netbox_name]
+        target_label: node_name
+      - source_labels: [__meta_netbox_site]
+        target_label: site
+      - source_labels: [__meta_netbox_tenant]
+        target_label: tenant
+      - source_labels: [__meta_netbox_role_slug]
+        target_label: device_role
+      - source_labels: [__meta_netbox_primary_ip]
         regex: (.*)
         replacement: '$1:9100'
         target_label: __address__
 
   - job_name: 'frr_exporter'
-    file_sd_configs:
-      - files:
-          - '/config/file_sd/targets_frr_exporter.yml'
+    http_sd_configs:
+      - url: http://netbox:8080/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=frr
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
     relabel_configs:
-      - source_labels: [__param_target]
+      - source_labels: [__meta_netbox_primary_ip]
         target_label: instance
-      - source_labels: [__address__]
+      - source_labels: [__meta_netbox_name]
+        target_label: node_name
+      - source_labels: [__meta_netbox_site]
+        target_label: site
+      - source_labels: [__meta_netbox_tenant]
+        target_label: tenant
+      - source_labels: [__meta_netbox_role_slug]
+        target_label: device_role
+      - source_labels: [__meta_netbox_primary_ip]
         regex: (.*)
         replacement: '$1:9342'
+        target_label: __address__
+  
+  - job_name: 'docker_exporter'
+    http_sd_configs:
+      - url: http://netbox:8080/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=docker
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
+    relabel_configs:
+      - source_labels: [__meta_netbox_primary_ip]
+        target_label: instance
+      - source_labels: [__meta_netbox_name]
+        target_label: node_name
+      - source_labels: [__meta_netbox_site]
+        target_label: site
+      - source_labels: [__meta_netbox_tenant]
+        target_label: tenant
+      - source_labels: [__meta_netbox_role_slug]
+        target_label: device_role
+      - source_labels: [__meta_netbox_primary_ip]
+        regex: (.*)
+        replacement: '$1:9323'
         target_label: __address__
 
   - job_name: 'speedtest'
@@ -82,18 +192,6 @@ scrape_configs:
     static_configs:
       - targets:
           - "prometheus-graphite_exporter:9108"
-
-  - job_name: 'docker'
-    file_sd_configs:
-      - files:
-          - '/config/file_sd/targets_docker.yml'
-    relabel_configs:
-      - source_labels: [__param_target]
-        target_label: instance
-      - source_labels: [__address__]
-        regex: (.*)
-        replacement: '$1:9323'
-        target_label: __address__
 
   - job_name: "hass"
     metrics_path: /api/prometheus

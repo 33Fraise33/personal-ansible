@@ -7,8 +7,8 @@ all:
           hosts:
             kingpin:
               ansible_host: 193.148.249.106
-            blackwidow:
-              ansible_host: 130.61.252.239
+            beokpdcort01:
+              ansible_host: 31.24.249.70
         windows:
           hosts:
             accserver:

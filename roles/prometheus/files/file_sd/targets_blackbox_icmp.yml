@@ -25,22 +25,3 @@
     node_name: "Citymesh"
   targets:
     - 31.31.132.249
-
-## Sites
-- labels:
-    site: "BELPMDAD"
-    node_name: "Dad PUB IP"
-    tenant: "Louis Stubbe"
-  targets:
-    - hfm09s3ywha.sn.mynetname.net
-- labels:
-    site: "BELPMMOM"
-    node_name: "Mom PUB IP"
-    tenant: "Mieke Vanmaele"
-  targets:
-    - 8b010aa79be4.sn.mynetname.net
-- labels:
-    site: "Vormir"
-    node_name: "Kingpin PUB IP"
-  targets:
-    - 193.148.249.106
