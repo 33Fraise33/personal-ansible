@@ -9,6 +9,8 @@ all:
               ansible_host: 193.148.249.106
             beokpdcort01:
               ansible_host: 31.24.249.70
+            beokpdcovm01:
+              ansible_host: 10.10.48.34
         windows:
           hosts:
             accserver:
@@ -35,7 +37,15 @@ all:
     monitoring:
       hosts:
         captain:
-        blackwidow:
+        beokpdcovm01:
+    docker:
+      hosts:
+        captain:
+        beokpdcovm01:
+    cloudflared:
+      hosts:
+        captain:
+        beokpdcovm01:
     asgard:
       children:
         truenas:

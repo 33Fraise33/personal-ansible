@@ -10,7 +10,7 @@
     name: grafana
     image: grafana/grafana:latest
     networks:
-      - name: macvlan333
+      - name: monitoring
     volumes:
       - "data_grafana:/var/lib/grafana"
     env:

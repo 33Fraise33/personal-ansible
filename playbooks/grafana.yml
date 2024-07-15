@@ -1,7 +1,0 @@
----
-- name: Setup Grafana
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - grafana

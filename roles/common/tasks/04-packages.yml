@@ -21,9 +21,16 @@
           - mtr
           - parted
           - python3-pip
+          - qemu-guest-agent
           - traceroute
           - tcpdump
           - vim
+
+    - name: PACKAGES - Enable qemu guest agent
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        state: started
+        enabled: true
 
     - name: PACKAGES - uninstall cloud-init
       ansible.builtin.apt:

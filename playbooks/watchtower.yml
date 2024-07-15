@@ -1,8 +1,0 @@
----
-- name: Setup watchtower
-  hosts:
-    - servers
-  connection: ssh
-  become: true
-  roles:
-    - watchtower

@@ -22,6 +22,11 @@
   tags: graphite, graphite_exporter, graphite-exporter
   when: prometheus.features.graphite | default (false)
 
+- name: Setup ipmi exporter
+  ansible.builtin.import_tasks: ipmi_exporter.yml
+  tags: ipmi, ipmi_exporter, ipmi-exporter
+  when: prometheus.features.ipmi | default (false)
+
 - name: Setup alertmanager
   ansible.builtin.import_tasks: alertmanager.yml
   tags: alertmanager, alerts, alert

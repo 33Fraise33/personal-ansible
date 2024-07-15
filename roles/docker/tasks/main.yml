@@ -59,20 +59,14 @@
     state: started
     enabled: true
 
-# - name: Install docker ansible dependencies
-#   ansible.builtin.pip:
-#     name: ['pip', 'docker']
-#     state: latest
-#   tags: pip, install
-
 - name: Create docker networks
   community.docker.docker_network:
-    name: "{{ item.name }}"
-    driver: "{{ item.type | default('bridge') }}"
-    enable_ipv6: "{{ item.ipv6 | default(false) }}"
-    driver_options: "{{ item.driver_options | default(omit) }}"
-    ipam_config: "{{ item.ipam | default(omit) }}"
-  loop: "{{ docker.networks }}"
+    name: "{{ item.key }}"
+    driver: "{{ item.value.type | default('bridge') }}"
+    enable_ipv6: "{{ item.value.ipv6 | default(false) }}"
+    driver_options: "{{ item.value.driver_options | default(omit) }}"
+    ipam_config: "{{ item.value.ipam | default(omit) }}"
+  loop: "{{ docker.networks | dict2items }}"
   tags: networks,network,ipam
   notify: Restart docker
 

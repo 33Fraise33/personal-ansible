@@ -31,12 +31,12 @@ scrape_configs:
   
   - job_name: 'general-icmp'
     http_sd_configs:
-      - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/devices/?status=active
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
-      - url: http://netbox:8080/api/plugins/prometheus-sd/virtual-machines/?status=active
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/virtual-machines/?status=active
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -63,12 +63,12 @@ scrape_configs:
   
   - job_name: 'public-icmp'
     http_sd_configs:
-      - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&cf_dyndns=.
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/devices/?status=active&cf_dyndns=.
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
-      - url: http://netbox:8080/api/plugins/prometheus-sd/virtual-machines/?status=active&cf_dyndns=.
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/virtual-machines/?status=active&cf_dyndns=.
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -113,7 +113,7 @@ scrape_configs:
 
   - job_name: 'node_exporter'
     http_sd_configs:
-      - url: http://netbox:8080/api/plugins/prometheus-sd/virtual-machines/?status=active&platform=debian-12
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/virtual-machines/?status=active&platform=debian-12
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -136,7 +136,7 @@ scrape_configs:
 
   - job_name: 'frr_exporter'
     http_sd_configs:
-      - url: http://netbox:8080/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=frr
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=frr
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -159,7 +159,7 @@ scrape_configs:
   
   - job_name: 'docker_exporter'
     http_sd_configs:
-      - url: http://netbox:8080/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=docker
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=docker
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -179,14 +179,37 @@ scrape_configs:
         regex: (.*)
         replacement: '$1:9323'
         target_label: __address__
+  
+  - job_name: 'ipmi_exporter'
+    metrics_path: /ipmi
+    http_sd_configs:
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/devices/?status=active&tag=ipmi
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
+    relabel_configs:
+      - source_labels: [__meta_netbox_oob_ip]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - source_labels: [__meta_netbox_name]
+        target_label: node_name
+      - source_labels: [__meta_netbox_site]
+        target_label: site
+      - source_labels: [__meta_netbox_tenant]
+        target_label: tenant
+      - source_labels: [__meta_netbox_role_slug]
+        target_label: device_role
+      - target_label: __address__
+        replacement: "prometheus-ipmi_exporter:9290"
 
   - job_name: 'speedtest'
-    metrics_path: /probe
-    scrape_interval: 5h
+    scrape_interval: 3h
     scrape_timeout: 3m
     static_configs:
       - targets:
-          - "prometheus-speedtest_exporter:9516"
+          - "prometheus-speedtest_exporter:9798"
 
   - job_name: 'graphite'
     static_configs:
@@ -205,7 +228,7 @@ scrape_configs:
 
   - job_name: 'mikrotik-snmp'
     http_sd_configs:
-      - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -234,12 +257,12 @@ scrape_configs:
 
   - job_name: 'generic-snmp'
     http_sd_configs:
-      - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
-      - url: http://netbox:8080/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch
         refresh_interval: 5m
         authorization: 
           type: "Token"

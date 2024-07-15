@@ -162,20 +162,10 @@ filtering:
   parental_block_host: family-block.dns.adguard.com
   safebrowsing_block_host: standard-block.dns.adguard.com
   rewrites:
-    - domain: wireguard.frai.se
-      answer: 31.24.249.70
-    - domain: wireguard.frai.se
-      answer: 2a12:4946:4001:35::1
-    - domain: acc.frai.se
-      answer: 172.16.33.9
-    - domain: '*.frai.se'
-      answer: {{ docker.network.ipv4_prefix }}{{ docker.network.hosts.traefik }}
-    - domain: '*.frai.se'
-      answer: {{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}
-    - domain: frai.se
-      answer: {{ docker.network.ipv4_prefix }}{{ docker.network.hosts.traefik }}
-    - domain: frai.se
-      answer: {{ docker.network.ipv6_prefix }}{{ docker.network.hosts.traefik }}
+{% for rewrite in domain.internal %}
+    - domain: {{ rewrite.domain }}
+      answer: {{ rewrite.answer }}
+{% endfor %}
   safebrowsing_cache_size: 1048576
   safesearch_cache_size: 1048576
   parental_cache_size: 1048576

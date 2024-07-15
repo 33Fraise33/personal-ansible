@@ -1,0 +1,52 @@
+---
+groups:
+  - name: ipmi.rules
+    rules:
+      - alert: IPMI/BMC - Unreachable
+        expr: ipmi_up == 0
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          title: "Device {{ $labels.node_name }} is unreachable"
+          description: "IPMI is not reachable"
+      - alert: IPMI/BMC - Fan Fault
+        expr: ipmi_chassis_cooling_fault_state == 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          title: "Device {{ $labels.node_name }} has a fan failure"
+          description: "Chassis cooling fault state went to 0, should be 1"
+      - alert: IPMI/BMC - Drive Fault
+        expr: ipmi_chassis_drive_fault_state == 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          title: "Device {{ $labels.node_name }} has a drive failure"
+          description: "Chassis drive fault state went to 0, should be 1"
+      - alert: IPMI/BMC - Power off
+        expr: ipmi_chassis_power_state == 0
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          title: "Device {{ $labels.node_name }} is powered off, should be on"
+          description: "Chassis power state went to 0, should be 1"
+      - alert: IPMI/BMC - Sensor state issue
+        expr: ipmi_sensor_state > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          title: "Device {{ $labels.node_name }} has a sensor issue for {{ $labels.name }}"
+          description: "Sensor state became {{ $value }}, 0= normal, 1=warning, 2=critical"
+      - alert: IPMI/BMC - Temperature state issue
+        expr: ipmi_temperature_state != 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          title: "Device {{ $labels.node_name }} has a temperature issue for {{ $labels.name }}"
+          description: "Temperature state became {{ $value }}, 0= normal, 1=warning, 2=critical"

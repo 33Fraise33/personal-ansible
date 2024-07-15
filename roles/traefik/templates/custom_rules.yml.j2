@@ -1,73 +1,21 @@
 http:
   services:
-    accweb:
-      loadBalancer:
-        servers:
-          - url: "http://172.16.33.6:80"
-    ironman:
-      loadBalancer:
-        servers:
-          - url: "https://10.33.0.1:8443"
-          - url: "https://[2a12:4946:4000::1]:8443"
-    proxmox:
-      loadBalancer:
-        servers:
-          - url: "https://172.16.33.7:8006/"
-    status:
-      loadBalancer:
-        servers:
-          - url: "https://33fraise33.github.io"
-    truenas:
-      loadBalancer:
-        servers:
-          - url: "https://172.16.33.3/"
-    unifi:
-      loadBalancer:
-        servers:
-          - url: "https://172.16.53.10"
+{% for rule in traefik_custom_rules %}
+    {{ rule.name }}:
+        loadBalancer:
+          servers:
+            - url: "{{ rule.target }}"
+{% endfor %}
   routers:
-    accweb:
-      rule: "Host(`accweb.frai.se`)"
-      service: "accweb"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    ironman:
-      rule: "Host(`ironman.frai.se`)"
-      service: "ironman"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    proxmox:
-      rule: "Host(`proxmox.frai.se`)"
-      service: "proxmox"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    status:
-      rule: "Host(`status.frai.se`)"
-      service: "status"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    truenas:
-      rule: "Host(`truenas.frai.se`)"
-      service: "truenas"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
-    unifi:
-      rule: "Host(`unifi.frai.se`)"
-      service: "unifi"
-      tls:
-        certResolver: le
-        domains:
-          - main: "*.frai.se"
+{% for rule in traefik_custom_rules %}
+    {{ rule.name }}:
+        rule: "Host(`{{ rule.name }}.frai.se`)"
+        service: "{{ rule.name }}"
+        tls:
+          certResolver: le
+          domains:
+            - main: "*.frai.se"
+{% endfor %}
   middlewares:
     corsheaders:
       headers:

@@ -1,0 +1,32 @@
+---
+- name: Create ipmi config directory
+  ansible.builtin.file:
+    path: "{{ docker.dir.config }}/prometheus_ipmi"
+    state: directory
+    mode: "0755"
+    owner: "{{ nobody.group }}"
+    group: "{{ nobody.group }}"
+
+- name: Copy ipmi config
+  ansible.builtin.template:
+    src: ipmi_config.yml.j2
+    dest: "{{ docker.dir.config }}/prometheus_ipmi/config.yml"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+    mode: "0755"
+
+- name: Setup prometheus ipmi exporter
+  community.docker.docker_container:
+    name: prometheus-ipmi_exporter
+    image: prometheuscommunity/ipmi-exporter:latest
+    networks:
+      - name: monitoring
+    volumes:
+      - "{{ docker.dir.config }}/prometheus_ipmi/config.yml:/config.yml:ro"
+    command: "--config.file /config.yml"
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

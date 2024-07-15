@@ -1,7 +1,6 @@
 ---
 - name: Setup cloudflared
-  hosts:
-    - captain
+  hosts: cloudflared
   connection: ssh
   become: true
   roles:

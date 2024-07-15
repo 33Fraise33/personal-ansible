@@ -1,0 +1,16 @@
+---
+- name: Setup prometheus with alertmanager
+  hosts: monitoring
+  connection: ssh
+  become: true
+  roles:
+    - prometheus
+  tags: prometheus
+
+- name: Setup Grafana
+  hosts: monitoring
+  connection: ssh
+  become: true
+  roles:
+    - grafana
+  tags: grafana

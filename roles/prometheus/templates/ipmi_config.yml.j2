@@ -1,0 +1,10 @@
+modules:
+  default:
+    user: "{{ prometheus_ipmi.user }}"
+    pass: "{{ prometheus_ipmi.password }}"
+    driver: "LAN_2_0"
+    timeout: 10000
+    collectors:
+    - bmc
+    - ipmi
+    - chassis

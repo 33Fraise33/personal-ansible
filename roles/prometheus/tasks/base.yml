@@ -43,7 +43,7 @@
     name: prometheus
     image: prom/prometheus:latest
     networks:
-      - name: macvlan333
+      - name: monitoring
     volumes:
       - "{{ docker.dir.config }}/prometheus:/config:ro"
       - "data_prometheus:/prometheus"

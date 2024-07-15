@@ -2,9 +2,9 @@
 - name: Setup prometheus speedtest exporter
   community.docker.docker_container:
     name: prometheus-speedtest_exporter
-    image: jraviles/prometheus_speedtest:latest
+    image: miguelndecarvalho/speedtest-exporter:latest
     networks:
-      - name: macvlan333
+      - name: monitoring
     restart: true
     restart_policy: always
     state: started

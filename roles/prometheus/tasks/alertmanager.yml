@@ -20,7 +20,7 @@
     name: prometheus-alertmanager
     image: prom/alertmanager:latest
     networks:
-      - name: macvlan333
+      - name: monitoring
     volumes:
       - "{{ docker.dir.config }}/prometheus_alertmanager:/etc/alertmanager"
     restart: true

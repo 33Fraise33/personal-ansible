@@ -19,3 +19,9 @@ groups:
         for: 5m
         annotations:
           summary: "There are some containers not running, amount: {{ $value }}"
+
+      - alert: Probe Failed
+        expr: probe_success != 1
+        for: 10m
+        annotations:
+          summary: "Endpoint {{ $labels.node_name }} is unreachable"

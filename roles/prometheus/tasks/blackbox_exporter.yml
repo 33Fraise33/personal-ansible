@@ -21,7 +21,7 @@
     name: prometheus-blackbox_exporter
     image: prom/blackbox-exporter:latest
     networks:
-      - name: macvlan333
+      - name: monitoring
     volumes:
       - "{{ docker.dir.config }}/prometheus_blackbox/blackbox.yml:/blackbox.yml:ro"
     command: "--config.file=/blackbox.yml"

@@ -1,0 +1,115 @@
+---
+dns:
+  domain: unitix.be
+  servers:
+    - 10.33.0.254
+    - 2a12:4946:4000:333::254
+
+mounts:
+  - mountpoint: /data/
+    source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
+    fs: ext4
+  # - mountpoint: /data/files
+  #   source: 172.16.33.3:/mnt/main/files
+  #   fs: nfs
+
+docker:
+  login:
+    username: "{{ docker_login.username }}"
+    password: "{{ docker_login.password }}"
+  users:
+    - fraise
+  dir:
+    config: /data/docker-config
+    data: /data/docker
+  networks:
+    monitoring:
+      type: ipvlan
+      ipam:
+        - subnet: '10.10.48.64/27'
+          gateway: '10.10.48.65'
+        - subnet: "2a12:4946:4002:1001::/64"
+          gateway: "2a12:4946:4002:1001::1"
+      ipv6: true
+      driver_options:
+        parent: ens19.1001
+      hosts: []
+    services:
+      type: ipvlan
+      ipam:
+        - subnet: '10.10.48.96/27'
+          gateway: '10.10.48.97'
+        - subnet: "2a12:4946:4002:1002::/64"
+          gateway: "2a12:4946:4002:1002::1"
+      ipv6: true
+      driver_options:
+        parent: ens19.1002
+      hosts:
+        traefik: 125
+    # media:
+    #   type: ipvlan
+    #   ipam:
+    #     - subnet: '10.10.48.64/27'
+    #       gateway: '10.10.48.65'
+    #     - subnet: "2a12:4946:4002:1001::/64"
+    #       gateway: "2a12:4946:4002:1001::1"
+    #   ipv6: true
+    #   driver_options:
+    #     parent: ens4
+    #   hosts: []
+  # network:
+  #   ipv4_prefix: "10.33.0."
+  #   ipv6_prefix: "2a12:4946:4000:333::"
+  #   name: macvlan333
+  #   hosts:
+  #     # use a high number to prevent boot conflicts
+  #     # graylog: 14 # TODO
+  #     unifi: 244
+  #     traefik: 245
+  #     plex: 246  # needed for port forward 32000
+  #     syncthing: 247  # needed for port forwared 22000
+  #     homeassistant: 248  # needed for shelly coloit
+  #     unbound: 249  # NEEDED FOR ADGUARD
+  #     lancache_monolitic: 250  # NEEDED FOR UNBOUND
+  #     adguard: 254 # NEEDED FOR DHCP
+
+prometheus:
+  features:
+    blackbox: true
+    snmp: true
+    graphite: true
+    speedtest: true
+    alertmanager: true
+    ipmi: true
+
+traefik_custom_rules:
+  - name: accweb
+    target: http://172.16.33.6:80
+  - name: bejbegiart01
+    target: https://10.33.0.1:8443
+  - name: status
+    target: https://33fraise33.github.io
+  - name: truenas
+    target: https://172.16.33.3/
+  - name: unifi
+    target: https://172.16.53.10
+  - name: proxmox
+    target: https://10.10.48.10:8006/
+
+cloudflared:
+  docker_network: services
+  service_token: !vault |
+    $ANSIBLE_VAULT;1.1;AES256
+    61633936633662363134386534333666353139643535623761393662303531623365373262383563
+    3936353635313662323039333435626534306463613639350a613838336665353862623161636665
+    62323033303030316437303061393263376637636563316363636538306461653561303935623732
+    6539636233643864660a363537663632333463363866326135336636626536666331353933343536
+    63316632616431383337373931663865376631643766313765653434646133356536333736353465
+    32306464646465313464333264303736363636336266643061666563316433303362303130306565
+    34653035643838376463306137393435636232393731313034396263336666643836393963383161
+    37333131613235306130636332323730653031356634613862623332376532383663343335393836
+    34376232343636313639633635373965313737393433646432343363653466656434356563356465
+    36663637306266326234386430373864316264656135373833306532613865396662346538636463
+    39396536653435656539313530666364383238656136663633323237626231306561346135316237
+    37623039653935643436666639393438386631613834623562326239326161656332326536323164
+    32323236336133363839396261643439623462313235363961623432336665643338

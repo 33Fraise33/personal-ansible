@@ -5,3 +5,4 @@ passlib  # needed for macos hashing and encryption
 pymongo  # needed to create databases
 psycopg2-binary  # needed to create postgres database
 pywinrm  # needed to manage windows hosts
+netaddr  # needed for ansible.utils.ipaddr
