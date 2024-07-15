@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-Plugins
+      network: host
     restart: always
     labels:
       traefik.http.routers.netbox.rule: "Host(`netbox.frai.se`)"
@@ -17,6 +18,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-Plugins
+      network: host
     restart: always
     labels:
       traefik.enable: "false"
@@ -25,6 +27,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-Plugins
+      network: host
     restart: always
     labels:
       traefik.enable: "false"
@@ -37,5 +40,5 @@ volumes:
   netbox-redis-data: !reset null
 networks:
   default:
-    name: macvlan333
+    name: services
     external: true

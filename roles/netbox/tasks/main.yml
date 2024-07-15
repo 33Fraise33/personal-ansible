@@ -1,18 +1,5 @@
 # netbox from : https://hub.docker.com/r/linuxserver/netbox
 ---
-- name: Copy docker-compose.override template
-  ansible.builtin.template:
-    src: docker-compose.override.yml.j2
-    dest: "{{ docker.dir.config }}/netbox/docker-compose.override.yml"
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Stop netbox services for possible changed config
-  community.docker.docker_compose_v2:
-    project_src: "{{ docker.dir.config }}/netbox"
-    state: stopped
-
 - name: Get postgres container ip
   community.docker.docker_container_info:
     name: postgres
@@ -21,7 +8,7 @@
 - name: Create a new database with name "netbox"
   community.general.postgresql_db:
     name: netbox
-    login_host: "{{ result_containerip.container.NetworkSettings.Networks.macvlan333.IPAddress }}"
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
   delegate_to: localhost
@@ -35,12 +22,34 @@
   with_items:
     - "{{ docker.dir.config }}/netbox/"
 
+- name: Get netbox container ip
+  community.docker.docker_container_info:
+    name: netbox-netbox-1
+  register: netbox_container
+
+- debug:
+    msg: "{{ netbox_container }}"
+
 - name: Clone git repo
   ansible.builtin.git:
     repo: https://github.com/netbox-community/netbox-docker.git
     dest: "{{ docker.dir.config }}/netbox/"
     version: "{{ netbox.docker_version }}"
     force: true
+
+- name: Copy docker-compose.override template
+  ansible.builtin.template:
+    src: docker-compose.override.yml.j2
+    dest: "{{ docker.dir.config }}/netbox/docker-compose.override.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Stop netbox services for possible changed config
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker.dir.config }}/netbox"
+    state: stopped
+  when: netbox_container.exists
 
 - name: Copy files to create custom docker image with plugins
   ansible.builtin.copy:

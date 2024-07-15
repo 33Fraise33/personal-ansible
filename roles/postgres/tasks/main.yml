@@ -4,17 +4,17 @@
 ---
 - name: Create a volume for postgres data
   community.docker.docker_volume:
-    name: data_postgres_15
+    name: data_postgres_16
 
 - name: Setup postgres
   community.docker.docker_container:
     name: postgres
     image: postgres:{{ postgres_major_version }}-alpine
     networks:
-      - name: macvlan333
+      - name: services
     volumes:
-    #  - "data_postgres:/old_data"
-      - "data_postgres_15:/var/lib/postgresql/data"
+      # - "data_postgres_15:/old_data"
+      - "data_postgres_16:/var/lib/postgresql/data"
     env:
       POSTGRES_USER: "{{ postgres_user }}"
       POSTGRES_PASSWORD: "{{ postgres_password }}"

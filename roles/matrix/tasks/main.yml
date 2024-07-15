@@ -34,7 +34,7 @@
 - name: Create a new database with name "dendrite"
   community.general.postgresql_db:
     name: dendrite
-    login_host: "{{ result_containerip.container.NetworkSettings.Networks.macvlan333.IPAddress }}"
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
     encoding: UTF-8
@@ -68,7 +68,7 @@
     name: matrix
     image: matrixdotorg/dendrite-monolith:latest
     networks:
-      - name: macvlan333
+      - name: services
     volumes:
       - "{{ docker.dir.config }}/dendrite:/etc/dendrite"
       - "data_dendrite_media:/var/dendrite/media"

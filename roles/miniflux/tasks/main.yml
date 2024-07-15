@@ -7,7 +7,7 @@
 - name: Create a new database with name "miniflux"
   community.general.postgresql_db:
     name: miniflux
-    login_host: "{{ result_containerip.container.NetworkSettings.Networks.macvlan333.IPAddress }}"
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
     encoding: UTF-8
@@ -22,7 +22,7 @@
     name: miniflux
     image: miniflux/miniflux:latest
     networks:
-      - name: macvlan333
+      - name: services
     env:
       DATABASE_URL: 'postgres://{{ postgres_user }}:{{ postgres_password | regex_replace("#", "%23") }}@postgres/miniflux?sslmode=disable'
       RUN_MIGRATIONS: "1"

@@ -1,16 +1,10 @@
 ---
-- name: Setup redis
-  hosts: captain
+- name: Setup redis & netbox 
+  hosts: beokpdcovm01
   connection: ssh
   become: true
   roles:
-    - redis
-  tags: redis
-
-- name: Setup netbox
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - netbox
-  tags: netbox
+    - role: redis
+      tags: redis
+    - role: netbox
+      tags: netbox

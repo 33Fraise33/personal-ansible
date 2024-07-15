@@ -12,7 +12,7 @@
     name: redis
     image: redis:alpine
     networks:
-      - name: macvlan333
+      - name: services
     restart: true
     restart_policy: always
     state: started

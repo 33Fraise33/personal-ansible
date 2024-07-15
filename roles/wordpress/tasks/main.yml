@@ -30,7 +30,7 @@
     name: wordpress
     image: wordpress:latest
     networks:
-      - name: macvlan333
+      - name: services
     env:
       WORDPRESS_DB_HOST: "mariadb"
       WORDPRESS_DB_NAME: wordpress
