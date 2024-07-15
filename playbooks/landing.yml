@@ -1,0 +1,10 @@
+---
+- name: Setup Nginx
+  hosts: beokpdcovm01
+  connection: ssh
+  become: true
+  roles:
+    - role: nginx
+      tags: nginx
+    - role: homer
+      tags: homer

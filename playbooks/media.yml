@@ -4,80 +4,25 @@
   connection: ssh
   become: true
   roles:
-    - deluge
-  tags: deluge
-
-- name: Setup jackett docker container
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - jackett
-  tags: jackett
-
-#### PLEX
-- name: Setup Plex
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - plex
-  tags: plex
-
-- name: Setup Tautulli
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - tautulli
-  tags: tautulli
-
-- name: Setup jellyfin
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - jellyfin
-  tags: jellyfin
-
-#### ARR
-- name: Setup radarr
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - radarr
-  tags: radarr,arr
-
-- name: Setup sonarr
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - sonarr
-  tags: sonarr,arr
-
-- name: Setup bazarr
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - bazarr
-  tags: bazarr,arr
-
-- name: Setup overseerr
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - overseerr
-  tags: overseerr,overseer,arr
-
-#### BOOKS
-- name: Setup Calibre
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - calibre
-  tags: calibre, books
+    - role: deluge
+      tags: deluge
+    - role: jackett
+      tags: jackett
+    # PLEX
+    - role: plex
+      tags: plex
+    - role: tautulli
+      tags: tautulli
+    - role: jellyfin
+      tags: jellyfin
+    # ARR
+    - role: radarr
+      tags: radarr,arr
+    - role: sonarr
+      tags: sonarr,arr
+    - role: bazarr
+      tags: bazarr,arr
+    - role: overseerr
+      tags: overseerr,overseer,arr
+    - role: calibre
+      tags: calibre,books

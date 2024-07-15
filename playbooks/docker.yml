@@ -1,28 +1,13 @@
 ---
-- name: Setup Docker
+- name: Setup Docker, portainer & watchtower
   hosts:
     - docker
   connection: ssh
   become: true
   roles:
-    - docker
-  tags: docker
-
-- name: Setup Portainer
-  hosts:
-    - docker
-  connection: ssh
-  become: true
-  roles:
-    - portainer
-  tags: portainer
-
-- name: Setup watchtower
-  hosts:
-    - docker
-  connection: ssh
-  become: true
-  roles:
-    - watchtower
-  tags: watchtower
-
+    - role: docker
+      tags: docker
+    - role: portainer
+      tags: portainer
+    - role: watchtower
+      tags: watchtower

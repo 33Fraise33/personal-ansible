@@ -1,7 +1,0 @@
----
-- name: Setup  filesharing
-  hosts: compute
-  connection: ssh
-  become: true
-  roles:
-    - fileshare

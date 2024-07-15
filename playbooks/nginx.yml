@@ -1,7 +1,0 @@
----
-- name: Setup Nginx
-  hosts: captain
-  connection: ssh
-  become: true
-  roles:
-    - nginx

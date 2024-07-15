@@ -89,7 +89,13 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: proxmox.frai.se
       answer: "{{ traefik.dco.ip }}"
+    - domain: frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: frai.se
+      answer: "{{ traefik.dco.ip }}"
     - domain: "'*.frai.se'"
       answer: "{{ traefik.home.ip }}"
     - domain: "'*.frai.se'"
       answer: "{{ traefik.home.ipv6 }}"
+
+matrix_base_url: matrix.frai.se

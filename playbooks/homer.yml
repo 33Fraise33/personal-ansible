@@ -1,8 +1,0 @@
----
-- name: Setup homer docker container
-  hosts: captain
-  connection: ssh
-  gather_facts: false
-  become: true
-  roles:
-    - homer

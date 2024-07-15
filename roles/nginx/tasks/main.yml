@@ -20,7 +20,7 @@
     name: nginx
     image: nginx:alpine
     networks:
-      - name: macvlan333
+      - name: services
     volumes:
       - "{{ docker.dir.config }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
     user: "{{ nobody.user }}:{{ nobody.group }}"
