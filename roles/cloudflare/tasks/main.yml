@@ -1,16 +1,157 @@
 ---
-- name: Cloudflare - Run fraise domain
-  ansible.builtin.include_tasks:
-    file: fraise.yml
-    apply:
-      tags: fraise
-  tags:
-    - always
+- name: Set non proxied a records
+  community.general.cloudflare_dns:
+    zone: "{{ item.domain }}"
+    type: A
+    record: "{{ item.name }}"
+    value: "{{ item.ipv4 | default(ipify_public_ip) }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+    solo: true
+  loop: "{{ domain.external }}"
 
-- name: Cloudflare - Run unitix domain
-  ansible.builtin.include_tasks:
-    file: unitix.yml
-    apply:
-      tags: unitix
-  tags:
-    - always
+- name: Set non proxied aaaa records
+  community.general.cloudflare_dns:
+    zone: "{{ item.domain }}"
+    type: AAAA
+    record: "{{ item.name }}"
+    value: "{{ item.ipv6 }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+    solo: true
+  loop: "{{ domain.external }}"
+  when: item.ipv6 is defined
+
+- name: Set proxied cname records
+  community.general.cloudflare_dns:
+    zone: "{{ item.domain }}"
+    type: CNAME
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    proxied: true
+    state: present
+    solo: true
+  loop:
+    - record: 'calendar'
+      value: 'ghs.googlehosted.com'
+      domain: frai.se
+    - record: 'drive'
+      value: 'ghs.googlehosted.com'
+      domain: frai.se
+    - record: 'mail'
+      value: 'ghs.googlehosted.com'
+      domain: frai.se
+    - record: 'status'
+      value: '33fraise33.github.io'
+      domain: frai.se
+    - record: 'calendar'
+      value: 'ghs.googlehosted.com'
+      domain: unitix.be
+    - record: 'drive'
+      value: 'ghs.googlehosted.com'
+      domain: unitix.be
+    - record: 'mail'
+      value: 'ghs.googlehosted.com'
+      domain: unitix.be
+
+- name: Set non proxied cname records
+  community.general.cloudflare_dns:
+    zone: "{{ item.domain }}"
+    type: CNAME
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+    solo: true
+  loop: []
+
+- name: Create TXT records
+  community.general.cloudflare_dns:
+    zone: "{{ item.domain }}"
+    type: TXT
+    record: "{{ item.record }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+    solo: "{{ item.solo | default(omit) }}"
+  with_items:
+    - record: '@'
+      value: 'v=spf1 include:_spf.google.com ~all'
+      domain: frai.se
+    - record: '@'
+      value: 'google-site-verification=oqKYMwGek5PSBAxJw6uvZKK9Zkc6mrx9fwwkfocDWpU'
+      domain: frai.se
+    - record: '_dmarc'
+      value: "v=DMARC1; p=quarantine; rua=mailto:e699fa84d7b84b44bb0c453e1c3ebe00@dmarc-reports.cloudflare.net;"
+      solo: true
+      domain: frai.se
+    - record: 'google._domainkey'
+      value: "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiaS81r\
+        Gr7+59D8EocCmoI9sZEAaggwqq9lOQ5jtqTD7Wc7iEPcxyb4uIJ6MNuS6yh9Wip/uzdGc0toPr\
+        H9grzGTeBFJlvCPc3NGffCV1WAW80NzoqToD+NU7/PjS0Nb/G+B5Bn1ksaRcX8grMZ0EIyk+c5\
+        tqf+n/sKdmUcA6ebPbZDePdxUEtw/+Q98tS1kguxyZdBNKRHrNTezsNsMEziLEJKz5EAWCwU5l\
+        bpWXXXLh6l0uCAPxXOFch0ONVQY8+CRYUz8qtV1o7RjGW40lh3R3L36xVy8Ys113wgDCEmZJJ5\
+        y5rm5FNHW802GjibaAaWc66zwJLSbaxATnTv0KiwIDAQAB"
+      solo: true
+      domain: frai.se
+    - record: '@'
+      value: 'v=spf1 include:_spf.google.com ~all'
+      domain: unitix.be
+    - record: '_dmarc'
+      value: "v=DMARC1; p=quarantine; rua=mailto:b61ffcaac5d044d2ad7ed20c29d21822@dmarc-reports.cloudflare.net;"
+      domain: unitix.be
+      solo: true
+    - record: 'google._domainkey'
+      value: "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm5XFJf6lwuOoYQw/Bizn1dbAohBdWCEbmiG5kLy448\
+        /GVKSF/9mnSg1qLCHNHaAde7ty/pqSTHxhrlSA25NyHWE5f1HvF2EJbOHXivLmnuH9PR/XQS3opJ+NnNkuVl8Cy/glNQ0kfj2DPJtw6Jp8uPvw\
+        Ja18cSy3KatNtDviyTEJ9SD7VWuxCW9ggMsq2ksv/gZETB0QCMiB6lHP/V8KjDzD9m5kzn745v39Zv+W4l3GmL3MctpS7DvROgYUT9hny7DP7f\
+        Xou79cuoddANzQvm+ppa7BDmIvbFolmMPoZTEpdbkh6yR69jfVB7PwrFYoNui9Ypmg0ydAfVpvl3ZYQwIDAQAB"
+      domain: unitix.be
+      solo: true
+
+- name: Create MX records
+  community.general.cloudflare_dns:
+    zone: "{{ item.domain }}"
+    type: MX
+    priority: "{{ item.priority }}"
+    value: "{{ item.value }}"
+    account_email: "{{ cloudflare_api_email }}"
+    account_api_token: "{{ cloudflare_api_token }}"
+    state: present
+  with_items:
+    - priority: 1
+      value: 'aspmx.l.google.com'
+      domain: frai.se
+    - priority: 5
+      value: 'alt1.aspmx.l.google.com'
+      domain: frai.se
+    - priority: 5
+      value: 'alt2.aspmx.l.google.com'
+      domain: frai.se
+    - priority: 10
+      value: 'alt3.aspmx.l.google.com'
+      domain: frai.se
+    - priority: 10
+      value: 'alt4.aspmx.l.google.com'
+      domain: frai.se
+    - priority: 1
+      value: 'aspmx.l.google.com'
+      domain: unitix.be
+    - priority: 5
+      value: 'alt1.aspmx.l.google.com'
+      domain: unitix.be
+    - priority: 5
+      value: 'alt2.aspmx.l.google.com'
+      domain: unitix.be
+    - priority: 10
+      value: 'alt3.aspmx.l.google.com'
+      domain: unitix.be
+    - priority: 10
+      value: 'alt4.aspmx.l.google.com'
+      domain: unitix.be

@@ -1,6 +1,6 @@
 ---
 - name: Setup UISP
-  hosts: captain
+  hosts: beokpdcovm01
   connection: ssh
   become: true
   roles:
@@ -8,7 +8,7 @@
   tags: uisp
 
 - name: Setup unifi
-  hosts: captain
+  hosts: beokpdcovm01
   connection: ssh
   become: true
   roles:

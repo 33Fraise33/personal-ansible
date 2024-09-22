@@ -24,6 +24,10 @@ mounts:
     source: 172.16.33.3:/mnt/main/files
     fs: nfs
 
+portainer:
+  type: agent
+  network: bridge
+
 lancache:
   dir: /lancache
 
@@ -34,24 +38,6 @@ interfaces:
   - name: ens4
     description: vlan333
     mode: manual  # no ip, just bring it up for docker
-
-domains:
-  ipv6_proxy: "2a12:4946:4000:333::10"
-  fraise:
-    direct:  # specific ipv4 at the front, no ipv4 = ddclient
-      - name: kingpin
-        ipv6: "2a12:4946:4001::1"
-        ipv4: "193.148.249.106"
-      - name: wireguard
-        # ipv6: ""
-        ipv4: "31.24.249.70"
-      - name: acc
-      - name: home
-  unitix:
-    direct:
-      - name: beokpdcort01
-        ipv6: "2a12:4946:4002::1"
-        ipv4: "31.24.249.70"
 
 docker:
   login:
@@ -82,7 +68,6 @@ docker:
     hosts:
       # use a high number to prevent boot conflicts
       # graylog: 14 # TODO
-      unifi: 244
       traefik: 245
       plex: 246  # needed for port forward 32000
       syncthing: 247  # needed for port forwared 22000
@@ -90,11 +75,3 @@ docker:
       unbound: 249  # NEEDED FOR ADGUARD
       lancache_monolitic: 250  # NEEDED FOR UNBOUND
       adguard: 254 # NEEDED FOR DHCP
-
-mongo_root_password: !vault |
-  $ANSIBLE_VAULT;1.1;AES256
-  63323733626265343439333463393535353031626565613934383638636333316239613066323830
-  6165353762323864306539663163333364643462613531380a306533393764306365373166643963
-  31343562316664653932623131333638313830316334646436623433396132383531636562656438
-  3262313861366230340a393739366233353834666464393138366331353064613034623863373532
-  36363761323834303831346237333731613731376131373466663731356664343331

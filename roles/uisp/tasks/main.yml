@@ -10,7 +10,13 @@
     name: uisp
     image: nico640/docker-unms:latest
     networks:
-      - name: macvlan333
+      - name: networking
+        ipv4_address: "{{ docker.networks.networking.ipam[0].subnet \
+          | ansible.utils.ipsubnet(24, 0) \
+          | ansible.utils.ipaddr(docker.networks.networking.hosts.uisp) \
+          | ansible.utils.ipaddr('address') }}"
+        ipv6_address: "{{ docker.networks.networking.ipam[1].subnet | ansible.utils.ipaddr('network') }}\
+          {{ docker.networks.networking.hosts.uisp }}"
     volumes:
       - "data_uisp:/config"
     env:
@@ -20,6 +26,7 @@
     state: started
     pull: true
     labels:
+      traefik.http.routers.uisp.rule: "Host(`uisp.unitix.be`)"
       traefik.http.routers.uisp.tls: "true"
       traefik.http.routers.uisp.tls.certresolver: "le"
       traefik.http.services.uisp.loadbalancer.server.port: "443"

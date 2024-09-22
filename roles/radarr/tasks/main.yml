@@ -11,10 +11,11 @@
     name: radarr
     image: linuxserver/radarr:latest
     networks:
-      - name: macvlan333
+      - name: media
     volumes:
       - "config_radarr:/config"
       - "/data/media:/media"
+      - "/downloads:/downloads"
     env:
       PUID: "{{ nobody.user }}"
       PGID: "{{ nobody.group }}"

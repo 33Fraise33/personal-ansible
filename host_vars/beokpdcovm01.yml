@@ -9,10 +9,18 @@ mounts:
   - mountpoint: /data/
     source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
     fs: ext4
+  - mountpoint: /data/media
+    source: 172.16.33.3:/mnt/data/media
+    fs: nfs
+  - mountpoint: /downloads
+    source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi3
+    fs: ext4
   # - mountpoint: /data/files
   #   source: 172.16.33.3:/mnt/main/files
   #   fs: nfs
 
+# portainer:
+#   type: portainer-ce
 docker:
   login:
     username: "{{ docker_login.username }}"
@@ -46,32 +54,30 @@ docker:
         parent: ens19.1002
       hosts:
         traefik: 125
-    # media:
-    #   type: ipvlan
-    #   ipam:
-    #     - subnet: '10.10.48.64/27'
-    #       gateway: '10.10.48.65'
-    #     - subnet: "2a12:4946:4002:1001::/64"
-    #       gateway: "2a12:4946:4002:1001::1"
-    #   ipv6: true
-    #   driver_options:
-    #     parent: ens4
-    #   hosts: []
-  # network:
-  #   ipv4_prefix: "10.33.0."
-  #   ipv6_prefix: "2a12:4946:4000:333::"
-  #   name: macvlan333
-  #   hosts:
-  #     # use a high number to prevent boot conflicts
-  #     # graylog: 14 # TODO
-  #     unifi: 244
-  #     traefik: 245
-  #     plex: 246  # needed for port forward 32000
-  #     syncthing: 247  # needed for port forwared 22000
-  #     homeassistant: 248  # needed for shelly coloit
-  #     unbound: 249  # NEEDED FOR ADGUARD
-  #     lancache_monolitic: 250  # NEEDED FOR UNBOUND
-  #     adguard: 254 # NEEDED FOR DHCP
+    media:
+      type: ipvlan
+      ipam:
+        - subnet: '10.10.48.128/27'
+          gateway: '10.10.48.129'
+        - subnet: "2a12:4946:4002:1003::/64"
+          gateway: "2a12:4946:4002:1003::1"
+      ipv6: true
+      driver_options:
+        parent: ens19.1003
+      hosts: []
+    networking:
+      type: ipvlan
+      ipam:
+        - subnet: '10.10.48.160/27'
+          gateway: '10.10.48.161'
+        - subnet: "2a12:4946:4002:1004::/64"
+          gateway: "2a12:4946:4002:1004::1"
+      ipv6: true
+      driver_options:
+        parent: ens19.1004
+      hosts:
+        unifi: 190
+        uisp: 189
 
 prometheus:
   features:
@@ -122,3 +128,11 @@ postgres_password: !vault |
   35313035363664653233393930656232353362393362333764333036656131663365393233626462
   3561373730656636350a356232353961356465373535343333376135363336303231636663333532
   33376330373832353538636334323633636338373139656161343061643466626632
+
+mongo_root_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  63323733626265343439333463393535353031626565613934383638636333316239613066323830
+  6165353762323864306539663163333364643462613531380a306533393764306365373166643963
+  31343562316664653932623131333638313830316334646436623433396132383531636562656438
+  3262313861366230340a393739366233353834666464393138366331353064613034623863373532
+  36363761323834303831346237333731613731376131373466663731356664343331

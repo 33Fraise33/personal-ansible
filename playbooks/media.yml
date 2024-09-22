@@ -1,13 +1,11 @@
 ---
 - name: Setup Deluge
-  hosts: captain
+  hosts: beokpdcovm01
   connection: ssh
   become: true
   roles:
     - role: deluge
       tags: deluge
-    - role: jackett
-      tags: jackett
     # PLEX
     - role: plex
       tags: plex
@@ -16,6 +14,10 @@
     - role: jellyfin
       tags: jellyfin
     # ARR
+    - role: sabnzbd
+      tags: sabnzbd,arr,usenet
+    - role: prowlarr
+      tags: prowlarr,arr,trackers
     - role: radarr
       tags: radarr,arr
     - role: sonarr

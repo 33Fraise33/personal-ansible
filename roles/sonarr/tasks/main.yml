@@ -11,10 +11,11 @@
     name: sonarr
     image: linuxserver/sonarr:latest
     networks:
-      - name: macvlan333
+      - name: media
     volumes:
       - "config_sonarr:/config"
       - "/data/media:/media"
+      - /downloads:/downloads
     env:
       PUID: "{{ nobody.user }}"
       PGID: "{{ nobody.group }}"

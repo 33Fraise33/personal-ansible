@@ -11,7 +11,7 @@
     name: bazarr
     image: linuxserver/bazarr:latest
     networks:
-      - name: macvlan333
+      - name: media
     volumes:
       - "config_bazarr:/config"
       - "/data/media:/media"

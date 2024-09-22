@@ -1,6 +1,6 @@
 ---
 - name: Get public ip once
-  hosts: compute,localhost
+  hosts: localhost
   gather_facts: false
   tasks:
     - name: Get public ip
@@ -8,9 +8,9 @@
   tags: always,ipify
 
 - name: Set Cloudflare DNS Records
-  hosts: captain
+  hosts: localhost
+  gather_facts: false
   connection: ssh
-  become: true
   roles:
     - cloudflare
   tags: cloudflare

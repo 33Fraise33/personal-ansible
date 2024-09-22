@@ -5,13 +5,15 @@
 - name: Create a volume for portainer config
   community.docker.docker_volume:
     name: config_portainer
+  when: (portainer.type| default(false)) != 'agent'
 
 - name: Setup portainer docker container
   community.docker.docker_container:
     name: portainer
-    image: portainer/portainer-ce:latest
+    image: portainer/{{ portainer.type | default('portainer-ce') }}:latest
     networks:
-      - name: services
+      - name: "{{ portainer.network | default('services') }}"
+    ports: "{{ portainer_ports.agent if (portainer.type | default(false)) == 'agent' else omit }}"
     volumes:
       - "config_portainer:/data"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -19,8 +21,4 @@
     restart_policy: always
     state: started
     pull: true
-    labels:
-      traefik.http.routers.portainer.tls: "true"
-      traefik.http.routers.portainer.tls.certresolver: "le"
-      traefik.http.services.portainer.loadbalancer.server.port: "9000"
-      traefik.http.routers.portainer.middlewares: "corsheaders@file"
+    labels: "{{ portainer_labels.agent if (portainer.type | default(false)) == 'agent' else portainer_labels.full }}"

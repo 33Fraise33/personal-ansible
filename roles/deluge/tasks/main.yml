@@ -20,11 +20,12 @@
     name: deluge
     image: linuxserver/deluge:latest
     networks:
-      - name: macvlan333
+      - name: media
     volumes:
       - "config_deluge:/config"
       - "/data/media:/media"
       - "data_deluge_watch:/watch"
+      - "/downloads:/downloads"
     env:
       PUID: "{{ nobody.user }}"
       PGID: "{{ nobody.group }}"

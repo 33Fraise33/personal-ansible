@@ -1,0 +1,12 @@
+---
+portainer_labels:
+  agent:
+    traefik.enable: 'false'
+  full:
+    traefik.http.routers.portainer.tls: 'true'
+    traefik.http.routers.portainer.tls.certresolver: 'le'
+    traefik.http.services.portainer.loadbalancer.server.port: '9000'
+    traefik.http.routers.portainer.middlewares: 'corsheaders@file'
+portainer_ports:
+  agent:
+    - 9001:9001

@@ -196,12 +196,17 @@ clients:
         schedule:
           time_zone: UTC
         ids: []
-      name: WG RANGE (NO LANCACHE)
+      name: No Lancache (DCO & Wireguard)
       ids:
+        - 2a12:4946:4002::/48
+        - 10.10.48.0/21
         - 10.10.35.0/24
       tags: []
       upstreams:
         - 1.1.1.1
+        - 1.0.0.1
+        - 2606:4700:4700::1111
+        - 2606:4700:4700::1001
       uid: 018d7efe-3e55-7790-a51f-d501dfc91112
       upstreams_cache_size: 0
       upstreams_cache_enabled: false

@@ -5,8 +5,6 @@ all:
       children:
         remote:
           hosts:
-            kingpin:
-              ansible_host: 193.148.249.106
             beokpdcort01:
               ansible_host: 31.24.249.70
             beokpdcovm01:

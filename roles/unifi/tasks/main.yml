@@ -6,7 +6,7 @@
 
 - name: Create unifi databases
   community.mongodb.mongodb_user:
-    login_host: "{{ result_containerip.container.NetworkSettings.Networks.macvlan333.IPAddress }}"
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.networking.IPAddress }}"
     login_user: root
     login_password: "{{ mongo_root_password }}"
     database: admin
@@ -30,9 +30,13 @@
     name: unifi
     image: lscr.io/linuxserver/unifi-network-application:latest
     networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.unifi }}"
-        ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.unifi }}"
+      - name: networking
+        ipv4_address: "{{ docker.networks.networking.ipam[0].subnet \
+          | ansible.utils.ipsubnet(24, 0) \
+          | ansible.utils.ipaddr(docker.networks.networking.hosts.unifi) \
+          | ansible.utils.ipaddr('address') }}"
+        ipv6_address: "{{ docker.networks.networking.ipam[1].subnet | ansible.utils.ipaddr('network') }}\
+          {{ docker.networks.networking.hosts.unifi }}"
     volumes:
       - "config_unifi:/config"
     env:
@@ -48,7 +52,7 @@
     state: started
     pull: true
     labels:
-      traefik.http.routers.unifi.rule: "Host(`unifi-controller.frai.se`)"
+      traefik.http.routers.unifi.rule: "Host(`unifi.unitix.be`)"
       traefik.http.routers.unifi.tls: "true"
       traefik.http.routers.unifi.tls.certresolver: "le"
       traefik.http.services.unifi.loadbalancer.server.port: "8443"

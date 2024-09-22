@@ -105,10 +105,69 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: frai.se
       answer: "{{ traefik.dco.ip }}"
+    - domain: deluge.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: deluge.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: radarr.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: radarr.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: sonarr.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: sonarr.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: prowlarr.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: prowlarr.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: bazarr.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: bazarr.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: overseerr.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: overseerr.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: sabnzbd.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: sabnzbd.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: portainer.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: portainer.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: books.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: books.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: calibre.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: calibre.frai.se
+      answer: "{{ traefik.dco.ip }}"
     - domain: "'*.frai.se'"
       answer: "{{ traefik.home.ip }}"
     - domain: "'*.frai.se'"
       answer: "{{ traefik.home.ipv6 }}"
+  external:  # specific ipv4 at the front, no ipv4 = ddclient
+    # FRAI.SE
+    - name: wireguard
+      domain: frai.se
+      # ipv6: ""
+      ipv4: "31.24.249.70"
+    - name: acc
+      domain: frai.se
+    - name: home
+      domain: frai.se
+    # UNITIX.BE
+    - name: beokpdcort01
+      ipv6: "2a12:4946:4002::1"
+      ipv4: "31.24.249.70"
+      domain: unitix.be
+    - name: inform
+      ipv4: "10.10.48.190"
+      domain: unitix.be
+
 
 matrix_base_url: matrix.frai.se
 

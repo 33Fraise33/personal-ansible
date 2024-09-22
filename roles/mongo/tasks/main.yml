@@ -9,7 +9,7 @@
     name: mongo
     image: mongo:{{ mongo_major_version }}
     networks:
-      - name: macvlan333
+      - name: networking
     volumes:
       - "data_mongo_{{ mongo_major_version }}:/data/db"
     env:

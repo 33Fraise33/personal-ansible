@@ -11,7 +11,7 @@
     name: overseerr
     image: sctx/overseerr:latest
     networks:
-      - name: macvlan333
+      - name: media
     volumes:
       - "config_overseerr:/app/config"
     env:

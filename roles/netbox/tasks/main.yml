@@ -27,9 +27,6 @@
     name: netbox-netbox-1
   register: netbox_container
 
-- debug:
-    msg: "{{ netbox_container }}"
-
 - name: Clone git repo
   ansible.builtin.git:
     repo: https://github.com/netbox-community/netbox-docker.git
@@ -85,7 +82,7 @@
     - regexp: "^DB_PASSWORD="
       line: "DB_PASSWORD={{ postgres_password }}"
     - regexp: "^REDIS_CACHE_HOST="
-      line: "REDIS_CACHE_HOST=redis"
+      line: "REDIS_CACHE_HOST=valkey"
     - regexp: "^REDIS_CACHE_PASSWORD="
       line: "REDIS_CACHE_PASSWORD=''"
     - regexp: "^REDIS_PASSWORD="
@@ -94,8 +91,8 @@
       line: "SECRET_KEY='{{ netbox.secret_key }}'"
     - regexp: "^CHANGELOG_RETENTION="
       line: "CHANGELOG_RETENTION=0"
-    - regexp: "^LOGIN_REQUIRED="
-      line: "LOGIN_REQUIRED=true"
+    # - regexp: "^LOGIN_REQUIRED="  # default changed to true
+    #   line: "LOGIN_REQUIRED=true"
     - regexp: "^EMAIL_FROM="
       line: "EMAIL_FROM=netbox@frai.se"
     - regexp: "^EMAIL_USERNAME="
@@ -125,37 +122,3 @@
     project_src: "{{ docker.dir.config }}/netbox"
     pull: always
     build: always
-
-# - name: Start netbox docker container
-#   community.docker.docker_container:
-#     name: netbox
-#     image: linuxserver/netbox:latest
-#     networks:
-#       - name: macvlan333
-#     volumes:
-#       - "{{ docker.dir.config }}/netbox:/config"
-#     env:
-#       ALLOWED_HOST: "netbox.frai.se"
-#       SUPERUSER_EMAIL: "{{ netbox_superuser_email }}"
-#       SUPERUSER_PASSWORD: "{{ netbox_superuser_password }}"
-#       DB_NAME: netbox
-#       DB_USER: "{{ postgres_user }}"
-#       DB_PASSWORD: "{{ postgres_password }}"
-#       DB_HOST: "postgres"
-#       REDIS_HOST: "redis"
-#       TZ: "Europe/Brussels"
-#     restart: true
-#     restart_policy: always
-#     state: started
-#     pull: true
-#     labels:
-#       traefik.http.routers.netbox.tls: "true"
-#       traefik.http.routers.netbox.tls.certresolver: "le"
-#       traefik.http.services.netbox.loadbalancer.server.port: "8000"
-
-# - name: Set prometheus plugin
-#   lineinfile:
-#     dest: "{{ docker.dir.config }}/netbox/configuration.py"
-#     state: present
-#     regexp: '^PLUGINS = ['
-#     line: 'PLUGINS = ["netbox_prometheus_sd"]'

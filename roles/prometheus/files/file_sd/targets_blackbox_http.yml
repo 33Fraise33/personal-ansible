@@ -3,7 +3,7 @@
     site: "Asgard"
     node_name: "UISP"
   targets:
-    - https://uisp.frai.se
+    - https://uisp.unitix.be
 - labels:
     site: "Asgard"
     node_name: "Portainer"
@@ -19,11 +19,6 @@
     node_name: "Adguard"
   targets:
     - https://adguard.frai.se/login.html
-- labels:
-    site: "Asgard"
-    node_name: "Jackett"
-  targets:
-    - https://jackett.frai.se
 - labels:
     site: "Asgard"
     node_name: "Unitix"
