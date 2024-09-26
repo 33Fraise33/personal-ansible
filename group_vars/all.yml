@@ -145,6 +145,10 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: calibre.frai.se
       answer: "{{ traefik.dco.ip }}"
+    - domain: n8n.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: n8n.frai.se
+      answer: "{{ traefik.dco.ip }}"
     - domain: "'*.frai.se'"
       answer: "{{ traefik.home.ip }}"
     - domain: "'*.frai.se'"

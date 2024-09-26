@@ -1,56 +1,61 @@
 ---
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
     node_name: "UISP"
   targets:
     - https://uisp.unitix.be
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
     node_name: "Portainer"
   targets:
     - https://portainer.frai.se
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
+    node_name: "n8n"
+  targets:
+    - https://n8n.frai.se
+- labels:
+    site: "BEJBEGIA"
     node_name: "Plex"
   targets:
     - https://plex.frai.se/web/index.html
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
     node_name: "Adguard"
   targets:
     - https://adguard.frai.se/login.html
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
     node_name: "Unitix"
   targets:
     - https://unitix.be
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
     node_name: "Homer"
   targets:
     - https://frai.se
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
     node_name: "Deluge"
   targets:
     - https://deluge.frai.se
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
     node_name: "Grafana"
   targets:
     - https://grafana.frai.se
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
     node_name: "Home Assistant"
   targets:
     - https://ha.frai.se
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
     node_name: "Netbox"
   targets:
     - https://netbox.frai.se
 - labels:
-    site: "Asgard"
+    site: "BEJBEGIA"
     node_name: "matrix"
   targets:
     - https://matrix.frai.se/_matrix/static/
