@@ -83,6 +83,8 @@
       line: "DB_PASSWORD={{ postgres_password }}"
     - regexp: "^REDIS_CACHE_HOST="
       line: "REDIS_CACHE_HOST=valkey"
+    - regexp: "^REDIS_HOST="
+      line: "REDIS_HOST=valkey"
     - regexp: "^REDIS_CACHE_PASSWORD="
       line: "REDIS_CACHE_PASSWORD=''"
     - regexp: "^REDIS_PASSWORD="

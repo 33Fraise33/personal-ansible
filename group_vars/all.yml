@@ -113,6 +113,10 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: radarr.frai.se
       answer: "{{ traefik.dco.ip }}"
+    - domain: readarr.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: readarr.frai.se
+      answer: "{{ traefik.dco.ip }}"
     - domain: sonarr.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: sonarr.frai.se

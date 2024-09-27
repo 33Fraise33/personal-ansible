@@ -28,3 +28,5 @@
       tags: overseerr,overseer,arr
     - role: calibre
       tags: calibre,books
+    - role: readarr
+      tags: readarr,books
