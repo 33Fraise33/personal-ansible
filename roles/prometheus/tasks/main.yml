@@ -17,11 +17,6 @@
   tags: speedtest, speedtest_exporter, speedtest-exporter
   when: prometheus.features.speedtest | default (false)
 
-- name: Setup graphite exporter
-  ansible.builtin.import_tasks: graphite_exporter.yml
-  tags: graphite, graphite_exporter, graphite-exporter
-  when: prometheus.features.graphite | default (false)
-
 - name: Setup ipmi exporter
   ansible.builtin.import_tasks: ipmi_exporter.yml
   tags: ipmi, ipmi_exporter, ipmi-exporter

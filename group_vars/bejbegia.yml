@@ -1,6 +1,6 @@
 ---
 dns:
-  domain: asgard.frai.se
+  domain: unitix.be
   servers:
     - 10.33.0.254
     - 2a12:4946:4000:333::254

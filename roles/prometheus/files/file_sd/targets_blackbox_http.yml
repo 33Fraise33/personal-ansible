@@ -6,6 +6,11 @@
     - https://uisp.unitix.be
 - labels:
     site: "BEJBEGIA"
+    node_name: "UNIFI"
+  targets:
+    - https://unifi.unitix.be
+- labels:
+    site: "BEJBEGIA"
     node_name: "Portainer"
   targets:
     - https://portainer.frai.se
@@ -34,11 +39,6 @@
     node_name: "Homer"
   targets:
     - https://frai.se
-- labels:
-    site: "BEJBEGIA"
-    node_name: "Deluge"
-  targets:
-    - https://deluge.frai.se
 - labels:
     site: "BEJBEGIA"
     node_name: "Grafana"

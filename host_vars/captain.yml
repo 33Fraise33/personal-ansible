@@ -38,6 +38,7 @@ interfaces:
   - name: ens4
     description: vlan333
     mode: manual  # no ip, just bring it up for docker
+    script: true
 
 docker:
   login:

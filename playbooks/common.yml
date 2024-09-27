@@ -2,7 +2,7 @@
 # for initial run don't forget --ask-become-pass and --ask-pass
 
 - name: Run common role
-  hosts: all
+  hosts: linux
   gather_facts: false
   connection: ssh
   become: true

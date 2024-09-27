@@ -118,6 +118,11 @@ scrape_configs:
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
+      - url: https://netbox.frai.se/api/plugins/prometheus-sd/devices/?status=active&platform=proxmox
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
     relabel_configs:
       - source_labels: [__meta_netbox_primary_ip]
         target_label: instance
@@ -210,11 +215,6 @@ scrape_configs:
     static_configs:
       - targets:
           - "prometheus-speedtest_exporter:9798"
-
-  - job_name: 'graphite'
-    static_configs:
-      - targets:
-          - "prometheus-graphite_exporter:9108"
 
   - job_name: "hass"
     metrics_path: /api/prometheus

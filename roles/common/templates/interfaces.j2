@@ -3,14 +3,11 @@
 
 source /etc/network/interfaces.d/*
 
-# Description: the loopback network interface
 auto lo
 iface lo inet loopback
+# Loopback interface
 
 {% for intf in interfaces %}
-{%  if intf.description is defined %}
-### Description: {{ intf.description }}
-{%  endif%}
 auto {{ intf.name }}
 iface {{ intf.name }} inet {{ intf.mode }}
 {%  if intf.mode == "dhcp" %}
@@ -18,7 +15,9 @@ iface {{ intf.name }} inet6 auto
 {%  endif %}
 {%  if intf.mode == "static" %}
 	address {{ intf.ip }}
+{%    if intf.gateway is defined %}
 	gateway {{ intf.gateway }}
+{%    endif%}
 {%    if intf.dns is defined %}
 	dns-nameservers {{ intf.dns }}
 {%    endif%}
@@ -29,9 +28,21 @@ iface {{ intf.name }} inet6 auto
 	hw-address {{ intf.mac }}
 {%    endif%}
 {%  endif%}
-{%  if intf.mode == "manual" %}
+{%  if intf.bridge is defined %}
+	bridge-ports {{ intf.bridge.ports }}
+	bridge-stp {{ intf.bridge.stp }}
+	bridge-fd {{ intf.bridge.fd | default('0') }}
+{%    if intf.bridge.vlan is defined %}
+	bridge-vlan-aware yes
+	bridge-vids {{ intf.bridge.vlan.vids }}
+{%    endif %}
+{%  endif %}
+{%  if intf.script | default(false) %}
 	pre-up ifconfig $IFACE up
 	post-down ifconfig $IFACE down
+{%  endif%}
+{%  if intf.description is defined %}
+# {{ intf.description }}
 {%  endif%}
 
 {% endfor %}

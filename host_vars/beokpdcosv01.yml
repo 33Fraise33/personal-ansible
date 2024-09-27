@@ -1,0 +1,31 @@
+---
+interfaces:
+  - name: eno1
+    description: UNUSED
+    mode: manual
+  - name: eno2
+    description: Passthrough
+    mode: manual
+  - name: eno3
+    description: UNUSED
+    mode: manual
+  - name: eno4
+    description: LOCAL_MGMT
+    mode: static
+    ip: 192.168.88.1/24
+  - name: vmbr0
+    description: MGMT Bridge
+    mode: static
+    ip: 10.10.48.10/29
+    gateway: 10.10.48.9
+    bridge:
+      ports: none
+      stp: "off"
+  - name: vmbr1
+    mode: manual
+    description: VM Bridge
+    bridge:
+      ports: none
+      stp: "off"
+      vlan:
+        vids: 2-4094

@@ -1,0 +1,17 @@
+---
+- name: Update packages
+  ansible.builtin.package:
+    name: '*'
+    state: latest
+    update_cache: true
+  register: updates_applied
+  diff: true
+
+- name: Check if reboot is required
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: reboot_required_check
+
+- name: Let me know if reboot is required
+  ansible.builtin.debug:
+    msg: "Patched: {{ updates_applied.changed }} & Reboot: {{ reboot_required_check.stat.exists }}"

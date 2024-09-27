@@ -1,0 +1,20 @@
+---
+- name: Patch systems gradually
+  hosts: linux,!proxmox
+  gather_facts: false
+  become: true
+  serial:
+    - 30%
+    - 60%
+    - 100%
+  roles:
+    - role: patch
+
+- name: Patch systems gradually
+  hosts: proxmox
+  gather_facts: false
+  become: true
+  serial:
+    - 1
+  roles:
+    - role: patch

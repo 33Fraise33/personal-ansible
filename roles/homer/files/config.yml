@@ -151,6 +151,11 @@ services:
         url: "https://sonarr.frai.se"
         subtitle: "Series Tracker"
         tag: wireguard
+      - name: "Readarr"
+        logo: "https://i.imgur.com/NklC8ZR.png"
+        url: "https://readarr.frai.se"
+        subtitle: "Book Tracker"
+        tag: wireguard
       - name: "Books"
         logo: "https://daisy.org/wp-content/uploads/2020/07/apple-books-app-icon.png"
         url: "https://books.frai.se"

@@ -20,7 +20,7 @@
 
 - name: SETUP - temporarily add debian to the sudo group
   ansible.builtin.user:
-    name: debian
+    name: "{{ ansible_user }}"
     groups: sudo
     append: true
   vars:
@@ -67,4 +67,5 @@
 - name: SETUP - Change user password for root
   ansible.builtin.user:
     name: "root"
-    password: "{{ new_password | password_hash('sha512', passwordsalt ) }}"
+    password: "{{ new_password | password_hash('sha512', passwordsalt) }}"
+  tags: root
