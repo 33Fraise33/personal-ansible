@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+  wazuh.dashboard:
+    ports: !reset null
+    labels:
+      traefik.http.routers.wazuh.rule: "Host(`wazuh.frai.se`)"
+      traefik.http.routers.wazuh.tls: "true"
+      traefik.http.routers.wazuh.tls.certresolver: "le"
+      traefik.http.services.wazuh.loadbalancer.server.port: "5601"
+  wazuh.indexer:
+    ports: !reset null
+  wazuh.manager:
+    ports: !reset null
+    labels:
+      traefik.enable: "false"
+networks:
+  default:
+    name: services
+    external: true

@@ -38,7 +38,8 @@
       WEBHOOK_URL: https://n8n.frai.se
       N8N_HOST: n8n.frai.se
       N8N_EDITOR_BASE_URL: https://n8n.frai.se
-      N8N_PROXY_HOPS: "1"
+      # N8N_PROXY_HOPS: "1"
+      N8N_LOG_LEVEL: debug
     state: started
     restart: true
     restart_policy: always

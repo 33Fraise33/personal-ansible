@@ -1,0 +1,35 @@
+# wazuh from : https://documentation.wazuh.com/current/deployment-options/docker/index.html
+---
+- name: Set max_map_count for wazuh
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: '262144'
+    state: present
+    reload: true
+
+- name: Create wazuh config directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  with_items:
+    - "{{ docker.dir.config }}/wazuh/"
+
+- name: Clone git repo
+  ansible.builtin.git:
+    repo: https://github.com/wazuh/wazuh-docker.git
+    dest: "{{ docker.dir.config }}/wazuh/"
+    version: "{{ wazuh_docker_version }}"
+    force: true
+
+- name: Start wazuh cert tool
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker.dir.config }}/wazuh/single-node"
+    files:
+      - generate-certs.yml
+    pull: always
+
+# - name: Start wazuh with docker compose
+#   community.docker.docker_compose_v2:
+#     project_src: "{{ docker.dir.config }}/waz"
+#     pull: always
