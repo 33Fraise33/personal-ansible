@@ -56,7 +56,7 @@
       data:
         icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
   mode: single
-- id: '1676395228339'
+- id: '1727525867473'
   alias: STYRBAR
   description: ''
   trigger:
@@ -65,28 +65,24 @@
     device_id: b6a7367363b2689386e9ee5467f98824
     type: action
     subtype: 'on'
-    discovery_id: 0x003c84fffe1fd811 action_on
     id: '1'
   - platform: device
     domain: mqtt
     device_id: b6a7367363b2689386e9ee5467f98824
     type: action
     subtype: 'off'
-    discovery_id: 0x003c84fffe1fd811 action_off
     id: '2'
   - platform: device
     domain: mqtt
     device_id: b6a7367363b2689386e9ee5467f98824
     type: action
     subtype: arrow_right_click
-    discovery_id: 0x003c84fffe1fd811 action_arrow_right_click
     id: '3'
   - platform: device
     domain: mqtt
     device_id: b6a7367363b2689386e9ee5467f98824
     type: action
     subtype: arrow_left_click
-    discovery_id: 0x003c84fffe1fd811 action_arrow_left_click
     id: '4'
   condition: []
   action:
@@ -95,18 +91,20 @@
       - condition: trigger
         id: '1'
       sequence:
-      - type: toggle
-        device_id: 5a7e24120c207c869bb3bf761cb438df
-        entity_id: switch.licht_voor
-        domain: switch
+      - service: switch.toggle
+        target:
+          entity_id:
+          - switch.in_vooraan
+        data: {}
     - conditions:
       - condition: trigger
         id: '2'
       sequence:
-      - type: toggle
-        device_id: 5a7e24120c207c869bb3bf761cb438df
-        entity_id: switch.licht_achter
-        domain: switch
+      - service: switch.toggle
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.in_achteraan
     - conditions:
       - condition: trigger
         id: '3'

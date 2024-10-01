@@ -98,7 +98,7 @@ traefik_custom_rules:
   - name: truenas
     target: https://172.16.33.3/
   - name: unifi
-    target: https://172.16.53.10
+    target: https://172.16.54.10
   - name: proxmox
     target: https://10.10.48.10:8006/
 
