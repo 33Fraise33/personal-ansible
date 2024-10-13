@@ -24,7 +24,8 @@
   tags: ddclient
 
 - name: Setup unbound
-  hosts: captain
+  hosts:
+    - beokpdcovm01
   connection: ssh
   become: true
   roles:
@@ -32,7 +33,8 @@
   tags: unbound
 
 - name: Setup adguard
-  hosts: captain
+  hosts: 
+    - beokpdcovm01
   connection: ssh
   become: true
   roles:

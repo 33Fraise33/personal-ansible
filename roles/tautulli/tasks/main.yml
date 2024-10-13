@@ -11,7 +11,7 @@
     name: tautulli
     image: ghcr.io/tautulli/tautulli:latest
     networks:
-      - name: macvlan333
+      - name: media
     volumes:
       - "config_tautulli:/config"
     env:

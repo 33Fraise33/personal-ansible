@@ -8,9 +8,13 @@
     name: plex
     image: linuxserver/plex:latest
     networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.plex }}"
-        ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.plex }}"
+      - name: media
+        ipv4_address: "{{ docker.networks.media.ipam[0].subnet \
+          | ansible.utils.ipsubnet(24, 0) \
+          | ansible.utils.ipaddr(docker.networks.media.hosts.plex) \
+          | ansible.utils.ipaddr('address') }}"
+        ipv6_address: "{{ docker.networks.media.ipam[1].subnet | ansible.utils.ipaddr('network') }}\
+          {{ docker.networks.media.hosts.plex }}"
     volumes:
       - "config_plex:/config"
       - "/data/media/movies:/movies"
@@ -20,7 +24,7 @@
       PGID: "{{ nobody.group }}"
       VERSION: "docker"
       # first time only
-      PLEX_CLAIM: claim-4GowV-_3QSuPH5bpwfvZ
+      # PLEX_CLAIM: claim-4GowV-_3QSuPH5bpwfvZ
     # devices:
     #   - /dev/dri:/dev/dri
     state: started

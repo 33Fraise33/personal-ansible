@@ -1,0 +1,17 @@
+---
+- name: Setup prometheus adguard exporter
+  community.docker.docker_container:
+    name: prometheus-adguard_exporter
+    image: ghcr.io/henrywhitaker3/adguard-exporter:latest
+    networks:
+      - name: monitoring
+    env:
+      ADGUARD_SERVERS: "http://{{ dns_servers.adguard.home.ip }},http://{{ dns_servers.adguard.dco.ip }}"
+      ADGUARD_USERNAMES: "fraise,fraise"
+      ADGUARD_PASSWORDS: "{{ adguard_password }},{{ adguard_password }}"
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

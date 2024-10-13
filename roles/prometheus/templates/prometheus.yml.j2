@@ -215,6 +215,11 @@ scrape_configs:
     static_configs:
       - targets:
           - "prometheus-speedtest_exporter:9798"
+  
+  - job_name: 'adguard'
+    static_configs:
+      - targets:
+          - "prometheus-adguard_exporter:9618"
 
   - job_name: "hass"
     metrics_path: /api/prometheus

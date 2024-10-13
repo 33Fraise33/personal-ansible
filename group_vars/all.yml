@@ -59,6 +59,30 @@ traefik:
     ip: 10.10.48.125
     ipv6: 2a12:4946:4002:1002::125
 
+dns_servers:
+  unbound:
+    home:
+      ip:
+      ipv6:
+    dco:
+      ip: 10.10.48.123
+      ipv6: 2a12:4946:4002:1002::123
+  adguard:
+    home:
+      ip: 10.33.0.254
+      ipv6: 2a12:4946:4000:333::254
+    dco:
+      ip: 10.10.48.124
+      ipv6: 2a12:4946:4002:1002::124
+
+dns:
+  domain: unitix.be
+  servers:
+    - "{{ dns_servers.adguard.home.ip }}"
+    - "{{ dns_servers.adguard.home.ipv6 }}"
+    - "{{ dns_servers.adguard.dco.ip }}"
+    - "{{ dns_servers.adguard.dco.ipv6 }}"
+
 domain:
   internal:
     - domain: wireguard.frai.se
@@ -153,6 +177,14 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: n8n.frai.se
       answer: "{{ traefik.dco.ip }}"
+    - domain: plex.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: plex.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: tautulli.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: tautulli.frai.se
+      answer: "{{ traefik.dco.ip }}"
     - domain: "'*.frai.se'"
       answer: "{{ traefik.home.ip }}"
     - domain: "'*.frai.se'"
@@ -193,3 +225,11 @@ gsuite_smtp_pass: !vault |
   38636539303565636637663064303163366361663862306138663934356538316632626163383863
   3562326332666535300a636431323239663530313737313937646161396338333930663266326530
   63373161343661663866353930356566366561373037663436646436333032343032
+
+adguard_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  31613037373930306531646264636463636130633430353230623637343232383134656632356262
+  3162303932666265356132366138373436353261633565370a666635343464306230373532303261
+  64343336356661393333386362313538613132343463373033336136613631386131343030383136
+  6431383965646230390a386361636338626338663032663033333162343531396539616238363830
+  38653634303966306137313132343565646239313433633863303639633862386237

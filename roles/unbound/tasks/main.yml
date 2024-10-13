@@ -3,39 +3,68 @@
 ---
 - name: Create unbound config directories
   ansible.builtin.file:
-    path: "{{ docker.dir.config }}/unbound"
+    path: "{{ docker.dir.config }}/{{ item }}"
     state: directory
     mode: "0755"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
+  loop:
+    - unbound
+    - unbound/conf.d
 
-- name: Import lancache task
-  ansible.builtin.import_tasks: lancache-dns.yml
-  tags: lancache
+# - name: Import lancache task
+#   ansible.builtin.import_tasks: lancache-dns.yml
+#   tags: lancache
 
 # config from https://github.com/klutchell/unbound-docker/blob/main/rootfs_overlay/etc/unbound/unbound.conf
-- name: Copy config file
+- name: Copy config files
   ansible.builtin.copy:
-    src: unbound.conf
-    dest: "{{ docker.dir.config }}/unbound/unbound.conf"
+    src: "{{ item }}"
+    dest: "{{ docker.dir.config }}/{{ item }}"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
     mode: "0755"
+  loop:
+    - unbound/unbound.conf
+    - unbound/conf.d/access-control.conf
+    - unbound/conf.d/interfaces.conf
+    - unbound/conf.d/logging.conf
+    - unbound/conf.d/performance.conf
+    - unbound/conf.d/remote-control.conf
+    - unbound/conf.d/security.conf
+    - unbound/conf.d/trust-anchor.conf
 
 - name: Setup unbound docker container
   community.docker.docker_container:
     name: unbound
-    image: mvance/unbound:latest
+    image: madnuttah/unbound:latest
     networks:
-      - name: macvlan333
-        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.unbound }}"
-        ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.unbound }}"
+      - name: services
+        ipv4_address: "{{ docker.networks.services.ipam[0].subnet \
+          | ansible.utils.ipsubnet(24, 0) \
+          | ansible.utils.ipaddr(docker.networks.services.hosts.unbound) \
+          | ansible.utils.ipaddr('address') }}"
+        ipv6_address: "{{ docker.networks.services.ipam[1].subnet | ansible.utils.ipaddr('network') }}\
+          {{ docker.networks.services.hosts.unbound }}"
+    env:
+      HEALTHCHECK_PORT: "53"
+      EXTENDED_HEALTHCHECK: "true"
+      EXTENDED_HEALTHCHECK_DOMAIN: "nlnetlabs.nl"
+      UNBOUND_UID: "{{ nobody.user }}"
+      UNBOUND_GID: "{{ nobody.group }}"
     volumes:
-      - "{{ docker.dir.config }}/unbound/lancache/scripts/output/unbound/:/opt/unbound/etc/unbound/custom.conf.d/:ro"
-      - "{{ docker.dir.config }}/unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro"
+      #- "{{ docker.dir.config }}/unbound/lancache/scripts/output/unbound/:/usr/local/unbound/conf.d/:ro"
+      - "{{ docker.dir.config }}/unbound/conf.d/:/usr/local/unbound/conf.d/:ro"
+      - "{{ docker.dir.config }}/unbound/unbound.conf:/usr/local/unbound/unbound.conf:ro"
     restart: true
     restart_policy: always
     state: started
     pull: true
+    healthcheck:
+      test: /usr/local/unbound/sbin/healthcheck.sh
+      interval: 60s
+      retries: 5
+      start_period: 15s
+      timeout: 30s
     labels:
       traefik.enable: "false"

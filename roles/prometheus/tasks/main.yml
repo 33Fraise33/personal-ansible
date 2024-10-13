@@ -22,6 +22,11 @@
   tags: ipmi, ipmi_exporter, ipmi-exporter
   when: prometheus.features.ipmi | default (false)
 
+- name: Setup adguard exporter
+  ansible.builtin.import_tasks: adguard_exporter.yml
+  tags: adguard, adguard_exporter
+  when: prometheus.features.adguard | default (false)
+
 - name: Setup alertmanager
   ansible.builtin.import_tasks: alertmanager.yml
   tags: alertmanager, alerts, alert

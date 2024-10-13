@@ -1,10 +1,4 @@
 ---
-dns:
-  domain: unitix.be
-  servers:
-    - 10.33.0.254
-    - 2a12:4946:4000:333::254
-
 mounts:
   - mountpoint: /data/
     source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
@@ -53,6 +47,8 @@ docker:
       driver_options:
         parent: ens19.1002
       hosts:
+        unbound: 123
+        adguard: 124
         traefik: 125
     media:
       type: ipvlan
@@ -64,7 +60,8 @@ docker:
       ipv6: true
       driver_options:
         parent: ens19.1003
-      hosts: []
+      hosts:
+        plex: 150
     networking:
       type: ipvlan
       ipam:
@@ -87,6 +84,7 @@ prometheus:
     speedtest: true
     alertmanager: true
     ipmi: true
+    adguard: true
 
 traefik_custom_rules:
   - name: accweb
