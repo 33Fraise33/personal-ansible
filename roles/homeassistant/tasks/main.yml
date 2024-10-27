@@ -18,11 +18,13 @@
     name: homeassistant
     image: ghcr.io/home-assistant/home-assistant:stable
     networks:
-      # - name: macvlan50
-      #   ipv4_address: 172.16.50.65
-      - name: macvlan333
-        ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.homeassistant }}"
-        ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.homeassistant }}"
+      - name: services
+        ipv4_address: "{{ docker.networks.services.ipam[0].subnet \
+          | ansible.utils.ipsubnet(24, 0) \
+          | ansible.utils.ipaddr(docker.networks.services.hosts.ha) \
+          | ansible.utils.ipaddr('address') }}"
+        ipv6_address: "{{ docker.networks.services.ipam[1].subnet | ansible.utils.ipaddr('network') }}\
+          {{ docker.networks.services.hosts.ha }}"
     volumes:
       - "{{ docker.dir.config }}/homeassistant:/config"
       - "data_homeassistant_media:/media"

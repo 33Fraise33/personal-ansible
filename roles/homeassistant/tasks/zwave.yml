@@ -11,7 +11,7 @@
     name: zwavejs
     image: zwavejs/zwave-js-ui:latest
     networks:
-      - name: macvlan333
+      - name: services
     volumes:
       - "data_zwavejs:/usr/src/app/store"
     devices:

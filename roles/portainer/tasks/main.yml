@@ -5,7 +5,6 @@
 - name: Create a volume for portainer config
   community.docker.docker_volume:
     name: config_portainer
-  when: (portainer.type| default(false)) != 'agent'
 
 - name: Setup portainer docker container
   community.docker.docker_container:
@@ -15,7 +14,7 @@
       - name: "{{ portainer.network | default('services') }}"
     ports: "{{ portainer_ports.agent if (portainer.type | default(false)) == 'agent' else omit }}"
     volumes:
-      - "config_portainer:/data"
+      - config_portainer:/data
       - "/var/run/docker.sock:/var/run/docker.sock"
     restart: true
     restart_policy: always

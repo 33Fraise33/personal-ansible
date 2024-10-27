@@ -1,6 +1,8 @@
 ---
 - name: Setup Traefik
-  hosts: beokpdcovm01
+  hosts: 
+    - beokpdcovm01
+    - bejbegiavm01
   connection: ssh
   become: true
   roles:

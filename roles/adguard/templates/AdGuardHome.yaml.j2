@@ -25,6 +25,8 @@ dns:
   upstream_dns:
     - {{ dns_servers.unbound.dco.ipv6 }}
     - {{ dns_servers.unbound.dco.ip }}
+    - {{ dns_servers.unbound.home.ipv6 }}
+    - {{ dns_servers.unbound.home.ip }}
   upstream_dns_file: ""
   bootstrap_dns:
     - 1.1.1.1
@@ -125,6 +127,7 @@ whitelist_filters: []
 user_rules:
   - '@@||tweakers.net^$important'
   - '@@||ewrc-results.com^$important'
+  - '@@||seedpool.org^$important'
   - ""
 dhcp:
   enabled: false
@@ -167,6 +170,16 @@ filtering:
 {% for rewrite in domain.internal %}
     - domain: {{ rewrite.domain }}
       answer: {{ rewrite.answer }}
+{% endfor %}
+{% for rewrite in traefik_custom_rules %}
+    - domain: {{ rewrite.name }}.frai.se
+      answer: {{ traefik.dco.ip }}
+    - domain: {{ rewrite.name }}.frai.se
+      answer: {{ traefik.dco.ipv6 }}
+    - domain: {{ rewrite.name }}.frai.se
+      answer: {{ traefik.home.ip }}
+    - domain: {{ rewrite.name }}.frai.se
+      answer: {{ traefik.home.ipv6 }}
 {% endfor %}
   safe_fs_patterns:
     - /opt/adguardhome/work/data/userfilters/*

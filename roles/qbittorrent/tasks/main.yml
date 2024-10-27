@@ -1,0 +1,63 @@
+---
+- name: Create a volume for qbittorent config
+  community.docker.docker_volume:
+    name: "{{ item }}"
+  loop:
+    - config_qbittorrent
+    - data_qbittorrent
+    - data_torrent_watch
+
+- name: Set permissions on docker volume
+  ansible.builtin.file:
+    path: /data/docker/docker/volumes/data_torrent_watch/_data
+    mode: "0755"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+
+- name: Setup Qbittorrent docker container
+  community.docker.docker_container:
+    name: qbittorrent
+    image: binhex/arch-qbittorrentvpn:latest
+    networks:
+      - name: media
+    volumes:
+      - "config_qbittorrent:/config"
+      - "data_qbittorrent:/data"
+      - "/data/media:/media"
+      - "data_torrent_watch:/watch"
+      - "/data/media/downloads:/downloads"
+      - "/etc/localtime:/etc/localtime:ro"
+    # capabilities:  # not needed for 
+    #   - NET_ADMIN
+    sysctls:
+      net.ipv4.conf.all.src_valid_mark: 1
+    privileged: true
+    env:
+      PUID: "{{ nobody.user }}"
+      PGID: "{{ nobody.group }}"
+      TZ: "Etc/UTC"
+      VPN_ENABLED: "yes"
+      VPN_USER: "{{ pia_user }}"
+      VPN_PASS: "{{ pia_password }}"
+      VPN_PROV: pia
+      VPN_CLIENT: wireguard
+      ENABLE_STARTUP_SCRIPTS: "no"
+      ENABLE_PRIVOXY: "no"
+      STRICT_PORT_FORWARD: "yes"
+      USERSPACE_WIREGUARD: "no"
+      ENABLE_SOCKS: "no"
+      LAN_NETWORK: "{{ traefik.home.ip }}/32,{{ traefik.dco.ip }}/32,10.10.35.0/24"
+      NAME_SERVERS: 9.9.9.9,1.1.1.1
+      VPN_INPUT_PORTS: "1234"
+      VPN_OUTPUT_PORTS: "5678"
+      DEBUG: "false"
+      UMASK: "000"
+    state: started
+    restart_policy: always
+    restart: true
+    pull: true
+    labels:
+      traefik.http.routers.qbittorrent.tls: "true"
+      traefik.http.routers.qbittorrent.tls.certresolver: "le"
+      traefik.http.services.qbittorrent.loadbalancer.server.port: "8080"
+      traefik.http.routers.qbittorrent.rule: "Host(`qbittorrent.frai.se`)"

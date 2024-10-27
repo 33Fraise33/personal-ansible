@@ -1,18 +1,18 @@
 ---
-- name: Setup Deluge
+- name: Setup Media Items
   hosts: beokpdcovm01
   connection: ssh
   become: true
   roles:
-    - role: deluge
-      tags: deluge
+    - role: qbittorrent
+      tags: qbittorrent
     # PLEX
     - role: plex
       tags: plex
     - role: tautulli
       tags: tautulli
-    - role: jellyfin
-      tags: jellyfin
+    # - role: jellyfin
+    #   tags: jellyfin
     # ARR
     - role: sabnzbd
       tags: sabnzbd,arr,usenet
@@ -30,3 +30,5 @@
       tags: calibre,books
     - role: readarr
       tags: readarr,books
+    - role: kometa
+      tags: kometa

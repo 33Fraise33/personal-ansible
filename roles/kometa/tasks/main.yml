@@ -1,0 +1,39 @@
+---
+- name: Create a volume for kometa config
+  community.docker.docker_volume:
+    name: config_kometa
+
+- name: Set permissions on docker volume
+  ansible.builtin.file:
+    path: /data/docker/docker/volumes/config_kometa/_data
+    mode: "0755"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+  
+- name: Copy config file
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: /data/docker/docker/volumes/config_kometa/_data/config.yml
+    mode: "0755"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+
+- name: Setup kometa docker container
+  community.docker.docker_container:
+    name: kometa
+    image: kometateam/kometa:latest
+    networks:
+      - name: media
+    volumes:
+      - "config_kometa:/config"
+    # env:
+    #   KOMETA_RUN: "true"
+      # KOMETA_CONFIG: /config/special-config.yml
+      # KOMETA_OVERLAYS_ONLY: true
+      # KOMETA_RUN_LIBRARIES: Movies
+    state: started
+    restart_policy: always
+    restart: true
+    pull: true
+    labels:
+      traefik.enable: "false"

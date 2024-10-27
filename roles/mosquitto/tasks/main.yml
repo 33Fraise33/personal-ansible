@@ -26,7 +26,7 @@
     name: mosquitto
     image: eclipse-mosquitto:latest
     networks:
-      - name: macvlan333
+      - name: services
     volumes:
       - "data_mqtt:/mosquitto/data"
       - "{{ docker.dir.config }}/mqtt:/mosquitto/config"

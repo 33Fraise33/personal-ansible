@@ -16,7 +16,7 @@
   tags: cloudflare
 
 - name: Setup ddclient
-  hosts: captain
+  hosts: bejbegiavm01
   connection: ssh
   become: true
   roles:
@@ -26,6 +26,7 @@
 - name: Setup unbound
   hosts:
     - beokpdcovm01
+    - bejbegiavm01
   connection: ssh
   become: true
   roles:
@@ -35,6 +36,7 @@
 - name: Setup adguard
   hosts: 
     - beokpdcovm01
+    - bejbegiavm01
   connection: ssh
   become: true
   roles:

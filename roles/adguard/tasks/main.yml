@@ -41,6 +41,7 @@
     restart_policy: always
     state: started
     labels:
+      traefik.http.routers.adguard.rule: "Host(`{{ adguard_hostname }}`)"
       traefik.http.routers.adguard.tls: "true"
       traefik.http.routers.adguard.tls.certresolver: "le"
       traefik.http.services.adguard.loadbalancer.server.port: "80"

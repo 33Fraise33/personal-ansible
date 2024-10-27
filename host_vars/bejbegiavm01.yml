@@ -1,0 +1,84 @@
+---
+mounts:
+  - mountpoint: /data/
+    source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
+    fs: ext4
+  - mountpoint: /lancache/
+    source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi3
+    fs: ext4
+
+docker:
+  login:
+    username: "{{ docker_login.username }}"
+    password: "{{ docker_login.password }}"
+  users:
+    - fraise
+  dir:
+    config: /data/docker-config
+    data: /data/docker
+  networks:
+    monitoring:
+      type: ipvlan
+      ipam:
+        - subnet: '172.16.48.64/27'
+          gateway: '172.16.48.65'
+        - subnet: "2a12:4946:4000:1001::/64"
+          gateway: "2a12:4946:4000:1001::1"
+      ipv6: true
+      driver_options:
+        parent: ens19.1001
+      hosts: []
+    services:
+      type: ipvlan
+      ipam:
+        - subnet: '172.16.48.96/27'
+          gateway: '172.16.48.97'
+        - subnet: "2a12:4946:4000:1002::/64"
+          gateway: "2a12:4946:4000:1002::1"
+      ipv6: true
+      driver_options:
+        parent: ens19.1002
+      hosts:
+        ha: 122
+        unbound: 123
+        adguard: 124
+        traefik: 125
+    media:
+      type: ipvlan
+      ipam:
+        - subnet: '172.16.48.128/27'
+          gateway: '172.16.48.129'
+        - subnet: "2a12:4946:4000:1003::/64"
+          gateway: "2a12:4946:4000:1003::1"
+      ipv6: true
+      driver_options:
+        parent: ens19.1003
+      hosts:
+        plex: 150
+
+portainer:
+  type: agent
+  network: bridge
+
+adguard_hostname: dns2.frai.se
+
+lancache:
+  dir: /lancache
+
+cloudflared:
+  docker_network: services
+  service_token: !vault |
+    $ANSIBLE_VAULT;1.1;AES256
+    38333638666138346131333738636137643132653530303366336164653436633632336662323038
+    3463363662643163663363663232393463613630613637310a613265333335346238613431643638
+    61363165343163383461343836383835373535373637663833306630323534343633643262326633
+    3233333638313065360a643163333335616365393666633564366137643964643961366162383832
+    32613864306264613533643736633433373437633535633434303562306266626635643034623066
+    65363834373834303464353034366463353363376661636234646463396261383136366230643734
+    65303365633338313363646131366635303365393636623231623731383635623238366132616635
+    38356335636430646364363630626563313733663233636232393031343365646265353336656662
+    34613236326661306437366438336630323031303732346333643537326334656562393165623434
+    62386331663662346363313436633364656163356630393237373031306464393663333838613931
+    30386539343235616237363535376530383364626331343330316231353864653562656562343463
+    31666565393963633964623339373133393536393130356330633034373566326331653363646237
+    36353962383230376465323564323332666239663064333963306364663862383363

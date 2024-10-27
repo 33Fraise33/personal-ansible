@@ -11,7 +11,7 @@
       - name: media
     volumes:
       - "config_sabnzbd:/config"
-      - "/downloads:/downloads"
+      - "/data/media/downloads:/downloads"
       - "/data/media:/media"
     env:
       TZ: "Europe/Brussels"

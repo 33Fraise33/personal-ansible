@@ -126,9 +126,9 @@ services:
         url: "https://prowlarr.frai.se"
         subtitle: "Torrent api proxy"
         tag: wireguard
-      - name: "Deluge"
-        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Deluge-Logo.svg/600px-Deluge-Logo.svg.png"
-        url: "https://deluge.frai.se"
+      - name: "Qbittorrent"
+        logo: "https://i.imgur.com/TCWo1dO.png"
+        url: "https://qbittorent.frai.se"
         subtitle: "Torrent client"
         tag: wireguard
       - name: "Sabnzbd"

@@ -20,6 +20,7 @@
     device: "{{ item.source }}"
     number: 1
     state: present
+    label: gpt
   when:
     - item.fs != 'nfs'
     - item_info.results[item_index].partitions|length<=0

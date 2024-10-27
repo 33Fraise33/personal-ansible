@@ -24,7 +24,7 @@
       - name: media
     volumes:
       - "config_prowlarr:/config"
-      - "data_deluge_watch:/downloads"
+      - "data_torrent_watch:/downloads"
     env:
       TZ: "Europe/Brussels"
       PUID: "65534"

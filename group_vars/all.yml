@@ -51,10 +51,20 @@ cloudflare_api_email: !vault |
   3263646334663434390a326338353233343537313361373663663231643666323862323861383037
   35643561613562366534383132626530663937386638356630306637373066623336
 
+traefik_custom_rules:
+  - name: bejbegiart01
+    target: https://172.16.33.1:8443
+  - name: unifi
+    target: https://172.16.54.10
+  - name: beokpdcosv01
+    target: https://10.10.48.10:8006/
+  - name: bejbegiasv01
+    target: https://172.16.33.3:8006/
+
 traefik:
   home:
-    ip: 10.33.0.245
-    ipv6: 2a12:4946:4000:333::245
+    ip: 172.16.48.125
+    ipv6: 2a12:4946:4002:1000::125
   dco:
     ip: 10.10.48.125
     ipv6: 2a12:4946:4002:1002::125
@@ -62,15 +72,15 @@ traefik:
 dns_servers:
   unbound:
     home:
-      ip:
-      ipv6:
+      ip: 172.16.48.123
+      ipv6: 2a12:4946:4000:1002::123
     dco:
       ip: 10.10.48.123
       ipv6: 2a12:4946:4002:1002::123
   adguard:
     home:
-      ip: 10.33.0.254
-      ipv6: 2a12:4946:4000:333::254
+      ip: 172.16.48.124
+      ipv6: 2a12:4946:4000:1002::124
     dco:
       ip: 10.10.48.124
       ipv6: 2a12:4946:4002:1002::124
@@ -89,10 +99,9 @@ domain:
       answer: 2a12:4946:4001:35::1
     - domain: wireguard.frai.se
       answer: 31.24.249.70
-    - domain: accweb.frai.se
-      answer: "{{ traefik.dco.ipv6 }}"
-    - domain: accweb.frai.se
-      answer: "{{ traefik.dco.ip }}"
+    - domain: inform.unitix.be
+      answer: "10.10.48.190"
+    # DCO
     - domain: alertmanager.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: alertmanager.frai.se
@@ -129,9 +138,9 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: frai.se
       answer: "{{ traefik.dco.ip }}"
-    - domain: deluge.frai.se
+    - domain: qbittorrent.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
-    - domain: deluge.frai.se
+    - domain: qbittorent.frai.se
       answer: "{{ traefik.dco.ip }}"
     - domain: radarr.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
@@ -185,9 +194,26 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: tautulli.frai.se
       answer: "{{ traefik.dco.ip }}"
-    - domain: "'*.frai.se'"
+    - domain: "dns1.frai.se"
+      answer: "{{ traefik.dco.ip }}"
+    - domain: "dns1.frai.se"
+      answer: "{{ traefik.dco.ipv6 }}"
+    # HOME
+    - domain: "ha.frai.se"
       answer: "{{ traefik.home.ip }}"
-    - domain: "'*.frai.se'"
+    - domain: "ha.frai.se"
+      answer: "{{ traefik.home.ipv6 }}"
+    - domain: "dns2.frai.se"
+      answer: "{{ traefik.home.ip }}"
+    - domain: "dns2.frai.se"
+      answer: "{{ traefik.home.ipv6 }}"
+    - domain: "z2m.frai.se"
+      answer: "{{ traefik.home.ip }}"
+    - domain: "z2m.frai.se"
+      answer: "{{ traefik.home.ipv6 }}"
+    - domain: "zwavejs.frai.se"
+      answer: "{{ traefik.home.ip }}"
+    - domain: "zwavejs.frai.se"
       answer: "{{ traefik.home.ipv6 }}"
   external:  # specific ipv4 at the front, no ipv4 = ddclient
     # FRAI.SE

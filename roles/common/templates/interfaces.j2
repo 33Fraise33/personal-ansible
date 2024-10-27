@@ -28,6 +28,9 @@ iface {{ intf.name }} inet6 auto
 	hw-address {{ intf.mac }}
 {%    endif%}
 {%  endif%}
+{%  if intf.mtu is defined %}
+	mtu {{ intf.mtu }}
+{%  endif %}
 {%  if intf.bridge is defined %}
 	bridge-ports {{ intf.bridge.ports }}
 	bridge-stp {{ intf.bridge.stp }}
@@ -36,6 +39,16 @@ iface {{ intf.name }} inet6 auto
 	bridge-vlan-aware yes
 	bridge-vids {{ intf.bridge.vlan.vids }}
 {%    endif %}
+{%  endif %}
+{%  if intf.vlan is defined %}
+	vlan-id {{ intf.vlan.id }}
+	vlan-raw-device {{ intf.vlan.device }}
+{%  endif %}
+{%  if intf.bond is defined %}
+	bond-slaves {{ intf.bond.slaves | join(" ") }}
+	bond-mode {{ intf.bond.mode }}
+	bond-miimon 100
+	bond-xmit-hash-policy layer3+4
 {%  endif %}
 {%  if intf.script | default(false) %}
 	pre-up ifconfig $IFACE up

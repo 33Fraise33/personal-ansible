@@ -15,7 +15,7 @@
     volumes:
       - "config_sonarr:/config"
       - "/data/media:/media"
-      - /downloads:/downloads
+      - "/data/media/downloads:/downloads"
     env:
       PUID: "{{ nobody.user }}"
       PGID: "{{ nobody.group }}"

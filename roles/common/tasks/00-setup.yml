@@ -51,21 +51,3 @@
 - name: SETUP - reset connection so sudo permission is recognized
   ansible.builtin.meta: reset_connection
 
-- name: SETUP - Generate random password
-  ansible.builtin.set_fact:
-    new_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,.,_,! length=15') }}"
-
-- name: SETUP - Add password to file
-  ansible.builtin.lineinfile:
-    path: "{{ local_password_location }}"
-    line: "{{ lookup('pipe', 'date -u +%FT%TZ') }};{{ inventory_hostname }};{{ new_password }}"
-    create: true
-    mode: "0755"
-  delegate_to: localhost
-  become: false
-
-- name: SETUP - Change user password for root
-  ansible.builtin.user:
-    name: "root"
-    password: "{{ new_password | password_hash('sha512', passwordsalt) }}"
-  tags: root
