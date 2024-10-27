@@ -128,7 +128,7 @@ services:
         tag: wireguard
       - name: "Qbittorrent"
         logo: "https://i.imgur.com/TCWo1dO.png"
-        url: "https://qbittorent.frai.se"
+        url: "https://qbittorrent.frai.se"
         subtitle: "Torrent client"
         tag: wireguard
       - name: "Sabnzbd"

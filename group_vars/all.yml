@@ -140,7 +140,7 @@ domain:
       answer: "{{ traefik.dco.ip }}"
     - domain: qbittorrent.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
-    - domain: qbittorent.frai.se
+    - domain: qbittorrent.frai.se
       answer: "{{ traefik.dco.ip }}"
     - domain: radarr.frai.se
       answer: "{{ traefik.dco.ipv6 }}"

@@ -1,5 +1,5 @@
 ---
-- name: Create a volume for qbittorent config
+- name: Create a volume for qbittorrent config
   community.docker.docker_volume:
     name: "{{ item }}"
   loop:
