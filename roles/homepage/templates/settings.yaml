@@ -1,0 +1,36 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/settings
+
+title: Frai.se & Unitix Home
+favicon: https://i.imgur.com/UgSg9YM.png
+background:
+  image: https://i.imgur.com/5rTGPOv.jpeg
+  # blur: sm # sm, "", md, xl... see https://tailwindcss.com/docs/backdrop-blur
+  # saturate: 50 # 0, 50, 100... see https://tailwindcss.com/docs/backdrop-saturate
+  # brightness: 50 # 0, 50, 75... see https://tailwindcss.com/docs/backdrop-brightness
+  opacity: 30 # 0-100
+cardBlur: md
+headerStyle: boxed
+
+target: _self  # open in own view
+
+quicklaunch:
+  searchDescriptions: true
+  showSearchSuggestions: true
+
+hideVersion: true
+
+layout:
+  Bookmarks:
+    style: row
+    columns: 4
+    header: false
+  Media: 
+    icon: mdi-multimedia
+    style: row
+    columns: 3
+  Networking:
+    icon: mdi-lan
+    style: row
+    columns: 2

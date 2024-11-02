@@ -1,0 +1,14 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/bookmarks
+
+- Bookmarks:
+  - Reddit:
+    - icon: si-reddit-#FF4500
+      href: https://reddit.com/
+  - Tweakers:
+    - icon: mdi-newspaper
+      href: https://tweakers.net
+  - Mail:
+    - icon: si-gmail-#EA4335
+      href: https://mail.google.com/a/unitix.be

@@ -1,0 +1,41 @@
+---
+- name: Create homepage config directory
+  ansible.builtin.file:
+    path: "{{ docker.dir.config }}/homepage"
+    state: directory
+    mode: "0755"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+
+- name: Template config files
+  ansible.builtin.template:
+    src: "{{ item }}.yaml"
+    dest: "{{ docker.dir.config }}/homepage/{{ item }}.yaml"
+    mode: "0644"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+  loop:
+    - bookmarks
+    - docker
+    - services
+    - settings
+    - widgets
+  tags: config
+
+- name: Setup homepage docker container
+  community.docker.docker_container:
+    name: homepage
+    image: ghcr.io/gethomepage/homepage:latest
+    networks:
+      - name: services
+    env:
+      PUID: "{{ nobody.user }}"
+      PGID: "{{ nobody.group }}"
+    volumes:
+      - "{{ docker.dir.config }}/homepage:/app/config"
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

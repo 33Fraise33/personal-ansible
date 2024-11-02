@@ -1,0 +1,161 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services
+
+- Media:
+  - Plex:
+      icon: sh-plex
+      href: https://plex.frai.se
+      description: Media Server
+      # server: localhost
+      # container: plex
+      widget:
+        type: tautulli
+        url: https://tautulli.frai.se
+        key: "{{ tautulli_api_key }}"
+  - Overseerr:
+      icon: sh-overseerr
+      href: https://overseerr.frai.se
+      description: Amelle Click Here
+      widget:
+        type: overseerr
+        url: https://overseerr.frai.se
+        key: "{{ overseerr_api_key }}"
+  - Prowlarr:
+      icon: sh-prowlarr
+      href: https://prowlarr.frai.se
+      description: Torrent Indexer
+      widget:
+        type: prowlarr
+        url: https://prowlarr.frai.se
+        key: "{{ prowlarr_api_key }}"
+  - Qbittorrent:
+      icon: si-qbittorrent-#2F67BA
+      href: https://qbittorrent.frai.se
+      description: Torrent Client
+      widget:
+        type: qbittorrent
+        url: https://qbittorrent.frai.se
+        username: admin
+        password: "{{ qbittorrent_pass }}"
+  - SabNZBd:
+      icon: sh-sabnzbd
+      href: https://sabnzbd.frai.se
+      description: Newsreader
+      widget:
+        type: sabnzbd
+        url: https://sabnzbd.frai.se
+        key: "{{ sabnzbd_api_key }}"
+  - Radarr:
+      icon: si-radarr-#FFCB3D
+      href: https://radarr.frai.se
+      description: Movie Tracker
+      widget:
+        type: radarr
+        url: https://radarr.frai.se
+        key: "{{ radarr_api_key }}"
+  - Sonarr:
+      icon: si-sonarr-#2596BE
+      href: https://sonarr.frai.se
+      description: Series Tracker
+      widget:
+        type: sonarr
+        url: https://sonarr.frai.se
+        key: "{{ sonarr_api_key }}"
+  - Bazarr:
+      icon: sh-bazarr
+      href: https://bazarr.frai.se
+      description: Subtitle Tracker
+      widget:
+        type: bazarr
+        url: https://bazarr.frai.se
+        key: "{{ bazarr_api_key }}"
+  - Readarr:
+      icon: sh-readarr
+      href: https://readarr.frai.se
+      description: Books Tracker
+      widget:
+        type: readarr
+        url: https://readarr.frai.se
+        key: "{{ readarr_api_key }}"
+  - Books:
+      icon: si-calibreweb-#45B29D
+      href: https://books.frai.se
+      description: Calibre Web - Kobo
+      widget:
+        type: calibreweb
+        url: https://books.frai.se
+        username: homepage
+        password: "{{ calibre_pass }}"
+  - Calibre:
+      icon: sh-calibre
+      href: https://calibre.frai.se
+      description: Books Archive
+  - Tautulli:
+      icon: https://i.imgur.com/VpwjEuP.png
+      href: https://tautulli.frai.se
+      description: Plex Stat Tracker
+
+- Networking:
+  - BEOKPDCOSV01:
+      icon: si-proxmox-#E57000
+      href: https://beokpdcosv01.frai.se
+      description: Proxmox 1 - BEOKPDCO
+      widget:
+        type: proxmox
+        url: https://beokpdcosv01.frai.se
+        username: homepage@pam!homepage
+        password: "{{ beokpdcosv01_api_key }}"
+  - BEJBEGIASV01:
+      icon: si-proxmox-#E57000
+      href: https://bejbegiasv01.frai.se
+      description: Proxmox 2 - BEJBEGIA
+      widget:
+        type: proxmox
+        url: https://bejbegiasv01.frai.se
+        username: homepage@pam!homepage
+        password: "{{ bejbegiasv01_api_key }}"
+  - DNS1:
+      icon: si-adguard-#68BC71
+      href: https://dns1.frai.se
+      description: DNS Server 1 - BEOKPDCO
+      widget:
+        type: adguard
+        url: https://dns1.frai.se
+        username: fraise
+        password: "{{ adguard_password }}"
+  - DNS2:
+      icon: si-adguard-#68BC71
+      href: https://dns2.frai.se
+      description: DNS Server 2 - BEJBEGIA
+      widget:
+        type: adguard
+        url: https://dns2.frai.se
+        username: fraise
+        password: "{{ adguard_password }}"
+  - Portainer:
+      icon: si-portainer-#13BEF9
+      href: https://portainer.frai.se
+      description: Portainer Container Management
+      widget:
+        type: portainer
+        url: https://portainer.frai.se
+        env: 2
+        key: "{{ portainer_api_key }}"
+  - Netbox:
+      icon: https://raw.githubusercontent.com/wiki/netbox-community/netbox/images/logos/netbox_icon.svg
+      href: https://netbox.frai.se
+      description: Network Documentation & IPAM
+  - Mikrotik: 
+      icon: si-mikrotik-#293239
+      href: https://bejbegiart01.frai.se
+      description: Router
+  - UISP: 
+      icon: si-ubiquiti-#0559C9
+      href: https://uisp.unitix.be
+      description: Ubiquiti Network Management
+  - Unifi: 
+      icon: si-ubiquiti-#0559C9
+      href: https://unifi.unitix.be
+      description: Unifi Network Management
+  

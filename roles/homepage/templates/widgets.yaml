@@ -1,0 +1,28 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/service-widgets
+
+### HEADER WIDGETS 
+- search:
+    provider: google
+    showSearchSuggestions: true
+
+- datetime:
+    locale: en-GB
+    text_size: xl
+    format:
+      hour: "2-digit"
+      minute: "2-digit"
+      day: "2-digit"
+      weekday: "short"
+      month: "short"
+      hourCycle: "h23"
+
+- logo:
+    icon: https://i.imgur.com/UgSg9YM.png
+
+- openmeteo:
+    units: metric # or imperial
+    cache: 15 # Time in minutes to cache API responses, to stay within limits
+    format: # optional, Intl.NumberFormat options
+      maximumFractionDigits: 1
