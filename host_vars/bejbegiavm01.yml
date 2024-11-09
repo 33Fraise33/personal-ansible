@@ -39,6 +39,7 @@ docker:
       driver_options:
         parent: ens19.1002
       hosts:
+        syncthing: 120
         ha: 122
         unbound: 123
         adguard: 124

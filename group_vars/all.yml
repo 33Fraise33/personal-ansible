@@ -215,6 +215,10 @@ domain:
       answer: "{{ traefik.home.ip }}"
     - domain: "zwavejs.frai.se"
       answer: "{{ traefik.home.ipv6 }}"
+    - domain: "syncthing.frai.se"
+      answer: "{{ traefik.home.ip }}"
+    - domain: "syncthing.frai.se"
+      answer: "{{ traefik.home.ipv6 }}"
   external:  # specific ipv4 at the front, no ipv4 = ddclient
     # FRAI.SE
     - name: wireguard
