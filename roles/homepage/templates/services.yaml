@@ -2,6 +2,20 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services
 
+- Services:
+  - Unifi Protect:
+      icon: https://i.imgur.com/RFV8GvU.png
+      href: https://unifi.frai.se/protect
+      description: Unifi Camera Server
+  - Home Assistant:
+      icon: si-homeassistant-#18BCF2
+      href: https://ha.frai.se
+      description: Home Assistant - Home Automation
+  - Miniflux:
+      icon: sh-miniflux
+      href: https://rss.frai.se
+      description: RSS Reader
+
 - Media:
   - Plex:
       icon: sh-plex
@@ -143,11 +157,11 @@
         env: 2
         key: "{{ portainer_api_key }}"
   - Netbox:
-      icon: https://raw.githubusercontent.com/wiki/netbox-community/netbox/images/logos/netbox_icon.svg
+      icon: sh-netbox
       href: https://netbox.frai.se
       description: Network Documentation & IPAM
   - Mikrotik: 
-      icon: si-mikrotik-#293239
+      icon: si-mikrotik-#ffffff
       href: https://bejbegiart01.frai.se
       description: Router
   - UISP: 
@@ -158,4 +172,18 @@
       icon: si-ubiquiti-#0559C9
       href: https://unifi.unitix.be
       description: Unifi Network Management
+
+- Monitoring:
+  - Grafana:
+      icon: si-grafana-#F46800
+      href: https://grafana.frai.se
+      description: Dashboarding Instance
+  - Prometheus:
+      icon: si-prometheus-#E6522C
+      href: https://prometheus.frai.se
+      description: Monitoring Instance
+  - Upptime:
+      icon: https://upptime.js.org/img/icon.svg
+      href: https://status.frai.se
+      description: Github Pages powered Monitoring
   

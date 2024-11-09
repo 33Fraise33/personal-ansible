@@ -9,7 +9,7 @@ background:
   # blur: sm # sm, "", md, xl... see https://tailwindcss.com/docs/backdrop-blur
   # saturate: 50 # 0, 50, 100... see https://tailwindcss.com/docs/backdrop-saturate
   # brightness: 50 # 0, 50, 75... see https://tailwindcss.com/docs/backdrop-brightness
-  opacity: 30 # 0-100
+  opacity: 70 # 0-100
 cardBlur: md
 headerStyle: boxed
 
@@ -26,11 +26,19 @@ layout:
     style: row
     columns: 4
     header: false
+  Services: 
+    icon: mdi-layers-triple-#FFFFFF
+    style: row
+    columns: 3
   Media: 
-    icon: mdi-multimedia
+    icon: mdi-multimedia-#FFFFFF
     style: row
     columns: 3
   Networking:
-    icon: mdi-lan
+    icon: mdi-lan-#FFFFFF
     style: row
     columns: 2
+  Monitoring: 
+    icon: mdi-speedometer-#FFFFFF
+    style: row
+    columns: 3
