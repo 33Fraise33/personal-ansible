@@ -15,6 +15,10 @@
       icon: sh-miniflux
       href: https://rss.frai.se
       description: RSS Reader
+      widget:
+        type: miniflux
+        url: https://rss.frai.se
+        key: "{{ miniflux_api_key }}"
 
 - Media:
   - Plex:
