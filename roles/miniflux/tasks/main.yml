@@ -31,6 +31,8 @@
       ADMIN_PASSWORD: "{{ miniflux.password }}"
       FETCH_YOUTUBE_WATCH_TIME: "1"
       BASE_URL: "https://rss.frai.se"
+      POLLING_PARSING_ERROR_LIMIT: "0"
+      WEBAUTHN: "on"
     state: started
     restart: true
     restart_policy: always
