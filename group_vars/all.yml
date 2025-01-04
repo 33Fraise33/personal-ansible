@@ -102,6 +102,10 @@ domain:
     - domain: inform.unitix.be
       answer: "10.10.48.190"
     # DCO
+    - domain: postiz.unitix.gg
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: postiz.unitix.gg
+      answer: "{{ traefik.dco.ip }}"
     - domain: alertmanager.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: alertmanager.frai.se
@@ -197,6 +201,14 @@ domain:
     - domain: "dns1.frai.se"
       answer: "{{ traefik.dco.ip }}"
     - domain: "dns1.frai.se"
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: "autobrr.frai.se"
+      answer: "{{ traefik.dco.ip }}"
+    - domain: "autobrr.frai.se"
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: "apprise.frai.se"
+      answer: "{{ traefik.dco.ip }}"
+    - domain: "apprise.frai.se"
       answer: "{{ traefik.dco.ipv6 }}"
     # HOME
     - domain: "ha.frai.se"

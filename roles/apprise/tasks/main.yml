@@ -1,0 +1,25 @@
+---
+- name: Create a volume for apprise
+  community.docker.docker_volume:
+    name: config_apprise
+
+- name: Setup apprise docker container
+  community.docker.docker_container:
+    name: apprise
+    image: caronc/apprise:latest
+    networks:
+      - name: services
+    env:
+      APPRISE_STATEFUL_MODE: simple
+      APPRISE_WORKER_COUNT: "2"
+    volumes:
+      - config_apprise:/config
+    state: started
+    restart: true
+    restart_policy: always
+    pull: true
+    labels:
+      traefik.http.routers.apprise.tls: "true"
+      traefik.http.routers.apprise.rule: "Host(`apprise.frai.se`)"
+      traefik.http.routers.apprise.tls.certresolver: "le"
+      traefik.http.services.apprise.loadbalancer.server.port: "8000"

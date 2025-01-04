@@ -1,0 +1,7 @@
+---
+- name: Setup apprise
+  hosts: beokpdcovm01
+  connection: ssh
+  become: true
+  roles:
+    - apprise

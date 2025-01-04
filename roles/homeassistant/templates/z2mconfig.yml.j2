@@ -1,9 +1,12 @@
+version: 4
+
 homeassistant:
-  legacy_entity_attributes: false
-  legacy_triggers: false
-permit_join: false
+  enabled: true
+
 frontend:
+  enabled: true
   url: https://z2m.frai.se
+
 advanced:
   network_key:
     - 49
@@ -23,17 +26,26 @@ advanced:
     - 192
     - 135
   channel: 15
-  log_level: warn
+  log_level: warning
+  homeassistant_legacy_entity_attributes: false
+  homeassistant_legacy_triggers: false
+  legacy_api: false
+  legacy_availability_payload: false
 log_output:
   - console
+
 mqtt:
   base_topic: zigbee2mqtt
   server: mqtt://mosquitto
   version: 5
+
 serial:
   port: /dev/ttyACM0
+  adapter: zstack
+
 device_options:
   legacy: false
+
 devices:
   '0x003c84fffe1fd811':
     friendly_name: Garage Switch
@@ -42,4 +54,6 @@ devices:
     friendly_name: Outlet Ikea
   '0xa4c138ca3d9cffd0':
     friendly_name: Tuin Outlet Sproeier
-availability: true
+
+availability:
+  enabled: true

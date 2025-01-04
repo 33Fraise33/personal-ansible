@@ -9,7 +9,7 @@ groups:
           summary: "IDLE - {{ $labels.peer }}:AS{{ $labels.peer_as }} - {{ $labels.peer_desc }}"
 
       - alert: Interface offline
-        expr: ifOperStatus{ifDescr!~".*me.*", ifDescr!~".*LOCAL_MGMT", ifDescr!~".*NOMON", ifIndex!="100000", ifDescr!~"tunnel.*", ifDescr!~"Logical-int.*", ifDescr!~"wlan.*", node_name!="BEJBEGIASW01"} != 1 and ifAdminStatus==1
+        expr: ifOperStatus{ifDescr!~".*LOCAL_MGMT", ifDescr!~".*NOMON", device_role!="switch"} != 1 and ifAdminStatus==1
         for: 10m
 
       - alert: High CPU Usage
