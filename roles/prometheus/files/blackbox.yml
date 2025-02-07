@@ -36,3 +36,13 @@ modules:
     prober: icmp
     icmp:
       preferred_ip_protocol: ip4
+  dns:
+    prober: dns
+    timeout: 1s
+    dns:
+      transport_protocol: "udp"
+      preferred_ip_protocol: "ip4"
+      query_name: "tweakers.net"
+      query_type: "A"
+      valid_rcodes:
+        - NOERROR

@@ -15,7 +15,6 @@
     volumes:
       - "config_radarr:/config"
       - "/data/media:/media"
-      - "/data/media/downloads:/downloads"
     env:
       PUID: "{{ nobody.user }}"
       PGID: "{{ nobody.group }}"

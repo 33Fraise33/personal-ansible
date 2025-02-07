@@ -5,7 +5,7 @@
   become: true
   roles:
     - role: qbittorrent
-      tags: qbittorrent
+      tags: qbittorrent,torrent
     # PLEX
     - role: plex
       tags: plex
@@ -32,3 +32,7 @@
       tags: readarr,books
     - role: kometa
       tags: kometa
+    - role: autobrr
+      tags: autobrr
+    - role: configarr
+      tags: configarr

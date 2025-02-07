@@ -1,0 +1,11 @@
+---
+- labels:
+    site: "BEOKPDCO"
+    node_name: "DNS1"
+  targets:
+    - 10.10.48.124
+- labels:
+    site: "BEJBEGIA"
+    node_name: "DNS2"
+  targets:
+    - 172.16.48.124

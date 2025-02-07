@@ -35,7 +35,7 @@ groups:
           title: "Device {{ $labels.node_name }} is powered off, should be on"
           description: "Chassis power state went to 0, should be 1"
       - alert: IPMI/BMC - Sensor state issue
-        expr: ipmi_sensor_state > 0
+        expr: ipmi_sensor_state{id!~"57|90"} > 0
         for: 10m
         labels:
           severity: warning

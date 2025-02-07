@@ -25,7 +25,6 @@
       - "data_qbittorrent:/data"
       - "/data/media:/media"
       - "data_torrent_watch:/watch"
-      - "/data/media/downloads:/downloads"
       - "/etc/localtime:/etc/localtime:ro"
     # capabilities:  # not needed for 
     #   - NET_ADMIN
@@ -45,7 +44,7 @@
       ENABLE_PRIVOXY: "no"
       STRICT_PORT_FORWARD: "yes"
       USERSPACE_WIREGUARD: "no"
-      ENABLE_SOCKS: "no"
+      ENABLE_SOCKS: "yes"
       LAN_NETWORK: "{{ traefik.home.ip }}/32,{{ traefik.dco.ip }}/32,10.10.35.0/24"
       NAME_SERVERS: 9.9.9.9,1.1.1.1
       VPN_INPUT_PORTS: "1234"

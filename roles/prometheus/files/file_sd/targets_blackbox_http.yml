@@ -26,11 +26,6 @@
     - https://plex.frai.se/web/index.html
 - labels:
     site: "BEJBEGIA"
-    node_name: "Adguard"
-  targets:
-    - https://adguard.frai.se/login.html
-- labels:
-    site: "BEJBEGIA"
     node_name: "Unitix"
   targets:
     - https://unitix.be
