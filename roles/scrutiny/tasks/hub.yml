@@ -18,7 +18,7 @@
       SCRUTINY_WEB_INFLUXDB_ORG: scrutiny
       SCRUTINY_WEB_INFLUXDB_BUCKET: scrutiny
       # Optional but highly recommended to notify you in case of a problem
-      # SCRUTINY_NOTIFY_URLS: ["http://gotify:80/message?token=a-gotify-token"]
+      SCRUTINY_NOTIFY_URLS: "telegram://{{ scrutiny_telegram_bot_token }}@telegram/?chats={{ scrutiny_telegram_chat_id }}"
     restart: true
     restart_policy: always
     state: started
