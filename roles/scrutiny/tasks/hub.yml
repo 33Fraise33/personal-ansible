@@ -1,0 +1,29 @@
+---
+- name: Create a volume for scrutiny hub
+  community.docker.docker_volume:
+    name: config_scrutiny
+
+- name: Setup scrutiny
+  community.docker.docker_container:
+    name: scrutiny
+    image: ghcr.io/analogj/scrutiny:master-web
+    networks:
+      - name: services
+    volumes:
+      - "config_scrutiny:/opt/scrutiny/config"
+    env:
+      SCRUTINY_WEB_INFLUXDB_HOST: influxdb
+      SCRUTINY_WEB_INFLUXDB_PORT: "8086"
+      SCRUTINY_WEB_INFLUXDB_TOKEN: "{{ scrutiny_influxdb_token }}"
+      SCRUTINY_WEB_INFLUXDB_ORG: scrutiny
+      SCRUTINY_WEB_INFLUXDB_BUCKET: scrutiny
+      # Optional but highly recommended to notify you in case of a problem
+      # SCRUTINY_NOTIFY_URLS: ["http://gotify:80/message?token=a-gotify-token"]
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.http.routers.scrutiny.tls: "true"
+      traefik.http.routers.scrutiny.tls.certresolver: "le"
+      traefik.http.services.scrutiny.loadbalancer.server.port: "8080"

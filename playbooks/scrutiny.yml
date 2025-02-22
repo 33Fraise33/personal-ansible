@@ -1,0 +1,21 @@
+---
+- name: Setup Scrutiny Server
+  hosts: beokpdcovm01
+  connection: ssh
+  become: true
+  roles:
+    - role: influxdb
+      tags: influx,influxdb
+    - role: scrutiny
+  vars:
+    scrutiny_hub: true
+
+- name: Setup Scrutiny collector
+  hosts: proxmox
+  connection: ssh
+  become: true
+  roles:
+    - role: scrutiny
+  vars:
+    scrutiny_collector: true
+    

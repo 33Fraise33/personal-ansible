@@ -34,5 +34,12 @@
     group: prometheus
   notify: Restart node_exporter
 
+- name: NODE_EXPORTER - Make sure service is started
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: node_exporter
+    state: started
+    enabled: true
+
 - name: NODE_EXPORTER - Flush handlers
   ansible.builtin.meta: flush_handlers

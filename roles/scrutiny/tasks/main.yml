@@ -1,0 +1,27 @@
+---
+- name: SCRUTINY - Setup collector
+  ansible.builtin.include_tasks:
+    file: collector.yml
+    apply:
+      tags:
+        - collector
+  tags: always
+  when: scrutiny_collector | default(false)
+
+- name: SCRUTINY - influxdb setup
+  ansible.builtin.include_tasks:
+    file: influx.yml
+    apply:
+      tags:
+        - creation
+  tags: creation
+  when: scrutiny_hub | default(false)
+
+- name: SCRUTINY - Setup hub/server
+  ansible.builtin.include_tasks:
+    file: hub.yml
+    apply:
+      tags:
+        - hub
+  tags: always
+  when: scrutiny_hub | default(false)

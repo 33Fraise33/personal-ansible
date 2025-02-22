@@ -1,0 +1,30 @@
+---
+- name: Create a volume for influxdb
+  community.docker.docker_volume:
+    name: '{{ item }}'
+  loop:
+    - data_influxdb
+    - config_influxdb
+
+- name: Setup Influxdb
+  community.docker.docker_container:
+    name: influxdb
+    image: influxdb:alpine
+    networks:
+      - name: services
+    volumes:
+      - "data_influxdb:/var/lib/influxdb2"
+      - "config_influxdb:/etc/influxdb2"
+    env:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: "{{ influxdb_admin_user }}"
+      DOCKER_INFLUXDB_INIT_PASSWORD: "{{ influxdb_admin_pass }}"
+      DOCKER_INFLUXDB_INIT_ORG: unitix
+      DOCKER_INFLUXDB_INIT_BUCKET: influx_main_db
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "{{ influxdb_admin_token }}"
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

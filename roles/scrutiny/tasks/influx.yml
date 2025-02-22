@@ -1,0 +1,64 @@
+---
+- name: Get influxdb container ip
+  community.docker.docker_container_info:
+    name: influxdb
+  register: result_containerip
+
+- name: Create organization
+  ansible.builtin.uri:
+    url: http://{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}:8086/api/v2/orgs
+    method: POST
+    body_format: json
+    status_code: 201
+    headers:
+      Content-Type: application/json
+      Authorization: Token {{ influxdb_admin_token }}
+    body: "{{ lookup('ansible.builtin.template','organization.json.j2') }}"
+  register: org_api_result
+  delegate_to: localhost
+  become: false
+
+- name: Create bucket
+  ansible.builtin.uri:
+    url: http://{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}:8086/api/v2/buckets
+    method: POST
+    body_format: json
+    status_code: 201
+    headers:
+      Content-Type: application/json
+      Authorization: Token {{ influxdb_admin_token }}
+    body: "{{ lookup('ansible.builtin.template','bucket.json.j2') }}"
+  register: bucket_api_result
+  delegate_to: localhost
+  become: false
+
+- name: Create user
+  ansible.builtin.uri:
+    url: http://{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}:8086/api/v2/users
+    method: POST
+    body_format: json
+    status_code: 201
+    headers:
+      Content-Type: application/json
+      Authorization: Token {{ influxdb_admin_token }}
+    body: "{{ lookup('ansible.builtin.template','user.json.j2') }}"
+  register: user_api_result
+  delegate_to: localhost
+  become: false
+
+- name: Create authorization
+  ansible.builtin.uri:
+    url: http://{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}:8086/api/v2/authorizations
+    method: POST
+    body_format: json
+    status_code: 201
+    headers:
+      Content-Type: application/json
+      Authorization: Token {{ influxdb_admin_token }}
+    body: "{{ lookup('ansible.builtin.template','authorization.json.j2') }}"
+  register: authorization_api_result
+  delegate_to: localhost
+  become: false
+
+- debug:
+    msg: "{{ authorization_api_result.json.token }}"

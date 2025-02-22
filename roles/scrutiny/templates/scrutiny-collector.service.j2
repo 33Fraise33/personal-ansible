@@ -1,0 +1,13 @@
+[Unit]
+Description=Scrutiny S.M.A.R.T. collector
+Wants=scrutiny.timer
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/local/bin/scrutiny-collector run --api-endpoint "https://scrutiny.frai.se" --host-id {{ ansible_hostname }}
+SyslogIdentifier=scrutiny-collector
+
+[Install]
+WantedBy=multi-user.target

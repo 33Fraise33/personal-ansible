@@ -1,0 +1,17 @@
+[Unit]
+Description=Scrutiny S.M.A.R.T. collector timer
+Requires=scrutiny-collector.service
+
+[Timer]
+Unit=scrutiny-collector.service
+OnCalendar=*-*-* *:00,15,30,45:00
+
+[Install]
+WantedBy=timers.target
+
+
+
+
+
+
+

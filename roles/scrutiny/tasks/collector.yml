@@ -1,0 +1,35 @@
+---
+- name: SCRUTINY - Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: PACKAGES - Install smartmontools
+  ansible.builtin.apt:
+    name:
+      - smartmontools
+
+- name: SCRUTINY - Download scrutiny to host
+  ansible.builtin.get_url:
+    url: "https://github.com/AnalogJ/scrutiny/releases/download/\
+      v{{ scrutiny_collector_version }}/\
+      scrutiny-collector-metrics-linux-amd64"
+    dest: "/usr/local/bin/scrutiny-collector"
+    mode: '0755'
+  
+- name: SCRUTINY - Copy the scrutiny systemd service files
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: /etc/systemd/system/{{ item }}
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - scrutiny-collector.service
+    - scrutiny-collector.timer
+
+- name: SCRUTINY - Make sure service is started
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: scrutiny-collector.timer
+    state: started
+    enabled: true

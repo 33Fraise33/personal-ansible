@@ -210,6 +210,10 @@ domain:
       answer: "{{ traefik.dco.ip }}"
     - domain: "apprise.frai.se"
       answer: "{{ traefik.dco.ipv6 }}"
+    - domain: "scrutiny.frai.se"
+      answer: "{{ traefik.dco.ip }}"
+    - domain: "scrutiny.frai.se"
+      answer: "{{ traefik.dco.ipv6 }}"
     # HOME
     - domain: "ha.frai.se"
       answer: "{{ traefik.home.ip }}"
