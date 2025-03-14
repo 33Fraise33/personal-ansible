@@ -1,0 +1,6 @@
+#jinja2: trim_blocks:True
+{% for nft_item in firewall.nat.srcnat|default([]) %}
+{% set statement = 'masquerade' %}
+{% include './nft_item.j2' %}
+
+{% endfor %}

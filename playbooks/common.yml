@@ -2,14 +2,13 @@
 # for initial run don't forget --ask-become-pass and --ask-pass
 
 - name: Run common role
-  hosts: linux
+  hosts:
+    - platform_debian_12
+    - platform_proxmox
   gather_facts: false
   connection: ssh
   become: true
-  vars_prompt:
-    - name: initial_setup
-      prompt: Is this the initial setup [yes/no]
-      private: false
-      default: "no"
   roles:
     - common
+    - role: firewall
+      tags: firewall

@@ -1,0 +1,47 @@
+---
+- name: Make sure nftables is installed
+  ansible.builtin.apt:
+    name: nftables
+    state: present
+    update_cache: true
+  tags: install
+
+- name: Make sure nftables is started and starts on boot
+  ansible.builtin.systemd:
+    name: nftables
+    state: started
+    enabled: true
+
+- name: Make nftables.d directory
+  ansible.builtin.file:
+    path: /etc/nftables.d
+    owner: root
+    group: root
+    mode: "0755"
+    state: directory
+
+- name: Copy nftables templates
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: /etc/{{ item }}
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - nftables.conf
+    - nftables.d/forward.conf
+    - nftables.d/input.conf
+    - nftables.d/sets.conf
+    - nftables.d/postrouting.conf
+    - nftables.d/prerouting.conf
+  tags: ruleset
+
+- name: Check if nftables config is valid
+  ansible.builtin.command: "nft --check --file /etc/nftables.conf"
+  changed_when: false
+  tags: ruleset
+
+- name: Install nftables rules
+  ansible.builtin.command: "nft -f /etc/nftables.conf"
+  changed_when: true
+  tags: ruleset

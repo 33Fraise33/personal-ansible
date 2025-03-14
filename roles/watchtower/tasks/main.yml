@@ -7,7 +7,7 @@
     image: containrrr/watchtower:latest
     command: --cleanup --interval 7200
     networks:
-      - name: services
+      - name: "{{ watchtower.network | default('services') }}"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     restart: true

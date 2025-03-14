@@ -1,0 +1,9 @@
+#jinja2: trim_blocks:True
+{% for set_item in firewall.sets|default([]) %}
+set {{ set_item.name }} {
+        type {{ set_item.type }}
+        flags interval
+
+        elements = { {{ set_item.elements|join(", ") }} }
+}
+{% endfor %}

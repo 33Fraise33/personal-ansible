@@ -1,7 +1,7 @@
 ---
 - name: Setup Docker, portainer & watchtower
   hosts:
-    - docker
+    - tag_docker
   connection: ssh
   become: true
   roles:

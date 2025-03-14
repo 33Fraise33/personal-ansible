@@ -69,6 +69,7 @@
   loop: "{{ docker.networks | dict2items }}"
   tags: networks,network,ipam
   notify: Restart docker
+  when: docker.networks is defined
 
 - name: Change docker vars (including default subnet)
   ansible.builtin.copy:

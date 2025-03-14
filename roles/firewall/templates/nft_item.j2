@@ -1,0 +1,14 @@
+{%- set type = nft_item.type|default('ip') -%}
+{%- if nft_item.source is defined -%}
+{%-   if nft_item.source.ip is defined -%}{{ type }} saddr {{ "!= " if nft_item.source.negate|default(false) else "" }}{{ nft_item.source.ip }} {%     endif-%}
+{%-   if nft_item.source.interface is defined -%}iifname {{ nft_item.source.interface }} {%     endif-%}
+{%- endif-%}
+{%- if nft_item.destination is defined -%}
+{%-   if nft_item.destination.ip is defined -%}{{ type }} daddr {{ "!= " if nft_item.destination.negate|default(false) else "" }}{{ nft_item.destination.ip }} {%     endif-%}
+{%-   if nft_item.destination.interface is defined -%}oifname {{ nft_item.destination.interface }} {%     endif-%}
+{%-   if nft_item.destination.protocol is defined -%}{{ nft_item.destination.protocol }} {%     endif-%}
+{%-   if nft_item.destination.port is defined -%}dport {{ nft_item.destination.port }} {%     endif-%}
+{%- endif-%}
+{%- if nft_item.counter is defined and nft_item.counter -%}counter {%   endif -%}
+{{ nft_item.statement|default(statement) }}
+{%- if nft_item.comment is defined %} comment "{{ nft_item.comment }}"{% endif -%}

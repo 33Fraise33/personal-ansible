@@ -25,8 +25,7 @@
 
 - name: Setup unbound
   hosts:
-    - beokpdcovm01
-    - bejbegiavm01
+    - tag_dns
   connection: ssh
   become: true
   roles:
@@ -34,9 +33,8 @@
   tags: unbound
 
 - name: Setup adguard
-  hosts: 
-    - beokpdcovm01
-    - bejbegiavm01
+  hosts:
+    - tag_dns
   connection: ssh
   become: true
   roles:

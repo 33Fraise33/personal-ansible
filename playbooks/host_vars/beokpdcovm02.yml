@@ -1,0 +1,63 @@
+---
+interfaces:
+  - name: ens18
+    description: MAIN
+    mode: static
+    ip: 10.10.48.35/27
+    gateway: 10.10.48.33
+  - name: ens19
+    description: docker-intf
+    mode: manual
+
+mounts:
+  - mountpoint: /data/media
+    source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
+    fs: ext4
+  - mountpoint: /data/media/incomplete
+    source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi3
+    fs: ext4
+docker:
+  login:
+    username: "{{ docker_login.username }}"
+    password: "{{ docker_login.password }}"
+  users:
+    - fraise
+  dir:
+    config: /data/docker-config
+    data: /data/docker
+  networks:
+    media:
+      type: ipvlan
+      ipam:
+        - subnet: '10.10.48.128/27'
+          gateway: '10.10.48.129'
+        - subnet: "2a12:4946:4002:1003::/64"
+          gateway: "2a12:4946:4002:1003::1"
+      ipv6: true
+      driver_options:
+        parent: ens19.1003
+      hosts:
+        plex: 150
+        traefik: 151
+
+traefik:
+  network: media
+
+portainer:
+  type: agent
+  network: host
+
+watchtower:
+  network: host
+
+firewall_filter_input_host:
+  - comment: "Allow portainer_agent"
+    destination:
+      port: 9001
+      protocol: tcp
+    counter: true
+
+firewall:
+  sets: "{{ firewall_sets_all }}"
+  filter:
+    input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"

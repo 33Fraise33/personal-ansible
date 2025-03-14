@@ -1,7 +1,8 @@
 FROM netboxcommunity/netbox:{{ netbox.version }}-{{ netbox.docker_version }}
 
 COPY ./plugin_requirements.txt /opt/netbox/
-RUN /opt/netbox/venv/bin/pip install  --no-warn-script-location -r /opt/netbox/plugin_requirements.txt
+RUN apt -y update && apt -y install git python3.12-venv
+RUN /opt/netbox/venv/bin/python -m ensurepip && /opt/netbox/venv/bin/pip3 install  --no-warn-script-location -r /opt/netbox/plugin_requirements.txt
 
 # These lines are only required if your plugin has its own static files.
 COPY configuration/configuration.py /etc/netbox/config/configuration.py

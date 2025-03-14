@@ -50,4 +50,3 @@
 
 - name: SETUP - reset connection so sudo permission is recognized
   ansible.builtin.meta: reset_connection
-

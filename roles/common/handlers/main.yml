@@ -15,6 +15,7 @@
 - name: Restart networking
   ansible.builtin.systemd:
     name: networking
+    enabled: true
     state: restarted
   become: true
 

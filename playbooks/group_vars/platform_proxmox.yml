@@ -1,0 +1,15 @@
+---
+ip_forwarding: false
+vm: false
+
+firewall_filter_input_proxmox:
+  - comment: "Allow PVE web"
+    destination:
+      port: 8006
+      protocol: tcp
+    counter: true
+
+firewall:
+  sets: "{{ firewall_sets_all }}"
+  filter:
+    input: "{{ firewall_filter_input_proxmox + firewall_filter_input_all }}"
