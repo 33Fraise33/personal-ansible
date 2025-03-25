@@ -1,6 +1,6 @@
 ---
 - name: Setup wordpress docker container
-  hosts: beokpdcovm01
+  hosts: BEOKPDCOVM01
   connection: ssh
   gather_facts: false
   become: true

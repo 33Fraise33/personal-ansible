@@ -1,6 +1,6 @@
 ---
 - name: Setup Miniflux
-  hosts: beokpdcovm01
+  hosts: BEOKPDCOVM01
   connection: ssh
   become: true
   roles:

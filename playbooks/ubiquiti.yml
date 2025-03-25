@@ -1,6 +1,6 @@
 ---
 - name: Setup UISP
-  hosts: beokpdcovm01
+  hosts: BEOKPDCOVM01
   connection: ssh
   become: true
   roles:
@@ -8,7 +8,7 @@
   tags: uisp
 
 - name: Setup unifi
-  hosts: beokpdcovm01
+  hosts: BEOKPDCOVM01
   connection: ssh
   become: true
   roles:
