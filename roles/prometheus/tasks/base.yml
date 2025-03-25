@@ -41,7 +41,7 @@
 - name: Setup prometheus docker container
   community.docker.docker_container:
     name: prometheus
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.2.1
     networks:
       - name: monitoring
     volumes:
