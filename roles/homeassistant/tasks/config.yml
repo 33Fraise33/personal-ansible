@@ -9,6 +9,7 @@
   loop:
     - automations.yaml
     - customize.yaml
+    - scripts.yaml
   notify: Restart homeassistant
 
 - name: Copy configuration templates to directory

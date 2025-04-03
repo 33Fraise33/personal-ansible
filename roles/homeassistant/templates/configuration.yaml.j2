@@ -4,8 +4,10 @@ default_config:
 http:
   use_x_forwarded_for: true
   trusted_proxies:
-    - "{{ docker.network.ipv4_prefix }}0/24"
-    - "{{ docker.network.ipv6_prefix }}/64"
+    - "10.10.48.0/24"
+    - "172.16.48.0/24"
+    - "2a12:4946:4002:1002::/64"
+    - "2a12:4946:4000:1002::/64"
     
 # Text to speech
 tts:
@@ -99,3 +101,42 @@ spotcast:
   sp_dc: {{ ha.spotify_dc }}
   sp_key: {{ ha.spotify_key }}
   country: BE
+
+{% raw %}
+media_player:
+  - platform: universal
+    name: Living AVR
+    unique_id: denon_living_avr_combined
+    device_class: receiver
+    children:
+      - media_player.living_avr       # Denon AVR Integration entity
+      - media_player.heos_avr_2  # Denon HEOS Integration entity
+    browse_media_entity: media_player.heos_avr_2
+    commands:
+      turn_off:
+        action: media_player.turn_off
+        data:
+          entity_id: media_player.living_avr
+      turn_on:
+        action: media_player.turn_on
+        data:
+          entity_id: media_player.living_avr
+      volume_up:
+        action: media_player.volume_up
+        data:
+          entity_id: media_player.living_avr
+      volume_down:
+        action: media_player.volume_down
+        data:
+          entity_id: media_player.living_avr
+      select_sound_mode:
+        action: media_player.select_sound_mode
+        target:
+          entity_id: media_player.living_avr
+        data:
+          sound_mode: "{{ sound_mode }}"
+    attributes:
+      sound_mode: media_player.living_avr|sound_mode
+      sound_mode_raw: media_player.living_avr|sound_mode_raw
+      sound_mode_list: media_player.living_avr|sound_mode_list
+{% endraw %}

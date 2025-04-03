@@ -1,0 +1,25 @@
+new_script:
+  sequence:
+  - action: media_player.turn_on
+    metadata: {}
+    data: {}
+    target:
+      device_id: 2750a819f82e9c8b38db6ad76ad00e5f
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - action: media_player.turn_on
+    metadata: {}
+    data: {}
+    target:
+      device_id: 595f1a6f2b525eac3fe3a61858466022
+  - action: media_player.play_media
+    data:
+      media_content_type: app
+      media_content_id: com.plexapp.android
+    target:
+      entity_id: media_player.shield_android_tv
+  alias: 'Script: Start Plex & AVR'
+  description: ''

@@ -56,125 +56,71 @@
       data:
         icon_url: https://img2.pngio.com/garage-free-business-icons-bus-garage-png-512_512.png
   mode: single
-- id: '1676395228339'
+- id: '1727525867473'
   alias: STYRBAR
   description: ''
-  trigger:
-  - platform: device
-    domain: mqtt
+  triggers:
+  - domain: mqtt
     device_id: b6a7367363b2689386e9ee5467f98824
     type: action
     subtype: 'on'
-    discovery_id: 0x003c84fffe1fd811 action_on
     id: '1'
-  - platform: device
-    domain: mqtt
+    trigger: device
+  - domain: mqtt
     device_id: b6a7367363b2689386e9ee5467f98824
     type: action
     subtype: 'off'
-    discovery_id: 0x003c84fffe1fd811 action_off
     id: '2'
-  - platform: device
-    domain: mqtt
+    trigger: device
+  - domain: mqtt
     device_id: b6a7367363b2689386e9ee5467f98824
     type: action
     subtype: arrow_right_click
-    discovery_id: 0x003c84fffe1fd811 action_arrow_right_click
     id: '3'
-  - platform: device
-    domain: mqtt
+    trigger: device
+  - domain: mqtt
     device_id: b6a7367363b2689386e9ee5467f98824
     type: action
     subtype: arrow_left_click
-    discovery_id: 0x003c84fffe1fd811 action_arrow_left_click
     id: '4'
-  condition: []
-  action:
+    trigger: device
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
         id: '1'
       sequence:
-      - type: toggle
-        device_id: 5a7e24120c207c869bb3bf761cb438df
-        entity_id: switch.licht_voor
-        domain: switch
+      - target:
+          entity_id:
+          - switch.in_vooraan
+        data: {}
+        action: switch.toggle
     - conditions:
       - condition: trigger
         id: '2'
       sequence:
-      - type: toggle
-        device_id: 5a7e24120c207c869bb3bf761cb438df
-        entity_id: switch.licht_achter
-        domain: switch
+      - metadata: {}
+        data: {}
+        target:
+          entity_id: switch.in_achteraan
+        action: switch.toggle
     - conditions:
       - condition: trigger
         id: '3'
       sequence:
-      - service: cover.close_cover
-        data: {}
+      - data: {}
         target:
           entity_id: cover.garage_door
+        action: cover.close_cover
     - conditions:
       - condition: trigger
         id: '4'
       sequence:
-      - service: cover.open_cover
-        data: {}
+      - data: {}
         target:
           entity_id: cover.garage_door
-  mode: single
-- id: '1683093433890'
-  alias: 'Notification: Auto Opladen'
-  description: ''
-  trigger:
-  - platform: numeric_state
-    entity_id:
-    - sensor.average_power_5min
-    below: -500
-  condition:
-  - condition: and
-    conditions:
-    - condition: zone
-      entity_id: device_tracker.320e
-      zone: zone.home
-    - type: is_not_charging
-      condition: device
-      device_id: 63b199a1c95a1a99a581388997081792
-      entity_id: binary_sensor.320e_charging_status
-      domain: binary_sensor
-  action:
-  - device_id: 0aacab7aaae31e3839efecd1059c90d7
-    domain: mobile_app
-    type: notify
-    title: Charge Car
-    message: Laten we de auto opladen
-  mode: single
-- id: '1683093764768'
-  alias: 'Notification: Stop Auto Laden'
-  description: ''
-  trigger:
-  - platform: numeric_state
-    entity_id:
-    - sensor.average_power_5min
-    above: 100
-  condition:
-  - condition: and
-    conditions:
-    - condition: zone
-      entity_id: device_tracker.320e
-      zone: zone.home
-    - type: is_charging
-      condition: device
-      device_id: 63b199a1c95a1a99a581388997081792
-      entity_id: binary_sensor.320e_charging_status
-      domain: binary_sensor
-  action:
-  - device_id: 0aacab7aaae31e3839efecd1059c90d7
-    domain: mobile_app
-    type: notify
-    title: Stop Car Charge
-    message: Gemiddeld verbruik stroom boven 100W
+        action: cover.open_cover
   mode: single
 - id: '1686683677480'
   alias: 'NFC: Toggle Garage'
