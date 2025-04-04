@@ -1,6 +1,6 @@
 ---
 - name: Setup cloudflared
-  hosts: cloudflared
+  hosts: tag_cloudflared
   connection: ssh
   become: true
   roles:

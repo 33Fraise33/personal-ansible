@@ -9,10 +9,15 @@
 - name: Setup portainer docker container
   community.docker.docker_container:
     name: portainer
-    image: portainer/{{ portainer.type | default('portainer-ce') }}:latest
+    image: portainer/{{ portainer.type | default('agent') }}:latest
     networks:
-      - name: "{{ portainer.network | default('services') }}"
-    ports: "{{ portainer_ports.agent if (portainer.type | default(false)) == 'agent' else omit }}"
+      - name: "{{ portainer.network | default('host') }}"
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+    ports: "{{ portainer_ports.agent if (portainer.type | default('agent')) == 'agent' else omit }}"
     volumes:
       - config_portainer:/data
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -20,4 +25,4 @@
     restart_policy: always
     state: started
     pull: true
-    labels: "{{ portainer_labels.agent if (portainer.type | default(false)) == 'agent' else portainer_labels.full }}"
+    labels: "{{ portainer_labels.agent if (portainer.type | default('agent')) == 'agent' else portainer_labels.full }}"

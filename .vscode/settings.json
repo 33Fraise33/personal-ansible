@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "*.yml": "ansible"
-    }
+    },
+    "ansible.python.interpreterPath": "/Users/fraise/git/ansiblevenv/bin/python"
 }

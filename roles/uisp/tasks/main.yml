@@ -17,6 +17,11 @@
           | ansible.utils.ipaddr('address') }}"
         ipv6_address: "{{ docker.networks.networking.ipam[1].subnet | ansible.utils.ipaddr('network') }}\
           {{ docker.networks.networking.hosts.uisp }}"
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
     volumes:
       - "data_uisp:/config"
     env:

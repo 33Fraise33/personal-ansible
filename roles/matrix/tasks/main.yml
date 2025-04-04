@@ -69,6 +69,11 @@
     image: matrixdotorg/dendrite-monolith:latest
     networks:
       - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
     volumes:
       - "{{ docker.dir.config }}/dendrite:/etc/dendrite"
       - "data_dendrite_media:/var/dendrite/media"

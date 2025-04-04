@@ -15,11 +15,8 @@ zone=frai.se,            \
 ttl=1,                      \
 login={{ cloudflare_api_email }},     \
 password={{ cloudflare_api_token }}             \
-{% for pub_domain in ([] + domains.fraise.direct) -%}
-{%- if pub_domain.name == "@" -%}
-frai.se
-{%- if not loop.last %},{% endif -%}
-{%- elif pub_domain.ipv4 is not defined -%}
+{% for pub_domain in ([] + domain.external) -%}
+{%- if pub_domain.ipv4 is not defined and pub_domain.domain == "frai.se" -%}
 {{ pub_domain.name }}.frai.se
 {%- if not loop.last %},{% endif -%}
 {%- endif -%}

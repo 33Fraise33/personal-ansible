@@ -11,6 +11,11 @@
     image: grafana/grafana:latest
     networks:
       - name: monitoring
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
     volumes:
       - "data_grafana:/var/lib/grafana"
     env:

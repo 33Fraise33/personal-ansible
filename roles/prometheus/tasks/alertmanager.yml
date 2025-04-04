@@ -19,6 +19,11 @@
   community.docker.docker_container:
     name: prometheus-alertmanager
     image: prom/alertmanager:latest
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
     networks:
       - name: monitoring
     volumes:

@@ -44,6 +44,11 @@
     image: prom/prometheus:v3.2.1
     networks:
       - name: monitoring
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
     volumes:
       - "{{ docker.dir.config }}/prometheus:/config:ro"
       - "data_prometheus:/prometheus"

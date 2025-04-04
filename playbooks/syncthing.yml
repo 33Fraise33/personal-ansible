@@ -1,7 +1,7 @@
 ---
 - name: Setup Syncthing
-  hosts: 
-    - bejbegiavm01
+  hosts:
+    - BEJBEGIAVM01
   connection: ssh
   become: true
   roles:

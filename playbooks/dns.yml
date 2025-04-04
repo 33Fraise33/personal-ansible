@@ -16,7 +16,7 @@
   tags: cloudflare
 
 - name: Setup ddclient
-  hosts: bejbegiavm01
+  hosts: BEJBEGIAVM01
   connection: ssh
   become: true
   roles:

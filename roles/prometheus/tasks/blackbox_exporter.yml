@@ -22,6 +22,11 @@
     image: prom/blackbox-exporter:latest
     networks:
       - name: monitoring
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
     volumes:
       - "{{ docker.dir.config }}/prometheus_blackbox/blackbox.yml:/blackbox.yml:ro"
     command: "--config.file=/blackbox.yml"

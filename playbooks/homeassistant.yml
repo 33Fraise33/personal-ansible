@@ -1,7 +1,10 @@
 ---
-- name: Setup homeassistant docker container
+- name: Setup hone automation containers
   hosts: BEJBEGIAVM01
   connection: ssh
   become: true
   roles:
-    - homeassistant
+    - role: mosquitto
+      tags: mqtt,mosquitto
+    - role: homeassistant
+      tags: homeassistant

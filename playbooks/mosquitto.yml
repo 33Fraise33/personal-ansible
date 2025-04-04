@@ -1,7 +1,0 @@
----
-- name: Setup mqtt docker container
-  hosts: bejbegiavm01
-  connection: ssh
-  become: true
-  roles:
-    - mosquitto

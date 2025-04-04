@@ -241,6 +241,14 @@ domain:
     - domain: "syncthing.frai.se"
       answer: "{{ traefik.home.ipv6 }}"
   external:  # specific ipv4 at the front, no ipv4 = ddclient
+    # UNITIX.BE
+    - name: beokpdcort01
+      ipv6: "2a12:4946:4002::1"
+      ipv4: "31.24.249.70"
+      domain: unitix.be
+    - name: inform
+      ipv4: "10.10.48.190"
+      domain: unitix.be
     # FRAI.SE
     - name: wireguard
       domain: frai.se
@@ -250,14 +258,6 @@ domain:
       domain: frai.se
     - name: home
       domain: frai.se
-    # UNITIX.BE
-    - name: beokpdcort01
-      ipv6: "2a12:4946:4002::1"
-      ipv4: "31.24.249.70"
-      domain: unitix.be
-    - name: inform
-      ipv4: "10.10.48.190"
-      domain: unitix.be
 
 matrix_base_url: matrix.frai.se
 

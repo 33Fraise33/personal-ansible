@@ -21,6 +21,11 @@
     image: prometheuscommunity/ipmi-exporter:latest
     networks:
       - name: monitoring
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
     volumes:
       - "{{ docker.dir.config }}/prometheus_ipmi/config.yml:/config.yml:ro"
     command: "--config.file /config.yml"

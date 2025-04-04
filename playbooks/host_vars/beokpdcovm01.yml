@@ -10,8 +10,10 @@ mounts:
   #   source: 172.16.33.3:/mnt/main/files
   #   fs: nfs
 
-# portainer:
-#   type: portainer-ce
+portainer:
+  type: portainer-ce
+  network: services
+
 docker:
   login:
     username: "{{ docker_login.username }}"

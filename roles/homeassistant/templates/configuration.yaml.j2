@@ -4,10 +4,8 @@ default_config:
 http:
   use_x_forwarded_for: true
   trusted_proxies:
-    - "10.10.48.0/24"
-    - "172.16.48.0/24"
-    - "2a12:4946:4002:1002::/64"
-    - "2a12:4946:4000:1002::/64"
+    - "{{ traefik.home.ip }}"
+    - "{{ traefik.home.ipv6 }}"
     
 # Text to speech
 tts:
@@ -135,8 +133,18 @@ media_player:
           entity_id: media_player.living_avr
         data:
           sound_mode: "{{ sound_mode }}"
+    state_template: >
+      {% if is_state('media_player.living_avr', 'off') %}
+        off
+      {% else %}
+        {{ states('media_player.living_avr') }}
+      {% endif %}
     attributes:
       sound_mode: media_player.living_avr|sound_mode
       sound_mode_raw: media_player.living_avr|sound_mode_raw
       sound_mode_list: media_player.living_avr|sound_mode_list
+      media_title: media_player.heos_avr_2|media_title
+      media_artist: media_player.heos_avr_2|media_artist
+      media_album_name: media_player.heos_avr_2|media_album_name
+      entity_picture: media_player.heos_avr_2|entity_picture
 {% endraw %}

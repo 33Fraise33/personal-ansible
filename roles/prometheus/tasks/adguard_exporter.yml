@@ -5,6 +5,11 @@
     image: ghcr.io/henrywhitaker3/adguard-exporter:latest
     networks:
       - name: monitoring
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
     env:
       ADGUARD_SERVERS: "http://{{ dns_servers.adguard.home.ip }},http://{{ dns_servers.adguard.dco.ip }}"
       ADGUARD_USERNAMES: "fraise,fraise"

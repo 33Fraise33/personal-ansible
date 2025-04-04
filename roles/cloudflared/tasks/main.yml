@@ -11,6 +11,11 @@
     image: cloudflare/cloudflared:latest
     networks:
       - name: "{{ cloudflared.docker_network }}"
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
     command: tunnel --no-autoupdate run --token {{ cloudflared.service_token }}
     restart: true
     restart_policy: always

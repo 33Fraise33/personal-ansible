@@ -21,6 +21,11 @@
     image: nginx:alpine
     networks:
       - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
     volumes:
       - "{{ docker.dir.config }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
     user: "{{ nobody.user }}:{{ nobody.group }}"

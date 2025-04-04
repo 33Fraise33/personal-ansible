@@ -53,7 +53,7 @@
       UNBOUND_UID: "{{ nobody.user }}"
       UNBOUND_GID: "{{ nobody.group }}"
     volumes:
-      #- "{{ docker.dir.config }}/unbound/lancache/scripts/output/unbound/:/usr/local/unbound/conf.d/:ro"
+      # - "{{ docker.dir.config }}/unbound/lancache/scripts/output/unbound/:/usr/local/unbound/conf.d/:ro"
       - "{{ docker.dir.config }}/unbound/conf.d/:/usr/local/unbound/conf.d/:ro"
       - "{{ docker.dir.config }}/unbound/unbound.conf:/usr/local/unbound/unbound.conf:ro"
     restart: true

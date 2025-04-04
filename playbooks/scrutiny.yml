@@ -18,4 +18,3 @@
     - role: scrutiny
   vars:
     scrutiny_collector: true
-    
