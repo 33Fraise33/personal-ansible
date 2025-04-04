@@ -29,7 +29,10 @@
       - "{{ dns_servers.adguard.home.ip }}"
     volumes:
       - "{{ docker.dir.config }}/prometheus_blackbox/blackbox.yml:/blackbox.yml:ro"
-    command: "--config.file=/blackbox.yml"
+    command:
+      - "--config.file=/blackbox.yml"
+      - "--log.level=info"
+      - "--log.prober=warn"
     restart: true
     restart_policy: always
     state: started
