@@ -24,3 +24,9 @@
     name: chronyd
     state: restarted
   become: true
+
+- name: Restart alloy  # reload does not work for new unix groups
+  ansible.builtin.systemd:
+    name: alloy
+    state: restarted
+  become: true

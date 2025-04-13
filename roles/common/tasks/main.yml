@@ -51,3 +51,7 @@
         - mounts
   tags: always
   when: mounts is defined
+
+- name: Run alloy config tasks
+  ansible.builtin.import_tasks: 09-alloy.yml
+  tags: alloy

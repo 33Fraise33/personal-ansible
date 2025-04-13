@@ -72,6 +72,7 @@ traefik:
     ip: 10.10.48.151
     ipv6: 2a12:4946:4002:1003::151
 
+loki_host: 2a12:4946:4002:1001::94
 
 dns_servers:
   unbound:
@@ -399,6 +400,10 @@ firewall_sets_all:
     type: ipv6_addr
     elements:
       - 2a12:4946:4002:1003::150/128
+  - name: LOKI_v6
+    type: ipv6_addr
+    elements:
+      - "{{ loki_host }}/128"
 
 firewall_filter_input_all:
   - comment: "Allow SSH"

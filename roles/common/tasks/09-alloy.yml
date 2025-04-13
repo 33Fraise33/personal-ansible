@@ -1,0 +1,56 @@
+---
+- name: Debian based Setup
+  when: ansible_os_family == "Debian"
+  tags: install
+  block:
+    - name: Install dependency packages
+      ansible.builtin.apt:
+        name:
+          - gpg
+        state: present
+    - name: Install grafana gpg key
+      ansible.builtin.get_url:
+        url: https://apt.grafana.com/gpg.key
+        dest: /etc/apt/trusted.gpg.d/grafana.asc
+        mode: "0644"
+    - name: Add grafana repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/grafana.asc] \
+          https://apt.grafana.com stable main"
+        update_cache: true
+    - name: Install alloy
+      ansible.builtin.apt:
+        name:
+          - alloy
+        state: present
+
+- name: Enable and start alloy
+  ansible.builtin.systemd:
+    name: alloy
+    state: started
+    enabled: true
+
+- name: Add alloy to docker group
+  ansible.builtin.user:
+    name: alloy
+    groups: docker
+    append: true
+  when: "'tag_docker' in group_names"
+
+- name: Add alloy to journal group
+  ansible.builtin.user:
+    name: alloy
+    groups: "{{ item }}"
+    append: true
+  loop:
+    - adm
+    - systemd-journal
+
+- name: Copy alloy config
+  ansible.builtin.template:
+    src: "config.alloy.j2"
+    dest: "/etc/alloy/config.alloy"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart alloy

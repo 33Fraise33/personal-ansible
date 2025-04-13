@@ -1,0 +1,73 @@
+// /VAR/LOG
+local.file_match "local_files" {
+    path_targets = [{
+        "__path__" = "/var/log/*.log",
+        instance = constants.hostname,
+    }]
+    sync_period = "5s"
+}
+loki.source.file "log_files" {
+    targets = local.file_match.local_files.targets
+    forward_to = [loki.write.default.receiver]
+}
+// JOURNAL
+loki.source.journal "local_journal" {
+    max_age = "24h0m0s"
+    relabel_rules = discovery.relabel.journal.rules
+    forward_to = [loki.write.default.receiver]
+}
+discovery.relabel "journal" {
+    targets = []
+    rule {
+        target_label = "instance"
+        replacement = constants.hostname
+    }
+    rule {
+        source_labels = ["__journal__systemd_unit"]
+        target_label = "unit"
+    }
+    rule {
+        source_labels = ["__journal__boot_id"]
+        target_label = "boot_id"
+    }
+    rule {
+        source_labels = ["__journal__transport"]
+        target_label = "transport"
+    }
+    rule {
+        source_labels = ["__journal_priority_keyword"]
+        target_label = "level"
+    }
+}
+
+{% if "tag_docker" in group_names %}
+// DOCKER
+discovery.docker "local" {
+    host = "unix:///var/run/docker.sock"
+}
+discovery.relabel "docker" {
+    targets = []
+    rule {
+        target_label = "instance"
+        replacement = constants.hostname
+    }
+    rule {
+        source_labels = ["__meta_docker_container_name"]
+        regex = "/(.*)"
+        target_label = "container"
+    }
+}
+loki.source.docker "default" {
+    host = "unix:///var/run/docker.sock"
+    targets = discovery.docker.local.targets
+    relabel_rules = discovery.relabel.docker.rules
+    forward_to = [loki.write.default.receiver]
+}
+{% endif %}
+
+// LOKI WRITE
+loki.write "default" {
+    endpoint {
+        url = "http://[{{ loki_host }}]:3100/loki/api/v1/push"
+    }
+}

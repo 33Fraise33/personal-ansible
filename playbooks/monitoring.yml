@@ -6,5 +6,7 @@
   roles:
     - role: prometheus
       tags: prometheus
+    - role: loki
+      tags: loki
     - role: grafana
       tags: grafana

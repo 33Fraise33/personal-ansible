@@ -34,7 +34,8 @@ docker:
       ipv6: true
       driver_options:
         parent: ens19.1001
-      hosts: []
+      hosts:
+        loki: 94
     services:
       type: ipvlan
       ipam:

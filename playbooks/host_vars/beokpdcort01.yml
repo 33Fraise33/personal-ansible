@@ -96,6 +96,15 @@ firewall:
           protocol: tcp
           port: "{ 80,443,9100,9323,9342 }"  # http,https,node_exporter,docker_exporter,frr_exporter
         counter: true
+      - comment: "Allow to LOKI"
+        type: ip6
+        source:
+          ip: "@AS211184"
+        destination:
+          ip: "@LOKI_v6"
+          protocol: tcp
+          port: "3100"
+        counter: true
       # DNS
       - comment: "Allow Adguard to Recursive"
         type: ip6
