@@ -5,7 +5,7 @@
     apply:
       tags:
         - setup
-  when: initial_setup == "yes"
+  when: initial_setup|default("no") == "yes"
 
 - name: Gather host facts
   ansible.builtin.setup:

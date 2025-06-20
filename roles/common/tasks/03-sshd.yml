@@ -18,24 +18,5 @@
       line: 'Port 1830'
   notify: Restart sshd
 
-- name: SSHD - Create override folder when vrf configured
-  ansible.builtin.file:
-    state: directory
-    path: /etc/systemd/system/ssh.service.d/
-    mode: "0755"
-    owner: root
-    group: root
-  when: sshd_vrf is defined
-
-- name: SSHD - Override SSHD vrf when configured
-  ansible.builtin.template:
-    src: sshd_override.conf.j2
-    dest: /etc/systemd/system/ssh.service.d/override.conf
-    mode: "0644"
-    group: root
-    owner: root
-  when: sshd_vrf is defined
-  notify: Restart sshd
-
 - name: USER - Flush handlers
   ansible.builtin.meta: flush_handlers

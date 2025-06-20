@@ -26,6 +26,7 @@
       - "data_uisp:/config"
     env:
       TZ: Europe/Brussels
+      QUIET_MODE: "1"
     restart: true
     restart_policy: always
     state: started

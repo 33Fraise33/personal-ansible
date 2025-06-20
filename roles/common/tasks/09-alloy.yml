@@ -3,41 +3,35 @@
   when: ansible_os_family == "Debian"
   tags: install
   block:
-    - name: Install dependency packages
+    - name: ALLOY - Install dependency packages
       ansible.builtin.apt:
         name:
           - gpg
         state: present
-    - name: Install grafana gpg key
+    - name: ALLOY - Install grafana gpg key
       ansible.builtin.get_url:
         url: https://apt.grafana.com/gpg.key
         dest: /etc/apt/trusted.gpg.d/grafana.asc
         mode: "0644"
-    - name: Add grafana repo
+    - name: ALLOY - Add grafana repo
       ansible.builtin.apt_repository:
         repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/grafana.asc] \
           https://apt.grafana.com stable main"
         update_cache: true
-    - name: Install alloy
+    - name: ALLOY - Install alloy
       ansible.builtin.apt:
         name:
           - alloy
         state: present
 
-- name: Enable and start alloy
-  ansible.builtin.systemd:
-    name: alloy
-    state: started
-    enabled: true
-
-- name: Add alloy to docker group
+- name: ALLOY - Add alloy user to docker group
   ansible.builtin.user:
     name: alloy
     groups: docker
     append: true
   when: "'tag_docker' in group_names"
 
-- name: Add alloy to journal group
+- name: ALLOY - Add alloy user to journal group
   ansible.builtin.user:
     name: alloy
     groups: "{{ item }}"
@@ -46,7 +40,24 @@
     - adm
     - systemd-journal
 
-- name: Copy alloy config
+- name: ALLOY - Disable reporting
+  ansible.builtin.lineinfile:
+    path: /etc/default/alloy
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: '^CUSTOM_ARGS='
+      line: 'CUSTOM_ARGS="--disable-reporting=true"'
+  notify: Restart alloy
+
+- name: ALLOY - Enable and start alloy
+  ansible.builtin.systemd:
+    name: alloy
+    state: started
+    daemon_reload: true
+    enabled: true
+
+- name: ALLOY - Copy alloy config
   ansible.builtin.template:
     src: "config.alloy.j2"
     dest: "/etc/alloy/config.alloy"

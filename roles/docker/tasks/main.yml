@@ -89,7 +89,7 @@
     password: "{{ docker.login.password }}"
   tags: docker_login
 
-- name: Ddd default_user to docker group
+- name: Add default_user to docker group
   ansible.builtin.user:
     name: "{{ item }}"
     groups: docker

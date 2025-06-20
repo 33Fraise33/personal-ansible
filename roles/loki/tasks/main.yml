@@ -45,7 +45,7 @@
       - "-config.file=/mnt/config/loki-config.yaml"
       - "-common.storage.filesystem.chunk-directory=/loki/chunks"
       - "-common.path-prefix=/loki"
-      - "-log.level=info"
+      - "-log.level=warn"
       - "-auth.enabled=false"
       - "-common.storage.ring.store=inmemory"
       - "-frontend.encoding=protobuf"

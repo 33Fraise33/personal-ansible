@@ -68,6 +68,6 @@ loki.source.docker "default" {
 // LOKI WRITE
 loki.write "default" {
     endpoint {
-        url = "http://[{{ loki_host }}]:3100/loki/api/v1/push"
+        url = "{{ loki_uri | default('https://loki.frai.se') }}/loki/api/v1/push"
     }
 }

@@ -21,6 +21,8 @@
     env:
       GF_SERVER_ROOT_URL: "https://grafana.frai.se"
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
+      GF_LOG_LEVEL: error
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
     restart: true
     state: started
     restart_policy: always

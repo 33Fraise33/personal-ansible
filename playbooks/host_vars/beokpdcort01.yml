@@ -1,6 +1,5 @@
 ---
-node_exporter_vrf: remotesites
-sshd_vrf: remotesites
+# loki_uri: http://[2a12:4946:4002:1001::94]:3100
 
 firewall_sets_host:
   - name: WAN
@@ -15,6 +14,7 @@ firewall_sets_host:
     type: ipv6_addr
     elements:
       - 2a12:4946:80ed:1::1/128
+      - fe80::/10
 
 firewall_filter_input_host:
   - comment: "Allow BGP from PEERS_v4"
@@ -57,7 +57,7 @@ firewall:
       # WAN
       - comment: "Allow to WAN"
         destination:
-          interface: "@WAN"
+          interface: "{ ens21, vlan770 }"  # ens21 out default, vlan770 out wanvrf
           negate: true
           ip: "@RFC1918"
         counter: true
@@ -66,21 +66,31 @@ firewall:
         source:
           ip: "@AS211184"
         destination:
-          interface: "@WAN"
+          interface: "{ ens21, vlan770 }"  # ens21 out default, vlan770 out wanvrf
+      - comment: "v6 - Allow to AS211184 BEJBEGIA"
+        type: ip6
+        destination:
+          ip: "2a12:4946:4000::/48"
+          interface: wgBEJBEGIA
         counter: true
       # MGMT
       - comment: "Allow from MGMT"
         source:
           ip: "@MGMT"
         counter: true
-      - comment: "Allow from VM to Captain"
+      - comment: "Allow from MGMT"
+        type: ip6
         source:
-          ip: "@VM01"
-        destination:
-          ip: 172.16.33.5
-          port: 1830
-          protocol: tcp
+          ip: "@v6_MGMT"
         counter: true
+      # - comment: "Allow from VM to Captain"
+      #   source:
+      #     ip: "@VM01"
+      #   destination:
+      #     ip: 172.16.33.5
+      #     port: 1830
+      #     protocol: tcp
+      #   counter: true
       # MONITORING
       - comment: "Allow from MONITORING"
         source:
@@ -95,15 +105,6 @@ firewall:
         destination:
           protocol: tcp
           port: "{ 80,443,9100,9323,9342 }"  # http,https,node_exporter,docker_exporter,frr_exporter
-        counter: true
-      - comment: "Allow to LOKI"
-        type: ip6
-        source:
-          ip: "@AS211184"
-        destination:
-          ip: "@LOKI_v6"
-          protocol: tcp
-          port: "3100"
         counter: true
       # DNS
       - comment: "Allow Adguard to Recursive"
@@ -133,14 +134,14 @@ firewall:
       # PROXY/TRAEFIK
       - comment: "Allow to TRAEFIK"
         source:
-          interface: "remotesites"
+          interface: "!=ens21"
         destination:
           ip: "@TRAEFIK"
         counter: true
       - comment: "Allow to TRAEFIK"
         type: ip6
         source:
-          interface: "remotesites"
+          interface: "!=ens21"
         destination:
           ip: "@TRAEFIK_v6"
         counter: true
@@ -241,10 +242,44 @@ firewall:
         destination:
           ip: "@PBS"
         counter: true
+      - comment: "Allow to syncthing udp"
+        source:
+          ip: "@RFC1918"
+        destination:
+          interface: "wg*"
+          protocol: udp
+          port: 22000
+        counter: true
+      - comment: "Allow to syncthing tcp"
+        source:
+          ip: "@RFC1918"
+        destination:
+          interface: wg*
+          protocol: tcp
+          port: 22000
+        counter: true
+      - comment: "Allow to syncthing udp"
+        type: ip6
+        source:
+          ip: "@AS211184"
+        destination:
+          interface: wg*
+          protocol: udp
+          port: 22000
+        counter: true
+      - comment: "Allow to syncthing tcp"
+        type: ip6
+        source:
+          ip: "@AS211184"
+        destination:
+          interface: wg*
+          protocol: tcp
+          port: 22000
+        counter: true
       # NETWORKING
       - comment: "Allow to UNIFI udp - stun, rsyslog"
         source:
-          interface: "remotesites"
+          interface: "wg*"
         destination:
           ip: "@UNIFI"
           protocol: udp
@@ -252,20 +287,12 @@ firewall:
         counter: true
       - comment: "Allow to UNIFI tcp - device comm, web"
         source:
-          interface: "remotesites"
+          interface: "wg*"
         destination:
           ip: "@UNIFI"
           protocol: tcp
           port: "{ 8080, 8443 }"
         counter: true
-      # icmp allowed by default
-      # - comment: "Allow from UISP - icmp"
-      #   source:
-      #     ip: "@UISP"
-      #   destination:
-      #     interface: "remotesites"
-      #     protocol: icmp
-      #   counter: true
       - comment: "Allow from UISP - SNMP, device discovery"
         source:
           ip: "@UISP"
@@ -281,17 +308,24 @@ firewall:
           port: "{ 443, 10001 }"
         counter: true
       # DENY LOG
+      - comment: "Drop AS211184 to wan"
+        counter: true
+        type: ip6
+        destination:
+          interface: "vlan770"
+          ip: "@AS211184"
+        statement: 'drop'
       - comment: "Drop unknown destination addresses returning to default route"
         counter: true
         source:
-          interface: "@WAN"
+          interface: "vlan770"
         destination:
-          interface: "@WAN"
+          interface: "vlan770"
         statement: 'drop'
       - comment: "Drop WAN"
         counter: true
         source:
-          interface: "@WAN"
+          interface: "vlan770"
         statement: 'drop'
       - counter: true
         statement: 'log prefix "DROPPED: " drop'
@@ -301,9 +335,19 @@ firewall:
         source:
           ip: "@RFC1918"
         destination:
-          interface: "@WAN"
+          interface: "vlan770"
           negate: true
           ip: "@RFC1918"
+        counter: true
+      # ip6 saddr <local-prefix>::/64 snat ip6 prefix to <public-prefix>::/64
+      - comment: NPTv6 from prefix without inet
+        type: ip6
+        statement: snat ip6 prefix to 2a12:4946:4002:2::/64
+        source:
+          ip: "2a12:4946:80ed:1::/64"
+        destination:
+          negate: true
+          ip: "2a12:4946:80ed:1::/64"
         counter: true
     dstnat:
       - comment: DNAT to Plex

@@ -1,6 +1,6 @@
 ---
 - name: Setup ACC Server with accweb
-  hosts: accserver
+  hosts: BEJBEGIAVM03
   gather_facts: false
   roles:
     - accserver

@@ -72,8 +72,6 @@ traefik:
     ip: 10.10.48.151
     ipv6: 2a12:4946:4002:1003::151
 
-loki_host: 2a12:4946:4002:1001::94
-
 dns_servers:
   unbound:
     home:
@@ -166,6 +164,10 @@ domain:
     - domain: "scrutiny.frai.se"
       answer: "{{ traefik.dco.ip }}"
     - domain: "scrutiny.frai.se"
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: "loki.frai.se"
+      answer: "{{ traefik.dco.ip }}"
+    - domain: "loki.frai.se"
       answer: "{{ traefik.dco.ipv6 }}"
     # MEDIA
     - domain: "autobrr.frai.se"
@@ -297,11 +299,16 @@ firewall_sets_all:
     type: ipv6_addr
     elements:
       - 2a12:4946:4000::/44
+      - 2a12:4946:80ed:1::2/128
   # AGGREGATES
   - name: MGMT
     type: ipv4_addr
     elements:
       - 10.10.35.0/24  # Wireguard Roadwarrior
+  - name: v6_MGMT
+    type: ipv6_addr
+    elements:
+      - 2a12:4946:4002:0035::/64  # Wireguard Roadwarrior
   - name: DCO_RemoteSites
     type: ipv4_addr
     elements:
@@ -342,9 +349,9 @@ firewall_sets_all:
   - name: TRAEFIK
     type: ipv4_addr
     elements:
-      - 10.10.48.125/32
-      - 10.10.48.151/32
-      - 172.16.48.125/32
+      - "{{ traefik.dco.ip }}/32"
+      - "{{ traefik.home.ip }}/32"
+      - "{{ traefik.media.ip }}/32"
   - name: PORTAINER_AGENTS
     type: ipv4_addr
     elements:
@@ -353,8 +360,9 @@ firewall_sets_all:
   - name: TRAEFIK_v6
     type: ipv6_addr
     elements:
-      - 2a12:4946:4000:1002::125/128
-      - 2a12:4946:4002:1002::125/128
+      - "{{ traefik.dco.ipv6 }}/128"
+      - "{{ traefik.home.ipv6 }}/128"
+      - "{{ traefik.media.ipv6 }}/128"
   - name: DNS
     type: ipv4_addr
     elements:
@@ -400,10 +408,6 @@ firewall_sets_all:
     type: ipv6_addr
     elements:
       - 2a12:4946:4002:1003::150/128
-  - name: LOKI_v6
-    type: ipv6_addr
-    elements:
-      - "{{ loki_host }}/128"
 
 firewall_filter_input_all:
   - comment: "Allow SSH"

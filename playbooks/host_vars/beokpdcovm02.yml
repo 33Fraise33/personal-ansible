@@ -1,11 +1,11 @@
 ---
 interfaces:
-  - name: ens18
+  - name: enp6s18
     description: MAIN
     mode: static
     ip: 10.10.48.35/27
     gateway: 10.10.48.33
-  - name: ens19
+  - name: enp6s19
     description: docker-intf
     mode: manual
 
@@ -35,7 +35,7 @@ docker:
           gateway: "2a12:4946:4002:1003::1"
       ipv6: true
       driver_options:
-        parent: ens19.1003
+        parent: enp6s19.1003
       hosts:
         plex: 150
         traefik: 151

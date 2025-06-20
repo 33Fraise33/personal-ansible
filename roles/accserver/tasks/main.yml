@@ -55,6 +55,15 @@
     src: config.yml.j2
     dest: C:\accweb\config.yml
 
+- name: Allow Ping
+  community.windows.win_firewall_rule:
+    name: ICMP Allow
+    enabled: true
+    state: present
+    action: allow
+    direction: in
+    protocol: icmpv4
+
 - name: Set Firewall rules for acc
   community.windows.win_firewall_rule:
     name: "{{ item.name }}"

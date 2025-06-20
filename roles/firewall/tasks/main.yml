@@ -3,7 +3,6 @@
   ansible.builtin.apt:
     name: nftables
     state: present
-    update_cache: true
   tags: install
 
 - name: Make sure nftables is started and starts on boot
