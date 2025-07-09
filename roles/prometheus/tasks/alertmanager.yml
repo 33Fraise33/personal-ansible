@@ -28,11 +28,16 @@
       - name: monitoring
     volumes:
       - "{{ docker.dir.config }}/prometheus_alertmanager:/etc/alertmanager"
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+      - "--web.external-url=https://alertmanager.frai.se"
     restart: true
     restart_policy: always
     state: started
     pull: true
     labels:
+      traefik.http.routers.alertmanager.rule: "Host(`alertmanager.frai.se`)"
       traefik.http.routers.alertmanager.tls: "true"
       traefik.http.routers.alertmanager.tls.certresolver: "le"
       traefik.http.services.alertmanager.loadbalancer.server.port: "9093"

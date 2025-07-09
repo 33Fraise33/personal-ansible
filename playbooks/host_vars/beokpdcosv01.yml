@@ -3,9 +3,9 @@ interfaces:
   - name: eno1
     description: UNUSED
     mode: manual
-  - name: eno2
-    description: Passthrough
-    mode: manual
+  # - name: eno2
+  #   description: Passthrough
+  #   mode: manual
   - name: eno3
     description: UNUSED
     mode: manual

@@ -12,12 +12,10 @@
     enabled: true
   become: true
 
-- name: Restart networking
-  ansible.builtin.systemd:
-    name: networking
-    enabled: true
-    state: restarted
+- name: Reload networking
+  ansible.builtin.command: ifreload -a
   become: true
+  changed_when: false
 
 - name: Restart chrony
   ansible.builtin.systemd:

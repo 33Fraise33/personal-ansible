@@ -9,5 +9,5 @@
       tags: docker
     - role: portainer
       tags: portainer
-    - role: watchtower
-      tags: watchtower
+    - role: wud
+      tags: wud

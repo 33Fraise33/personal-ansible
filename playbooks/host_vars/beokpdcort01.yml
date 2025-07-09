@@ -57,7 +57,7 @@ firewall:
       # WAN
       - comment: "Allow to WAN"
         destination:
-          interface: "{ ens21, vlan770 }"  # ens21 out default, vlan770 out wanvrf
+          interface: "@WAN"
           negate: true
           ip: "@RFC1918"
         counter: true
@@ -66,7 +66,7 @@ firewall:
         source:
           ip: "@AS211184"
         destination:
-          interface: "{ ens21, vlan770 }"  # ens21 out default, vlan770 out wanvrf
+          interface: "@WAN"
       - comment: "v6 - Allow to AS211184 BEJBEGIA"
         type: ip6
         destination:
@@ -83,14 +83,6 @@ firewall:
         source:
           ip: "@v6_MGMT"
         counter: true
-      # - comment: "Allow from VM to Captain"
-      #   source:
-      #     ip: "@VM01"
-      #   destination:
-      #     ip: 172.16.33.5
-      #     port: 1830
-      #     protocol: tcp
-      #   counter: true
       # MONITORING
       - comment: "Allow from MONITORING"
         source:
@@ -134,14 +126,14 @@ firewall:
       # PROXY/TRAEFIK
       - comment: "Allow to TRAEFIK"
         source:
-          interface: "!=ens21"
+          interface: "!=@WAN"
         destination:
           ip: "@TRAEFIK"
         counter: true
       - comment: "Allow to TRAEFIK"
         type: ip6
         source:
-          interface: "!=ens21"
+          interface: "!=@WAN"
         destination:
           ip: "@TRAEFIK_v6"
         counter: true
@@ -203,14 +195,6 @@ firewall:
           ip: "@Proxmox"
           protocol: tcp
           port: 8006
-        counter: true
-      - comment: "Allow from TRAEFIK to BEJBEGIACN01"
-        source:
-          ip: "@TRAEFIK"
-        destination:
-          ip: "172.16.54.10"
-          protocol: tcp
-          port: 443
         counter: true
       # MEDIA
       - comment: "To Plex Allow"
@@ -312,20 +296,20 @@ firewall:
         counter: true
         type: ip6
         destination:
-          interface: "vlan770"
+          interface: "@WAN"
           ip: "@AS211184"
         statement: 'drop'
       - comment: "Drop unknown destination addresses returning to default route"
         counter: true
         source:
-          interface: "vlan770"
+          interface: "@WAN"
         destination:
-          interface: "vlan770"
+          interface: "@WAN"
         statement: 'drop'
       - comment: "Drop WAN"
         counter: true
         source:
-          interface: "vlan770"
+          interface: "@WAN"
         statement: 'drop'
       - counter: true
         statement: 'log prefix "DROPPED: " drop'
@@ -335,7 +319,7 @@ firewall:
         source:
           ip: "@RFC1918"
         destination:
-          interface: "vlan770"
+          interface: "@WAN"
           negate: true
           ip: "@RFC1918"
         counter: true

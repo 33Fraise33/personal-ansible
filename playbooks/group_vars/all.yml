@@ -113,10 +113,6 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: alertmanager.frai.se
       answer: "{{ traefik.dco.ip }}"
-    - domain: bejbegia.frai.se
-      answer: "{{ traefik.dco.ipv6 }}"
-    - domain: bejbegia.frai.se
-      answer: "{{ traefik.dco.ip }}"
     - domain: prometheus.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: prometheus.frai.se
@@ -168,6 +164,10 @@ domain:
     - domain: "loki.frai.se"
       answer: "{{ traefik.dco.ip }}"
     - domain: "loki.frai.se"
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: "beokpdcosv01.frai.se"
+      answer: "{{ traefik.dco.ip }}"
+    - domain: "beokpdcosv01.frai.se"
       answer: "{{ traefik.dco.ipv6 }}"
     # MEDIA
     - domain: "autobrr.frai.se"
@@ -242,6 +242,18 @@ domain:
     - domain: "syncthing.frai.se"
       answer: "{{ traefik.home.ip }}"
     - domain: "syncthing.frai.se"
+      answer: "{{ traefik.home.ipv6 }}"
+    - domain: "unifi.frai.se"
+      answer: "{{ traefik.home.ip }}"
+    - domain: "unifi.frai.se"
+      answer: "{{ traefik.home.ipv6 }}"
+    - domain: "bejbegiasv01.frai.se"
+      answer: "{{ traefik.home.ip }}"
+    - domain: "bejbegiasv01.frai.se"
+      answer: "{{ traefik.home.ipv6 }}"
+    - domain: "bejbegiart01.frai.se"
+      answer: "{{ traefik.home.ip }}"
+    - domain: "bejbegiart01.frai.se"
       answer: "{{ traefik.home.ipv6 }}"
   external:  # specific ipv4 at the front, no ipv4 = ddclient
     # UNITIX.BE
@@ -415,6 +427,12 @@ firewall_filter_input_all:
       port: 1830
       protocol: tcp
     counter: true
+  - comment: "Allow WUD from MGMT"
+    source:
+      ip: "@MGMT"
+    destination:
+      port: 9103
+      protocol: tcp
   - comment: "Allow node_exporter from MONITORING"
     source:
       ip: "@MONITORING"

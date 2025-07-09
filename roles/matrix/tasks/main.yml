@@ -5,68 +5,88 @@
     name: postgres
   register: result_containerip
 
-- name: Create dendrite config directories
+- name: Create synapse config directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: "0755"
-    owner: "{{ nobody.user }}"
-    group: "{{ nobody.group }}"
+    owner: "991"
+    group: "991"
   loop:
-    - "{{ docker.dir.config }}/dendrite"
-  tags: dendrite
+    - "{{ docker.dir.config }}/synapse"
 
 - name: Copy config template to server
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ docker.dir.config }}/dendrite/{{ item }}"
-    owner: "{{ nobody.user }}"
-    group: "{{ nobody.group }}"
-    mode: "0755"
-  tags: dendrite, config
+    dest: "{{ docker.dir.config }}/synapse/{{ item }}"
+    mode: "0644"
+  tags: config
   loop:
-    - matrix_key.pem
-    - server.crt
-    - server.key
-    - old_synapse_key.pem
-    - dendrite.yaml
+    - frai.se.signing.key
+    - homeserver.yaml
+    - frai.se.log.config
 
-- name: Create a new database with name "dendrite"
+- name: Create a new database with name "synapse"
   community.general.postgresql_db:
-    name: dendrite
+    name: synapse
     login_host: "{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
+    # required for synapse
     encoding: UTF-8
     lc_collate: C
     lc_ctype: C
     template: template0
   delegate_to: localhost
   become: false
-  tags: dendrite
 
-- name: Create a volume for persistent media and jetstream
+- name: Create matrix postgres user
+  community.general.postgresql_user:
+    name: "{{ matrix_postgres_user }}"
+    password: "{{ matrix_postgres_pass }}"
+    login_db: synapse
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+  delegate_to: localhost
+  become: false
+
+- name: Set matrix postgres permissions
+  community.general.postgresql_privs:
+    roles: "{{ matrix_postgres_user }}"
+    privs: ALL
+    type: "{{ item.type }}"
+    login_db: synapse
+    objs: "{{ item.objs }}"
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+  delegate_to: localhost
+  become: false
+  loop:
+    - type: database
+      objs: "{{ omit }}"
+    - type: schema
+      objs: "public"
+
+- name: Create a volume for persistent media
   community.docker.docker_volume:
     name: "{{ item }}"
   loop:
-    - data_dendrite_media
-    - data_dendrite_jetstream
+    - data_synapse_media
 
-- name: Set permissions to data volume for jetstream
+- name: Set permissions to data volume for synapse
   ansible.builtin.file:
-    path: "{{ docker.dir.data }}/docker/volumes/{{ item }}/_data"
+    path: "{{ docker.dir.data }}/docker/volumes/data_synapse_media/_data"
     state: directory
     mode: "0755"
-    owner: "{{ nobody.user }}"
-    group: "{{ nobody.group }}"
-  loop:
-    - data_dendrite_media
-    - data_dendrite_jetstream
+    owner: "991"
+    group: "991"
 
-- name: Start dendrite docker container
+- name: Start synapse docker container
   community.docker.docker_container:
     name: matrix
-    image: matrixdotorg/dendrite-monolith:latest
+    image: ghcr.io/element-hq/synapse:latest
     networks:
       - name: services
     dns_servers:
@@ -75,120 +95,27 @@
       - "{{ dns_servers.adguard.home.ipv6 }}"
       - "{{ dns_servers.adguard.home.ip }}"
     volumes:
-      - "{{ docker.dir.config }}/dendrite:/etc/dendrite"
-      - "data_dendrite_media:/var/dendrite/media"
-      - "data_dendrite_jetstream:/jetstream"
-    user: "{{ nobody.user }}:{{ nobody.group }}"
-    command:
-      - "--tls-cert=server.crt"
-      - "--tls-key=server.key"
+      - "{{ docker.dir.config }}/synapse:/data"
+      - "data_synapse_media:/data/media"
+    healthcheck:
+      test: ["CMD", "curl", "-fSs", "http://localhost:8008/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     restart: true
     restart_policy: always
-    state: started
+    state: healthy
     pull: true
     labels:
-      traefik.http.routers.dendrite.rule: "Host(`{{ matrix_base_url }}`)"
-      traefik.http.routers.dendrite.tls: "true"
-      traefik.http.routers.dendrite.tls.certresolver: "le"
-      traefik.http.services.dendrite.loadbalancer.server.port: "8008"
-  tags: dendrite,config
+      traefik.http.routers.synapse.rule: "Host(`{{ matrix_base_url }}`)"
+      traefik.http.routers.synapse.tls: "true"
+      traefik.http.routers.synapse.tls.certresolver: "le"
+      traefik.http.services.synapse.loadbalancer.server.port: "8008"
 
-#### USE dendrite instead of synapse
-
-# - name: create matrix config directories
-#   file:
-#     path: "{{ item }}"
-#     state: directory
-#     mode: 0755
-#     owner: "{{ nobody.user }}"
-#     group: "{{ nobody.group }}"
-#     recurse: yes
-#   loop:
-#     - "{{ docker.dir.config }}/synapse"
-#     - "{{ docker.dir.config }}/matrix-bridges"
-#   tags: synapse
-
-# - name: Copy config template to server
-#   template:
-#     src: homeserver.yaml.j2
-#     dest: "{{ docker.dir.config }}/synapse/homeserver.yaml"
-#     owner: "{{ nobody.user }}"
-#     group: "{{ nobody.group }}"
-#     mode: 0755
-#   tags: synapse, config
-
-# - name: Copy logging config to server
-#   copy:
-#     src: frai.se.log.config
-#     dest: "{{ docker.dir.config }}/synapse/fpostgresrai.se.log.config"
-#     owner: "{{ nobody.user }}"
-#     group: "{{ nobody.group }}"
-#     mode: 0755
-#   tags: synapse, config
-
-# - name: Create a new database with name "synapse"
-#   community.general.postgresql_db:
-#     name: synapse
-#     login_host: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.postgres }}"
-#     login_password: "{{ postgres_password }}"
-#     login_user: "{{ postgres_user }}"
-#     encoding: UTF-8
-#     lc_collate: C
-#     lc_ctype: C
-#     template: template0
-#   tags: synapse
-
-# - name: Create a volume for synapse content
-#   docker_volume:
-#     name: data_synapse
-
-# - name: Start synapse docker container
-#   community.docker.docker_container:
-#     name: synapse
-#     image: matrixdotorg/synapse:latest
-#     networks:
-#       - name: macvlan333
-#         ipv4_address: "{{ docker.network.ipv4_prefix }}{{ docker.network.hosts.synapse}}"
-#         ipv6_address: "{{ docker.network.ipv6_prefix }}{{ docker.network.hosts.synapse}}"
-##     volumes:
-#       - "{{ docker.dir.config }}/synapse:/config"
-#       - "data_synapse:/data"
-#       - "{{ docker.dir.config }}/matrix-bridges:/bridges"
-#     user: "{{ nobody.user }}:{{ nobody.group }}"
-#     env:
-#       SYNAPSE_CONFIG_DIR: "/config"
-#       TZ: "Europe/Brussels"
-#     restart: yes
-#     restart_policy: always
-#     state: started
-#     pull: true
-#     labels:
-#       traefik.http.routers.synapse.rule: "Host(`{{ matrix_base_url }}`)"
-#       traefik.http.routers.synapse.tls: "true"
-#       traefik.http.routers.synapse.tls.certresolver: "le"
-#       traefik.http.services.synapse.loadbalancer.server.port: "8008"
-#   tags: synapse,config
-
-# - name: wait for container to be healthy
-#   pause:
-#     seconds: 70
-#   tags: synapse
-
-# - name: create admin user
-#   command: docker exec synapse bash -l -c "register_new_matrix_user -c \
-# /config/homeserver.yaml -u {{ synapse_admin }} -p {{ synapse_admin_password }} -a https://{{ matrix_base_url }}"
-#   tags: synapse
-#   ignore_errors: true
-
-# not running these anymore
-# - import_tasks: coturn.yaml
-#   tags: coturn
-
-# - import_tasks: maubot.yaml
-#   tags: maubot
-
-# - import_tasks: telegram.yaml
-#   tags: telegram,bridges
-
-# - import_tasks: whatsapp.yaml
-#   tags: whatsapp,bridges
+- name: Create admin user
+  ansible.builtin.command: docker exec matrix bash -l -c "register_new_matrix_user -c \
+    /data/homeserver.yaml -u {{ matrix_admin }} -p {{ matrix_admin_password }} -a https://{{ matrix_base_url }}"
+  failed_when: false
+  changed_when: true
+  tags: never,createadmin

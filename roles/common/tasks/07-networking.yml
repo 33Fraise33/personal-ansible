@@ -8,7 +8,6 @@
     - "net.ipv4.ip_forward"
     - "net.ipv6.conf.default.forwarding"
     - "net.ipv6.conf.all.forwarding"
-    - "net.ipv4.udp_l3mdev_accept"
 
 - name: NETWORKING - Template interface file
   ansible.builtin.template:
@@ -17,5 +16,5 @@
     owner: root
     group: root
     mode: "0644"
-  notify: Restart networking
+  notify: Reload networking
   when: interfaces is defined and interfaces != ""

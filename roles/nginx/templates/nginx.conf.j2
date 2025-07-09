@@ -16,11 +16,15 @@ http {
     }
 
     location /.well-known/matrix/client {
-      # If your sever_name here doesn't match your matrix homeserver URL
-      # (e.g. hostname.com as server_name and matrix.hostname.com as homeserver URL)
       add_header Access-Control-Allow-Origin *;
 
       return 200 '{"m.homeserver": {"base_url": "https://{{ matrix_base_url }}"} }';
+    }
+
+    location /.well-known/matrix/support {
+      add_header Access-Control-Allow-Origin *;
+
+      return 200 '{"contacts": [{"email_address": "matrix-support@frai.se","matrix_id": "@gianni:frai.se","role": "m.role.admin"}]}';
     }
   }
   client_body_temp_path /tmp/client_temp;

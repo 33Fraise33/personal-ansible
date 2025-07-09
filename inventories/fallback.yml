@@ -1,0 +1,13 @@
+---
+all:
+  children:
+    frr:
+      children:
+        beokpdco:
+    platform_debian_12:
+      children:
+        beokpdco:
+    beokpdco:
+      hosts:
+        beokpdcort01:
+          ansible_host: 10.10.48.0

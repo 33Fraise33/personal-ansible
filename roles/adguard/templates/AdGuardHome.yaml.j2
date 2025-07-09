@@ -173,16 +173,6 @@ filtering:
     - domain: {{ rewrite.domain }}
       answer: {{ rewrite.answer }}
 {% endfor %}
-{% for rewrite in traefik_custom_rules %}
-    - domain: {{ rewrite.name }}.frai.se
-      answer: {{ traefik.dco.ip }}
-    - domain: {{ rewrite.name }}.frai.se
-      answer: {{ traefik.dco.ipv6 }}
-    - domain: {{ rewrite.name }}.frai.se
-      answer: {{ traefik.home.ip }}
-    - domain: {{ rewrite.name }}.frai.se
-      answer: {{ traefik.home.ipv6 }}
-{% endfor %}
   safe_fs_patterns:
     - /opt/adguardhome/work/data/userfilters/*
   safebrowsing_cache_size: 1048576

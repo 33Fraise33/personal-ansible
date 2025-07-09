@@ -41,7 +41,7 @@
 - name: Setup prometheus docker container
   community.docker.docker_container:
     name: prometheus
-    image: prom/prometheus:v3.2.1
+    image: prom/prometheus:v3.4.2
     networks:
       - name: monitoring
     dns_servers:
@@ -60,7 +60,6 @@
     restart: true
     restart_policy: always
     state: started
-    pull: true
     labels:
       traefik.http.routers.prometheus.tls: "true"
       traefik.http.routers.prometheus.tls.certresolver: "le"

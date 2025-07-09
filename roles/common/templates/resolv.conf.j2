@@ -1,4 +1,7 @@
 #{{ ansible_managed }}
+options rotate
+options timeout:1
+options attempts:1
 {% for server in dns.servers %}
 nameserver {{ server }}
 {% endfor %}

@@ -1,0 +1,33 @@
+---
+- name: WUD - Set up container
+  community.docker.docker_container:
+    name: wud
+    image: ghcr.io/getwud/wud:latest
+    networks:
+      - name: host
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    healthcheck:
+      test: curl --fail http://localhost:${WUD_SERVER_PORT:-3000}/health || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    env:
+      WUD_SERVER_PORT: "9103"
+      WUD_WATCHER_LOCAL_CRON: "33 5 * * *"
+      WUD_TRIGGER_DOCKER_UPGRADEANY_AUTO: "true"
+      WUD_TRIGGER_APPRISE_NOTIFYANY_AUTO: "true"
+      WUD_TRIGGER_APPRISE_NOTIFYANY_SIMPLETITLE: "{{ inventory_hostname }}: Container update for ${container.name}"
+      WUD_TRIGGER_APPRISE_NOTIFYANY_SIMPLEBODY:
+        '${container.updateKind.kind} ${container.updateKind.localValue} can be updated to
+        ${container.updateKind.kind} ${container.updateKind.remoteValue}${container.result
+        && container.result.link ? "\\n" + container.result.link : ""}'
+      WUD_TRIGGER_APPRISE_NOTIFYANY_URL: "https://apprise.frai.se"
+      WUD_TRIGGER_APPRISE_NOTIFYANY_CONFIG: "docker"
+    restart: true
+    state: healthy
+    restart_policy: always
+    pull: true
+    labels:
+      traefik.enable: "false"

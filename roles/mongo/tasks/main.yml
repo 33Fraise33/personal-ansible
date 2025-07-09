@@ -23,6 +23,5 @@
     restart: true
     restart_policy: always
     state: started
-    pull: true
     labels:
       traefik.enable: "false"
