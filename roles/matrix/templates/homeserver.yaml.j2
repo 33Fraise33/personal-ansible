@@ -91,3 +91,18 @@ url_preview_ip_range_blacklist:
   - fec0::/10
   - 2a12:4946:4000::/44
 # vim:ft=yaml
+
+experimental_features:
+  msc3861:
+    enabled: true
+
+    # Synapse will call `{issuer}/.well-known/openid-configuration` to get the OIDC configuration
+    issuer: https://mas.frai.se/
+
+    client_id: 0000000000000000000SYNAPSE
+    client_auth_method: client_secret_basic
+    # Matches the `client_secret` in the auth service config
+    client_secret: "{{ matrix_mas_client_secret }}"
+
+    # Matches the `matrix.secret` in the auth service config
+    admin_token: "{{ matrix_mas_matrix_secret }}"

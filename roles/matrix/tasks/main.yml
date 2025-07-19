@@ -83,6 +83,10 @@
     owner: "991"
     group: "991"
 
+- name: Setup mas
+  ansible.builtin.import_tasks: mas.yml
+  tags: mas
+
 - name: Start synapse docker container
   community.docker.docker_container:
     name: matrix
@@ -110,6 +114,7 @@
     labels:
       traefik.http.routers.synapse.rule: "Host(`{{ matrix_base_url }}`)"
       traefik.http.routers.synapse.tls: "true"
+      traefik.http.routers.synapse.priority: "50"
       traefik.http.routers.synapse.tls.certresolver: "le"
       traefik.http.services.synapse.loadbalancer.server.port: "8008"
 

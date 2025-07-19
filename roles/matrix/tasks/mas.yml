@@ -1,0 +1,102 @@
+---
+- name: Create mas config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ nobody.user }}"
+    group: "{{ nobody.group }}"
+  loop:
+    - "{{ docker.dir.config }}/mas"
+
+- name: Copy config template to server
+  ansible.builtin.template:
+    src: "mas-config.yaml.j2"
+    dest: "{{ docker.dir.config }}/mas/config.yaml"
+    mode: "0644"
+  tags: config
+
+- name: Get postgres container ip
+  community.docker.docker_container_info:
+    name: postgres
+  register: result_containerip
+
+- name: Create a new database with name "mas"
+  community.general.postgresql_db:
+    name: mas
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+    encoding: UTF-8
+    lc_collate: C
+    lc_ctype: C
+    template: template0
+  delegate_to: localhost
+  become: false
+
+- name: Create mas postgres user
+  community.general.postgresql_user:
+    name: "{{ matrix_mas_postgres_user }}"
+    password: "{{ matrix_mas_postgres_pass }}"
+    login_db: synapse
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+  delegate_to: localhost
+  become: false
+
+- name: Set mas postgres permissions
+  community.general.postgresql_privs:
+    roles: "{{ matrix_mas_postgres_user }}"
+    privs: ALL
+    type: "{{ item.type }}"
+    login_db: mas
+    objs: "{{ item.objs }}"
+    login_host: "{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+  delegate_to: localhost
+  become: false
+  loop:
+    - type: database
+      objs: "{{ omit }}"
+    - type: schema
+      objs: "public"
+
+- name: Start matrix mas docker container
+  community.docker.docker_container:
+    name: mas
+    image: ghcr.io/element-hq/matrix-authentication-service:latest
+    networks:
+      - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+    volumes:
+      - "{{ docker.dir.config }}/mas/config.yaml:/config.yaml"
+      - "{{ docker.dir.config }}/synapse/homeserver.yaml:/homeserver.yaml"
+    env:
+      MAS_CONFIG: /config.yaml
+    # healthcheck:
+    #   test: http://[::1]:8081/health
+    #   interval: 15s
+    #   timeout: 5s
+    #   retries: 3
+    #   start_period: 5s
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      # Default mas rule
+      traefik.http.routers.mas.tls: "true"
+      traefik.http.routers.mas.tls.certresolver: "le"
+      traefik.http.services.mas.loadbalancer.server.port: "8080"
+      # --- Router 2: Legacy fallback paths for Matrix domain (High Priority) ---
+      traefik.http.routers.matrix-auth-fallback.rule: "Host(`{{ matrix_base_url }}`) && PathRegexp(`^/_matrix/client/.*/(login|logout|refresh)`)"
+      # Higher priority ensures this rule is checked before synapse
+      traefik.http.routers.matrix-auth-fallback.priority: "100"
+      traefik.http.routers.matrix-auth-fallback.tls: "true"
+      traefik.http.routers.matrix-auth-fallback.service: mas

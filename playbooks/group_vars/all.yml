@@ -133,6 +133,10 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: matrix.frai.se
       answer: "{{ traefik.dco.ip }}"
+    - domain: mas.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: mas.frai.se
+      answer: "{{ traefik.dco.ip }}"
     - domain: netbox.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: netbox.frai.se
