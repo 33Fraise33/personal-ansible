@@ -1,0 +1,74 @@
+http:
+  public_base: https://mas.frai.se/
+  issuer: https://mas.frai.se/
+  listeners:
+  - name: web
+    resources:
+    - name: discovery
+    - name: human
+    - name: oauth
+    - name: compat
+    - name: graphql
+    - name: assets
+    binds:
+    - address: '[::]:8080'
+    proxy_protocol: false
+  - name: internal
+    resources:
+    - name: health
+    binds:
+    - host: localhost
+      port: 8081
+    proxy_protocol: false
+  trusted_proxies:
+  - 192.168.0.0/16
+  - 172.16.0.0/12
+  - 10.0.0.0/10
+  - 127.0.0.1/8
+  - fd00::/8
+  - ::1/128
+database:
+  host: postgres
+  port: 5432
+  username: "{{ matrix_mas_postgres_user }}"
+  password: "{{ matrix_mas_postgres_pass }}"
+  database: mas
+  
+email:
+  from: '"Authentication Service" <root@localhost>'
+  reply_to: '"Authentication Service" <root@localhost>'
+  transport: blackhole
+secrets:
+  encryption: {{ matrix_mas_encryption_secret }}
+  keys:
+  - kid: ktlF6uiQFC
+    key: |
+      {{ matrix_mas_key1 }}
+  - kid: f2iZHauDGX
+    key: |
+      {{ matrix_mas_key2 }}
+  - kid: f3EWl3eBfV
+    key: |
+      {{ matrix_mas_key3 }}
+  - kid: WPnqS5FCAP
+    key: |
+      {{ matrix_mas_key4 }}
+passwords:
+  enabled: true
+  schemes:
+  - version: 1
+    algorithm: bcrypt
+    unicode_normalization: true
+  - version: 2
+    algorithm: argon2id
+  minimum_complexity: 3
+matrix:
+  kind: synapse
+  homeserver: frai.se
+  secret: "{{ matrix_mas_matrix_secret }}"
+  endpoint: https://matrix.frai.se/
+
+clients:
+  - client_id: 0000000000000000000SYNAPSE
+    client_auth_method: client_secret_basic
+    client_secret: "{{ matrix_mas_client_secret }}"
