@@ -1,0 +1,11 @@
+---
+groups:
+  - name: node.rules
+    rules:
+      - alert: ZFS Zpool State Issue
+        expr: node_zfs_zpool_state{state!="online"} == 1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Device {{ $labels.node_name }} ZFS pool {{ $labels.zpool }} state is now {{ $labels.state }}"
