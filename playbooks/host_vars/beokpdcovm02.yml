@@ -3,8 +3,9 @@ interfaces:
   - name: enp6s18
     description: MAIN
     mode: static
-    ip: 10.10.48.35/27
-    gateway: 10.10.48.33
+    addresses:
+      - ip: 10.10.48.35/27
+        gateway: 10.10.48.33
   - name: enp6s19
     description: docker-intf
     mode: manual

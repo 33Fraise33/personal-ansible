@@ -1,0 +1,8 @@
+---
+- name: Setup PBS
+  hosts:
+    - tag_pbs
+  connection: ssh
+  become: true
+  roles:
+    - pbs

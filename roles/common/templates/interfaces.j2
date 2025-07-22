@@ -14,10 +14,12 @@ iface {{ intf.name }} inet {{ intf.mode }}
 iface {{ intf.name }} inet6 auto
 {%  endif %}
 {%  if intf.mode == "static" %}
-	address {{ intf.ip }}
-{%    if intf.gateway is defined %}
-	gateway {{ intf.gateway }}
-{%    endif%}
+{%    for addr_obj in intf.addresses | default([]) %}
+	address {{ addr_obj.ip }}
+{%      if addr_obj.gateway is defined %}
+	gateway {{ addr_obj.gateway }}
+{%      endif%}
+{%    endfor %}
 {%    if intf.dns is defined %}
 	dns-nameservers {{ intf.dns }}
 {%    endif%}

@@ -31,8 +31,9 @@ interfaces:
     description: MGMT Vlan
     # do not set to dhcp, after reboot there will be boot issues, idk why
     mode: static
-    ip: 172.16.33.3/24
-    gateway: 172.16.33.1
+    addresses:
+      - ip: 172.16.33.3/24
+        gateway: 172.16.33.1
     vlan:
       device: vmbr0
       id: 33
