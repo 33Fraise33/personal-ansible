@@ -28,7 +28,7 @@
 - name: Setup unifi docker container
   community.docker.docker_container:
     name: unifi
-    image: lscr.io/linuxserver/unifi-network-application:latest
+    image: quay.io/linuxserver.io/unifi-network-application:latest
     networks:
       - name: networking
         ipv4_address: "{{ docker.networks.networking.ipam[0].subnet \

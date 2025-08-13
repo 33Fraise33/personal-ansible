@@ -9,7 +9,7 @@
 - name: Start valkey docker container
   community.docker.docker_container:
     name: valkey
-    image: valkey/valkey:alpine
+    image: ghcr.io/valkey-io/valkey:alpine
     networks:
       - name: services
     dns_servers:

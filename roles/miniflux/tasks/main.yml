@@ -20,7 +20,7 @@
 - name: Setup miniflux docker container
   community.docker.docker_container:
     name: miniflux
-    image: miniflux/miniflux:latest
+    image: ghcr.io/miniflux/miniflux:latest
     networks:
       - name: services
     dns_servers:

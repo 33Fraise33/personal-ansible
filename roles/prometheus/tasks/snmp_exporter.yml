@@ -25,7 +25,7 @@
 - name: Setup prometheus snmp generator
   community.docker.docker_container:
     name: prometheus-snmp-generator
-    image: prom/snmp-generator:latest
+    image: quay.io/prometheus/snmp-generator:latest
     volumes:
       - "{{ docker.dir.config }}/prometheus_snmp:/opt"
     restart: true
@@ -42,7 +42,7 @@
 - name: Setup prometheus snmp exporter
   community.docker.docker_container:
     name: prometheus-snmp_exporter
-    image: prom/snmp-exporter:latest
+    image: quay.io/prometheus/snmp-exporter:latest
     networks:
       - name: monitoring
     dns_servers:

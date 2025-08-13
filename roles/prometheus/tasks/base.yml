@@ -41,7 +41,7 @@
 - name: Setup prometheus docker container
   community.docker.docker_container:
     name: prometheus
-    image: prom/prometheus:v3.5.0
+    image: quay.io/prometheus/prometheus:v3.5.0
     networks:
       - name: monitoring
     dns_servers:

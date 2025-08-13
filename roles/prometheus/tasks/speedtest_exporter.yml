@@ -2,7 +2,7 @@
 - name: Setup prometheus speedtest exporter
   community.docker.docker_container:
     name: prometheus-speedtest_exporter
-    image: miguelndecarvalho/speedtest-exporter:latest
+    image: ghcr.io/miguelndecarvalho/speedtest-exporter:latest
     networks:
       - name: monitoring
     healthcheck:

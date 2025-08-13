@@ -19,7 +19,7 @@
 - name: Setup prometheus blackbox exporter
   community.docker.docker_container:
     name: prometheus-blackbox_exporter
-    image: prom/blackbox-exporter:latest
+    image: quay.io/prometheus/blackbox-exporter:latest
     networks:
       - name: monitoring
     dns_servers:

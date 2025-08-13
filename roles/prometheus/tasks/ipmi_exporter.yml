@@ -18,7 +18,7 @@
 - name: Setup prometheus ipmi exporter
   community.docker.docker_container:
     name: prometheus-ipmi_exporter
-    image: prometheuscommunity/ipmi-exporter:latest
+    image: quay.io/prometheuscommunity/ipmi-exporter:latest
     networks:
       - name: monitoring
     dns_servers:
