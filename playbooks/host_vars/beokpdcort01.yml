@@ -15,6 +15,10 @@ firewall_sets_host:
     elements:
       - 2a12:4946:80ed:1::1/128
       - fe80::/10
+  - name: v6_NPTv6_HOME
+    type: ipv6_addr
+    elements:
+      - 2a02:578:856d:1e00::/56  # EDPNET
 
 firewall_filter_input_host:
   - comment: "Allow BGP from PEERS_v4"
@@ -129,6 +133,13 @@ firewall:
           interface: "!=@WAN"
         destination:
           ip: "@TRAEFIK"
+        counter: true
+      - comment: "Allow to TRAEFIK from NPTv6"
+        type: ip6
+        source:
+          ip: "@v6_NPTv6_HOME"
+        destination:
+          ip: "@TRAEFIK_v6"
         counter: true
       - comment: "Allow to TRAEFIK"
         type: ip6
