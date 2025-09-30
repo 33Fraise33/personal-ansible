@@ -226,6 +226,10 @@ domain:
       answer: "{{ traefik.media.ipv6 }}"
     - domain: sabnzbd.frai.se
       answer: "{{ traefik.media.ip }}"
+    - domain: tdarr.frai.se
+      answer: "{{ traefik.media.ipv6 }}"
+    - domain: tdarr.frai.se
+      answer: "{{ traefik.media.ip }}"
     # HOME
     - domain: "ha.frai.se"
       answer: "{{ traefik.home.ip }}"

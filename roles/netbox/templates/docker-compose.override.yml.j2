@@ -31,20 +31,6 @@ services:
       - "{{ dns_servers.adguard.home.ip }}"
     labels:
       traefik.enable: "false"
-  netbox-housekeeping:
-    image: netbox:latest-plugins
-    build:
-      context: .
-      dockerfile: Dockerfile-Plugins
-      network: host
-    restart: always
-    dns:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
-    labels:
-      traefik.enable: "false"
   postgres: !reset null
   redis: !reset null
   redis-cache: !reset null

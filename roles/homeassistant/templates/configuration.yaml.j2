@@ -52,18 +52,6 @@ cover:
           {% endif %}
         {% endraw %}
 
-sensor:
-  - platform: afvalbeheer
-    wastecollector: RecycleApp
-    resources:
-      - restafval
-      - gft
-      - papier
-      - pmd
-    postcode: 8490
-    streetname: Eernegemweg
-    streetnumber: 96
-
 {% raw %}
 alarm_control_panel:
   - platform: template

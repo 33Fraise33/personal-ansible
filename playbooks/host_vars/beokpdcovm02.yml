@@ -12,10 +12,7 @@ interfaces:
 
 mounts:
   - mountpoint: /data/media
-    source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
-    fs: ext4
-  - mountpoint: /data/media/incomplete
-    source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi3
+    source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi4
     fs: ext4
 docker:
   login:

@@ -9,7 +9,7 @@
 - name: ZWAVE - Setup zwavejs docker container
   community.docker.docker_container:
     name: zwavejs
-    image: zwavejs/zwave-js-ui:latest
+    image: ghcr.io/zwave-js/zwave-js-ui:latest
     networks:
       - name: services
     dns_servers:
@@ -20,7 +20,7 @@
     volumes:
       - "data_zwavejs:/usr/src/app/store"
     devices:
-      - "/dev/serial/by-id/usb-0658_0200-if00:/dev/zwave"
+      - "/dev/serial/by-id/usb-Nabu_Casa_ZWA-2_1020BA73250C-if00:/dev/zwave"
     restart: true
     restart_policy: always
     state: started
