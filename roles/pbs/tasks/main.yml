@@ -1,0 +1,20 @@
+---
+- name: Debian based Setup
+  when: ansible_os_family == "Debian"
+  tags: install
+  block:
+    - name: PBS - Add proxmox repo
+      ansible.builtin.deb822_repository:
+        name: pbs-no-subscription
+        types: deb
+        uris: https://download.proxmox.com/debian/pbs
+        suites: bookworm
+        signed_by: https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg
+        components:
+          - pbs-no-subscription
+    - name: PBS - Install PBS
+      ansible.builtin.apt:
+        update_cache: true
+        name:
+          - proxmox-backup-server
+        state: present

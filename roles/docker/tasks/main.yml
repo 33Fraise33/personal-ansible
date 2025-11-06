@@ -10,20 +10,18 @@
           - curl
           - gnupg
         state: present
-    - name: Install docker gpg key
-      ansible.builtin.get_url:
-        url: https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
-        dest: /etc/apt/trusted.gpg.d/docker.asc
-        mode: "0644"
-    - name: Add docker repo
-      ansible.builtin.apt_repository:
-        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.asc] \
-          https://download.docker.com/linux/\
-          {{ ansible_distribution | lower }} \
-          {{ ansible_distribution_release }} stable"
-        update_cache: true
+    - name: Add Docker repo
+      ansible.builtin.deb822_repository:
+        name: docker
+        types: deb
+        uris: https://download.docker.com/linux/{{ ansible_distribution | lower }}
+        suites: "{{ ansible_distribution_release }}"
+        components: stable
+        architectures: amd64
+        signed_by: https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
     - name: Install docker
       ansible.builtin.apt:
+        update_cache: true
         name:
           - docker-ce
           - docker-ce-cli
