@@ -34,6 +34,7 @@
     - nftables.d/postrouting.conf
     - nftables.d/prerouting.conf
   tags: ruleset
+  register: ruleset_update
 
 - name: Check if nftables config is valid
   ansible.builtin.command: "nft --check --file /etc/nftables.conf"
@@ -43,4 +44,5 @@
 - name: Install nftables rules
   ansible.builtin.command: "nft -f /etc/nftables.conf"
   changed_when: true
+  when: ruleset_update.changed
   tags: ruleset

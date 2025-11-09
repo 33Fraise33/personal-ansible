@@ -20,11 +20,13 @@
     state: started
     enabled: true
 
-- name: DATE - Set timeserver to config
-  ansible.builtin.lineinfile:
-    path: "/etc/chrony/chrony.conf"
-    regexp: '^pool'
-    line: "pool {{ ntp }} iburst"
+- name: DATE - Set Chrony config
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    mode: "0644"
+    owner: root
+    group: root
   notify: Restart chrony
 
 - name: DATE - Flush handlers

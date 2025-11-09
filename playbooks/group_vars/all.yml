@@ -23,7 +23,11 @@ nobody:
   group: "65534"
   user: "65534"
 
-ntp: time.cloudflare.com
+ntp:
+  - 0.be.pool.ntp.org
+  - 0.europe.pool.ntp.org
+  - 1.be.pool.ntp.org
+  - 2.be.pool.ntp.org
 
 docker_login:
   username: 33fraise33

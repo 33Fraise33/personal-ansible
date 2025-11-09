@@ -1,21 +1,23 @@
-- name: NODE_EXPORTER - Download node_exporter binary to local folder
-  ansible.builtin.get_url:
-    url: "https://github.com/prometheus/node_exporter/releases/download/\
-      v{{ node_exporter_version }}/\
-      node_exporter-{{ node_exporter_version }}\
-      .linux-amd64.tar.gz"
-    dest: "/tmp/node_exporter-latest.linux-amd64.tar.gz"
-    mode: '0644'
+---
+- name: NODE_EXPORTER - Download node_exporter to localhost
   delegate_to: localhost
   become: false
+  check_mode: false
+  block:
+    - name: NODE_EXPORTER - Download node_exporter binary to local folder
+      ansible.builtin.get_url:
+        url: "https://github.com/prometheus/node_exporter/releases/download/\
+          v{{ node_exporter_version }}/\
+          node_exporter-{{ node_exporter_version }}\
+          .linux-amd64.tar.gz"
+        dest: "/tmp/node_exporter-latest.linux-amd64.tar.gz"
+        mode: '0644'
 
-- name: NODE_EXPORTER - Unpack node_exporter binary
-  ansible.builtin.unarchive:
-    src: "/tmp/node_exporter-latest.linux-amd64.tar.gz"
-    dest: "/tmp"
-    creates: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
-  delegate_to: localhost
-  become: false
+    - name: NODE_EXPORTER - Unpack node_exporter binary
+      ansible.builtin.unarchive:
+        src: "/tmp/node_exporter-latest.linux-amd64.tar.gz"
+        dest: "/tmp"
+        creates: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
 
 - name: NODE_EXPORTER - Copy the node_exporter systemd service file
   ansible.builtin.template:

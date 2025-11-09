@@ -5,6 +5,7 @@
     value: '1'
     state: present
     reload: true
+    sysctl_file: /etc/sysctl.d/20-memory.conf
 
 - name: Start valkey docker container
   community.docker.docker_container:

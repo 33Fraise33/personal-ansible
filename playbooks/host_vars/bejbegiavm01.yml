@@ -56,18 +56,6 @@ docker:
         unbound: 123
         adguard: 124
         traefik: 125
-    media:
-      type: ipvlan
-      ipam:
-        - subnet: '172.16.48.128/27'
-          gateway: '172.16.48.129'
-        - subnet: "2a12:4946:4000:1003::/64"
-          gateway: "2a12:4946:4000:1003::1"
-      ipv6: true
-      driver_options:
-        parent: ens19.1003
-      hosts:
-        plex: 150
 
 portainer:
   type: agent
