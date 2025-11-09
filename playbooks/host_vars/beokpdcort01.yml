@@ -273,16 +273,12 @@ firewall:
         counter: true
       # NETWORKING
       - comment: "Allow to UNIFI udp - stun, rsyslog"
-        source:
-          interface: "wg*"
         destination:
           ip: "@UNIFI"
           protocol: udp
           port: "{ 3478, 5514 }"
         counter: true
       - comment: "Allow to UNIFI tcp - device comm, web"
-        source:
-          interface: "wg*"
         destination:
           ip: "@UNIFI"
           protocol: tcp
@@ -350,5 +346,19 @@ firewall:
         destination:
           port: 32400
           protocol: tcp
+          ip: 31.24.249.70
+        counter: true
+      - comment: DNAT to unifi - inform
+        statement: dnat to 10.10.48.190
+        destination:
+          port: 8080
+          protocol: tcp
+          ip: 31.24.249.70
+        counter: true
+      - comment: DNAT to unifi - STUN
+        statement: dnat to 10.10.48.190
+        destination:
+          port: 3478
+          protocol: udp
           ip: 31.24.249.70
         counter: true

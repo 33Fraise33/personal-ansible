@@ -107,7 +107,7 @@ domain:
     - domain: wireguard.frai.se
       answer: 31.24.249.70
     - domain: inform.unitix.be
-      answer: "10.10.48.190"
+      answer: 10.10.48.190
     # DCO
     - domain: postiz.unitix.gg
       answer: "{{ traefik.dco.ipv6 }}"
@@ -274,7 +274,7 @@ domain:
       ipv4: "31.24.249.70"
       domain: unitix.be
     - name: inform
-      ipv4: "10.10.48.190"
+      ipv4: "31.24.249.70"
       domain: unitix.be
     # FRAI.SE
     - name: wireguard
