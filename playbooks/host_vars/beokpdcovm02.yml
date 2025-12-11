@@ -38,8 +38,7 @@ docker:
         plex: 150
         traefik: 151
 
-traefik:
-  network: media
+traefik_network: media
 
 firewall_filter_input_host:
   - comment: "Allow portainer_agent"

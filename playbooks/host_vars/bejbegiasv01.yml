@@ -12,7 +12,7 @@ interfaces:
   - name: bond0
     description: LACP
     mode: manual
-    mtu: 9216
+    mtu: 9000
     bond:
       mode: 802.3ad
       slaves:
@@ -21,7 +21,7 @@ interfaces:
   - name: vmbr0
     description: Main Bridge
     mode: manual
-    mtu: 9216
+    mtu: 9000
     bridge:
       ports: bond0
       stp: "off"
