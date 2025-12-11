@@ -6,7 +6,7 @@ http:
   session_ttl: 720h
 users:
   - name: fraise
-    password: {{ adguard_password | string | password_hash('bcrypt') }}
+    password: {{ adguard_password }}
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
@@ -45,6 +45,7 @@ dns:
   trusted_proxies:
     - 127.0.0.0/8
     - ::1/128
+  cache_enabled: true
   cache_size: 4194304
   cache_ttl_min: 0
   cache_ttl_max: 0
@@ -172,6 +173,7 @@ filtering:
 {% for rewrite in domain.internal %}
     - domain: {{ rewrite.domain }}
       answer: {{ rewrite.answer }}
+      enabled: true
 {% endfor %}
   safe_fs_patterns:
     - /opt/adguardhome/work/data/userfilters/*
@@ -182,6 +184,7 @@ filtering:
   filters_update_interval: 24
   blocked_response_ttl: 10
   filtering_enabled: true
+  rewrites_enabled: true
   parental_enabled: false
   safebrowsing_enabled: false
   protection_enabled: true
@@ -206,4 +209,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 29
+schema_version: 31

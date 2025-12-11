@@ -13,10 +13,10 @@
     networks:
       - name: services
     dns_servers:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
       - "{{ dns_servers.adguard.home.ipv6 }}"
       - "{{ dns_servers.adguard.home.ip }}"
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
     volumes:
       - "data_zwavejs:/usr/src/app/store"
     devices:

@@ -31,7 +31,7 @@
       - "{{ docker.dir.config }}/prometheus_blackbox/blackbox.yml:/blackbox.yml:ro"
     command:
       - "--config.file=/blackbox.yml"
-      - "--log.level=info"
+      - "--log.level=warn"
       - "--log.prober=warn"
     restart: true
     restart_policy: always

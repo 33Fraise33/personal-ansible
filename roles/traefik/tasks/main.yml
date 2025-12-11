@@ -26,7 +26,7 @@
 
 - name: Set network var
   ansible.builtin.set_fact:
-    traefik_network: "{{ traefik.network | default('services') }}"
+    traefik_network: "{{ traefik_network | default('services') }}"
 
 - name: Setup traefik docker container
   community.docker.docker_container:
