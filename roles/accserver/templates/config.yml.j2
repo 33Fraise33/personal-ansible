@@ -23,7 +23,7 @@ webserver:
 auth:
   # Set the session duration (Default value is 20 minutes).
   # duration documentation can be found at https://pkg.go.dev/time#ParseDuration
-  timeout: 60m
+  timeout: 20m
 
   # Set the admin, moderator and read only user password.
   # accweb won't start without an admin password.
@@ -57,3 +57,11 @@ loglevel: info
 cors:
   origins: "*"
   loglevel: info
+
+log:
+  with_timestamp: true
+
+# Event System configuration.
+# More info: https://github.com/assetto-corsa-web/accweb/wiki/Event-System
+callback:
+  enabled: false

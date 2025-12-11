@@ -115,10 +115,10 @@
       protocol: tcp
   tags: firewall
 
-- name: Install Visual C thingy
-  ansible.windows.win_package:
-    path: https://aka.ms/vs/16/release/vc_redist.x64.exe
-    arguments:
-      - /install
-      - /passive
-      - /norestart
+# - name: Install Visual C thingy
+#   ansible.windows.win_package:
+#     path: https://aka.ms/vs/16/release/vc_redist.x64.exe
+#     arguments:
+#       - /install
+#       - /passive
+#       - /norestart

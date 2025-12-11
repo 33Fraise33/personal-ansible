@@ -2,7 +2,7 @@
 steam:
   user: buggyfreak2
 accweb:
-  version: 1.25.1
+  version: 1.26.0
   users:
     admin: !vault |
       $ANSIBLE_VAULT;1.1;AES256

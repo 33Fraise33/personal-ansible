@@ -64,6 +64,8 @@ traefik_custom_rules:
     target: https://10.10.48.10:8006/
   - name: bejbegiasv01
     target: https://172.16.33.3:8006/
+  - name: accweb
+    target: http://172.16.33.6
 
 traefik:
   home:
@@ -266,6 +268,10 @@ domain:
     - domain: "bejbegiart01.frai.se"
       answer: "{{ traefik.home.ip }}"
     - domain: "bejbegiart01.frai.se"
+      answer: "{{ traefik.home.ipv6 }}"
+    - domain: "accweb.frai.se"
+      answer: "{{ traefik.home.ip }}"
+    - domain: "accweb.frai.se"
       answer: "{{ traefik.home.ipv6 }}"
   external:  # specific ipv4 at the front, no ipv4 = ddclient
     # UNITIX.BE
