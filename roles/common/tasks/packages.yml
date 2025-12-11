@@ -1,0 +1,93 @@
+---
+- name: PACKAGES - Make sure debian repositories exist
+  when: ansible_os_family == "Debian"
+  ansible.builtin.deb822_repository:
+    name: debian
+    types: deb
+    uris: https://deb.debian.org/debian/
+    suites:
+      - trixie
+      - trixie-updates
+    components:
+      - main
+      - contrib
+      - non-free-firmware
+    architectures: amd64
+    signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
+
+- name: PACKAGES - Make sure debian-security repositories exist
+  when: ansible_os_family == "Debian"
+  ansible.builtin.deb822_repository:
+    name: debian-security
+    types: deb
+    uris: https://security.debian.org/debian-security/
+    suites:
+      - trixie-security
+    components:
+      - main
+      - contrib
+      - non-free-firmware
+    architectures: amd64
+    signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
+
+- name: PACKAGES - Make sure pve repositories exist
+  when: "'platform_proxmox' in group_names"
+  ansible.builtin.deb822_repository:
+    name: pve
+    types: deb
+    uris: http://download.proxmox.com/debian/pve
+    suites: trixie
+    components: pve-no-subscription
+    architectures: amd64
+    signed_by: /usr/share/keyrings/proxmox-archive-keyring.gpg
+
+- name: PACKAGES - Make sure enterprise repository does not exist
+  when: "'platform_proxmox' in group_names"
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/{{ item }}.sources
+    state: absent
+  loop:
+    - pve-enterprise
+    - ceph
+
+- name: Run debian tasks
+  when: ansible_os_family == "Debian"
+  block:
+    - name: PACKAGES - Update apt cache so packages are available to download
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: PACKAGES - Install default packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - fail2ban
+          - gdu
+          - git
+          - htop
+          - ifupdown2
+          - net-tools
+          - nfs-common
+          - nmap
+          - mtr
+          - parted
+          - python3-pip
+          - qemu-guest-agent
+          - traceroute
+          - tcpdump
+          - vim
+
+    - name: PACKAGES - Enable qemu guest agent
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        state: started
+        enabled: true
+      when: vm | default(true)
+
+    - name: PACKAGES - uninstall cloud-init
+      ansible.builtin.apt:
+        state: absent
+        name:
+          - cloud-init
+          - netplan.io
+        purge: true

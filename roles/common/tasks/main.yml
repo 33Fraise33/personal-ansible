@@ -12,40 +12,40 @@
   tags: always
 
 - name: Run hostname tasks
-  ansible.builtin.import_tasks: 01-hostname.yml
+  ansible.builtin.import_tasks: hostname.yml
   tags: hostname
 
 - name: Run date tasks
-  ansible.builtin.import_tasks: 02-date.yml
+  ansible.builtin.import_tasks: date.yml
   tags: date
 
-- name: Run sshd tasks
-  ansible.builtin.import_tasks: 03-sshd.yml
-  tags: sshd,ssh
-
-- name: Run user tasks
-  ansible.builtin.import_tasks: 03-users.yml
-  tags: users
-
 - name: Run package tasks
-  ansible.builtin.import_tasks: 04-packages.yml
+  ansible.builtin.import_tasks: packages.yml
   tags: packages
 
+- name: Run user tasks
+  ansible.builtin.import_tasks: users.yml
+  tags: users
+
+- name: Run sshd tasks
+  ansible.builtin.import_tasks: sshd.yml
+  tags: sshd,ssh
+
 - name: Run dns tasks
-  ansible.builtin.import_tasks: 05-dns.yml
+  ansible.builtin.import_tasks: dns.yml
   tags: dns
 
 - name: Run node_exporter tasks
-  ansible.builtin.import_tasks: 06-node_exporter.yml
+  ansible.builtin.import_tasks: node_exporter.yml
   tags: node_exporter
 
 - name: Run networking tasks
-  ansible.builtin.import_tasks: 07-networking.yml
+  ansible.builtin.import_tasks: networking.yml
   tags: networking
 
 - name: Run mounts tasks
   ansible.builtin.include_tasks:
-    file: 08-mounts.yml
+    file: mounts.yml
     apply:
       tags:
         - mounts
@@ -53,5 +53,9 @@
   when: mounts is defined
 
 - name: Run alloy config tasks
-  ansible.builtin.import_tasks: 09-alloy.yml
+  ansible.builtin.import_tasks: alloy.yml
   tags: alloy
+
+- name: Run action1 config tasks
+  ansible.builtin.import_tasks: action1.yml
+  tags: action1

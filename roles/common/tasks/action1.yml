@@ -1,0 +1,14 @@
+---
+- name: Debian based Setup
+  when: ansible_os_family == "Debian"
+  tags: install
+  block:
+    - name: ACTION1 - Download deb package
+      ansible.builtin.get_url:
+        url: "{{ action1_url }}"
+        dest: /tmp/action1.deb
+        mode: '0644'
+
+    - name: ACTION1 - Install package
+      ansible.builtin.apt:
+        deb: /tmp/action1.deb
