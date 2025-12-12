@@ -41,7 +41,7 @@
 
 - name: Run networking tasks
   ansible.builtin.import_tasks: networking.yml
-  tags: networking
+  tags: networking,interfaces,ifupdown2,interface
 
 - name: Run mounts tasks
   ansible.builtin.include_tasks:

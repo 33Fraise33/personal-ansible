@@ -1,0 +1,61 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+auto lo
+iface lo inet loopback
+# Loopback interface
+
+{% for intf in interfaces %}
+{% if not intf.mgmt_only %}
+auto {{ intf.name }}
+iface {{ intf.name }} inet {{ 'static' if intf.ip_addresses|length>0 else 'manual' }}
+{%  for addr_obj in intf.ip_addresses %}
+{%    if addr_obj.address is not none %}
+	address {{ addr_obj.address }}
+{%      if (addr_obj.address | ansible.utils.ipaddr('address')) == primary_ip4 %}
+	gateway {{ addr_obj.address | ansible.utils.ipaddr('subnet') | ansible.utils.ipaddr('net') | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
+{%      endif%}
+{%    endif%}
+{%  endfor %}
+{%  if intf.mtu is not none %}
+	mtu {{ intf.mtu }}
+{%  endif %}
+{%  if intf.type is not none and intf.type.value == 'bridge' %}
+{%    set bridge_ports = [] %}
+{%    for b_intf in interfaces %}
+{%      if b_intf.bridge is not none and b_intf.bridge.name == intf.name %}
+{{    bridge_ports.append(b_intf.name) }}
+{%      endif %}
+{%    endfor %}
+	bridge-ports {{ bridge_ports|join(' ')}}
+	bridge-stp off
+	bridge-fd 0
+{%    if intf.mode is not none and intf.mode.value == 'tagged-all' %}
+	bridge-vlan-aware yes
+	bridge-vids 2-4094
+{%    endif %}
+{%  endif %}
+{%  if intf.mode is not none and intf.mode.value == 'access' %}
+	vlan-id {{ intf.untagged_vlan.vid }}
+	vlan-raw-device {{ intf.parent.name }}
+{%  endif %}
+{%  if intf.type is not none and intf.type.value == 'lag' %}
+{%    set lag_ports = [] %}
+{%    for l_intf in interfaces %}
+{%      if l_intf.lag is not none and l_intf.lag.name == intf.name %}
+{{    lag_ports.append(l_intf.name) }}
+{%      endif %}
+{%    endfor %}
+	bond-slaves {{ lag_ports | join(" ") }}
+	bond-mode 802.3ad
+	bond-miimon 100
+	bond-xmit-hash-policy layer3+4
+{%  endif %}
+{%  if intf.description != "" or intf.connected_endpoints is not none %}
+# {{ intf.description if intf.description!= "" else (intf.connected_endpoints[0].device.name + '-' + intf.connected_endpoints[0].name) }}
+{%  endif%}
+
+{% endif %}
+{% endfor %}

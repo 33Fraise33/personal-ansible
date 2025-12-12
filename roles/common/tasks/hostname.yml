@@ -1,12 +1,16 @@
 ---
+- name: HOSTNAME - Sanitize hostname
+  ansible.builtin.set_fact:
+    common_sanitized_hostname: "{{ inventory_hostname | lower | replace('_', '-') }}"
+
 - name: HOSTNAME - Update hostname
   ansible.builtin.hostname:
-    name: "{{ inventory_hostname | lower | replace('_', '-') }}"
+    name: "{{ common_sanitized_hostname }}"
 
 - name: HOSTNAME - Set in /etc/hosts
   ansible.builtin.lineinfile:
     path: /etc/hosts
-    regexp: '^{{ static_ip | default("127.0.1.1") }}'
-    line: '{{ static_ip | default("127.0.1.1") }}
-      {{ inventory_hostname | lower | replace("_", "-") }}.{{ dns.domain }}
-      {{ inventory_hostname | lower | replace("_", "-") }}'
+    regexp: '{{ common_sanitized_hostname }}'
+    line: '{{ primary_ip4 }}
+      {{ common_sanitized_hostname }}.{{ dns.domain }}
+      {{ common_sanitized_hostname }}'

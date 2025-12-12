@@ -13,7 +13,7 @@
 
 - name: NETWORKING - Template interface file
   ansible.builtin.template:
-    src: interfaces.j2
+    src: "{{ 'netbox_interfaces' if netbox_interface | default(false) else 'interfaces' }}.j2"
     dest: /etc/network/interfaces
     owner: root
     group: root
