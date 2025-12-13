@@ -11,6 +11,9 @@ iface lo inet loopback
 {% if not intf.mgmt_only %}
 auto {{ intf.name }}
 iface {{ intf.name }} inet {{ 'static' if intf.ip_addresses|length>0 else 'manual' }}
+{% if intf.enabled is not none and not intf.enabled %}
+	link-down yes
+{% endif %}
 {%  for addr_obj in intf.ip_addresses %}
 {%    if addr_obj.address is not none %}
 	address {{ addr_obj.address }}
@@ -25,11 +28,9 @@ iface {{ intf.name }} inet {{ 'static' if intf.ip_addresses|length>0 else 'manua
 {%  if intf.type is not none and intf.type.value == 'bridge' %}
 {%    set bridge_ports = [] %}
 {%    for b_intf in interfaces %}
-{%      if b_intf.bridge is not none and b_intf.bridge.name == intf.name %}
-{{    bridge_ports.append(b_intf.name) }}
-{%      endif %}
+{%      if b_intf.bridge is not none and b_intf.bridge.name == intf.name %}{{ bridge_ports.append(b_intf.name) }}{% endif %}
 {%    endfor %}
-	bridge-ports {{ bridge_ports|join(' ')}}
+	bridge-ports {{ bridge_ports|join(' ') if bridge_ports|length > 0 else 'none' }}
 	bridge-stp off
 	bridge-fd 0
 {%    if intf.mode is not none and intf.mode.value == 'tagged-all' %}
@@ -44,9 +45,7 @@ iface {{ intf.name }} inet {{ 'static' if intf.ip_addresses|length>0 else 'manua
 {%  if intf.type is not none and intf.type.value == 'lag' %}
 {%    set lag_ports = [] %}
 {%    for l_intf in interfaces %}
-{%      if l_intf.lag is not none and l_intf.lag.name == intf.name %}
-{{    lag_ports.append(l_intf.name) }}
-{%      endif %}
+{%      if l_intf.lag is not none and l_intf.lag.name == intf.name %}{{ lag_ports.append(l_intf.name) }}{% endif %}
 {%    endfor %}
 	bond-slaves {{ lag_ports | join(" ") }}
 	bond-mode 802.3ad
