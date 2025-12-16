@@ -1,0 +1,7 @@
+- name: Setup PVE
+  hosts:
+    - platform_proxmox
+  connection: ssh
+  become: true
+  roles:
+    - pve

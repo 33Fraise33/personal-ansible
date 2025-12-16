@@ -1,0 +1,40 @@
+---
+- name: PACKAGES - Install microcode
+  ansible.builtin.package:
+    name: "{{ 'amd64-microcode' if 'amd' in (ansible_facts['processor'] | lower) else 'intel-microcode' }}"
+    state: present
+
+- name: STORAGE - Create ZFS Pool
+  community.general.zpool:
+    name: "{{ item.pool }}"
+    filesystem_properties:
+      compression: lz4
+    pool_properties:
+      ashift: 12
+    vdevs: "{{ item.vdevs }}"
+  loop: "{{ zfs | default([]) }}"
+  register: result
+  failed_when:  # see https://github.com/ansible-collections/community.general/issues/10771
+    - result.rc != 0
+    - '"contains a unknown filesystem" not in result.stderr'
+
+- name: Add ZFS Thin Provisioned Storage to Proxmox
+  community.proxmox.proxmox_storage:
+    api_host: "{{ ansible_host }}"
+    api_user: root@pam
+    api_token_id: ansible
+    api_token_secret: "{{ pve_api_key }}"
+    name: zfs-{{ inventory_hostname | lower | replace('_', '-') }}-{{ item.pool }}
+    type: zfspool
+    state: present
+    nodes:
+      - "{{ inventory_hostname | lower | replace('_', '-') }}"
+    content:
+      - images
+      - rootdir
+    zfspool_options:
+      pool: "{{ item.pool }}"
+      # sparse: 1  # not supported, see: https://github.com/ansible-collections/community.proxmox/issues/215
+  loop: "{{ zfs | default([]) }}"
+  delegate_to: localhost
+  become: false

@@ -7,3 +7,4 @@ psycopg2-binary  # needed to create postgres database
 pywinrm  # needed to manage windows hosts
 netaddr  # needed for ansible.utils.ipaddr
 bcrypt  # needed for adguard password hash
+proxmoxer  # needed for proxmox modules
