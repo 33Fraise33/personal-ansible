@@ -19,7 +19,7 @@
     group: root
     mode: "0644"
   notify: Reload networking
-  when: interfaces is defined and interfaces != ""
+  when: interfaces is defined and interfaces is not none and interfaces != ""
 
 - name: NETWORKING - Flush handlers
   ansible.builtin.meta: flush_handlers

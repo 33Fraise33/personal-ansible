@@ -5,23 +5,63 @@ flush ruleset
 table inet filter {
 
         include "/etc/nftables.d/sets.conf"
+        set v6_flood_blacklist {
+                type ipv6_addr
+                flags dynamic, timeout
+                timeout 60m   # How long a subnet stays banned
+                size 65535
+        }
+
+        set v6_icmp_meter {
+                type ipv6_addr
+                flags dynamic
+                size 65535
+        }
+
+        set v6_ssh_meter {
+                type ipv6_addr
+                flags dynamic
+                size 65535
+        }
+        
 
         chain INPUT {
                 type filter hook input priority 0; policy accept;
+                ip6 saddr & ffff:ffff:ffff:: @v6_flood_blacklist counter drop
                 iif "lo" accept
                 ct state established,related accept
                 meta l4proto icmp accept comment "Allow ICMP"
+		ip6 saddr != @AS211184 icmpv6 type echo-request \
+			add @v6_icmp_meter { ip6 saddr & ffff:ffff:ffff:: limit rate over 5/second burst 10 packets } \
+			add @v6_flood_blacklist { ip6 saddr & ffff:ffff:ffff:: } \
+			log prefix "ICMPv6 Flood Blocked: " \
+			drop
                 icmpv6 type { echo-request, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert } accept comment "Allow ICMP"
+                ip6 saddr != @AS211184 tcp dport { 22,1830 } \
+                        add @v6_ssh_meter { ip6 saddr & ffff:ffff:ffff:: limit rate over 5/second burst 10 packets } \
+			add @v6_flood_blacklist { ip6 saddr & ffff:ffff:ffff:: } \
+			log prefix "SSH Flood Blocked: " \
+			drop
 
                 include "/etc/nftables.d/input.conf"
         }
 
         chain FORWARD {
                 type filter hook forward priority 0; policy accept;
-
+                ip6 saddr & ffff:ffff:ffff:: @v6_flood_blacklist counter drop
                 ct state established,related accept
                 meta l4proto icmp accept comment "Allow ICMP"
+		ip6 saddr != @AS211184 icmpv6 type echo-request \
+			add @v6_icmp_meter { ip6 saddr & ffff:ffff:ffff:: limit rate over 5/second burst 10 packets } \
+			add @v6_flood_blacklist { ip6 saddr & ffff:ffff:ffff:: } \
+			log prefix "ICMPv6 Flood Blocked: " \
+			drop
                 icmpv6 type { echo-request, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert } accept comment "Allow ICMP"
+                ip6 saddr != @AS211184 tcp dport { 22,1830 } \
+                        add @v6_ssh_meter { ip6 saddr & ffff:ffff:ffff:: limit rate over 5/second burst 10 packets } \
+			add @v6_flood_blacklist { ip6 saddr & ffff:ffff:ffff:: } \
+			log prefix "SSH Flood Blocked: " \
+			drop
 
                 include "/etc/nftables.d/forward.conf"
         }
@@ -45,3 +85,14 @@ table inet nat {
                 include "/etc/nftables.d/postrouting.conf"
         }
 }
+
+{% if firewall.raw is defined %}
+table inet raw {
+
+        chain PREROUTING {
+                type filter hook prerouting priority -300;
+
+                include "/etc/nftables.d/raw-prerouting.conf"
+        }
+}
+{% endif %}

@@ -1,6 +1,6 @@
 ---
 - name: Debian based Setup
-  when: ansible_os_family == "Debian"
+  when: ansible_facts["os_family"] == "Debian"
   tags: install
   block:
     - name: ACTION1 - Download deb package

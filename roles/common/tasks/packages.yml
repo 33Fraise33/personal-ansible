@@ -1,6 +1,6 @@
 ---
 - name: PACKAGES - Make sure debian repositories exist
-  when: ansible_os_family == "Debian"
+  when: ansible_facts["os_family"] == "Debian"
   ansible.builtin.deb822_repository:
     name: debian
     types: deb
@@ -16,7 +16,7 @@
     signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
 
 - name: PACKAGES - Make sure debian-security repositories exist
-  when: ansible_os_family == "Debian"
+  when: ansible_facts["os_family"] == "Debian"
   ansible.builtin.deb822_repository:
     name: debian-security
     types: deb
@@ -51,7 +51,7 @@
     - ceph
 
 - name: Run debian tasks
-  when: ansible_os_family == "Debian"
+  when: ansible_facts["os_family"] == "Debian"
   block:
     - name: PACKAGES - Update apt cache so packages are available to download
       ansible.builtin.apt:
@@ -82,7 +82,7 @@
         name: qemu-guest-agent
         state: started
         enabled: true
-      when: vm | default(true)
+      when: qemu_guest_agent | default(true)
 
     - name: PACKAGES - uninstall cloud-init
       ansible.builtin.apt:

@@ -1,6 +1,6 @@
 ---
 ip_forwarding: false
-vm: false
+qemu_guest_agent: false
 
 firewall_filter_input_proxmox:
   - comment: "Allow PVE web"

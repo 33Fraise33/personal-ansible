@@ -1,19 +1,4 @@
 ---
-interfaces:
-  - name: ens18
-    description: main-interface
-    mtu: 9000
-    mode: static
-    addresses:
-      - ip: 172.16.33.5/24
-        gateway: 172.16.33.1
-      - ip: 2a12:4946:4000:33::5/64
-        gateway: 2a12:4946:4000:33::1
-  - name: ens19
-    mtu: 9000
-    description: docker-interface
-    mode: manual
-
 mounts:
   - mountpoint: /data/
     source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
@@ -49,8 +34,8 @@ docker:
       ipam:
         - subnet: '172.16.48.64/27'
           gateway: '172.16.48.65'
-        - subnet: "2a12:4946:4000:1001::/64"
-          gateway: "2a12:4946:4000:1001::1"
+        - subnet: "2001:678:1080:1201::/64"
+          gateway: "2001:678:1080:1201::1"
       ipv6: true
       driver_options:
         parent: ens19.1001
@@ -60,8 +45,8 @@ docker:
       ipam:
         - subnet: '172.16.48.96/27'
           gateway: '172.16.48.97'
-        - subnet: "2a12:4946:4000:1002::/64"
-          gateway: "2a12:4946:4000:1002::1"
+        - subnet: "2001:678:1080:1202::/64"
+          gateway: "2001:678:1080:1202::1"
       ipv6: true
       driver_options:
         parent: ens19.1002

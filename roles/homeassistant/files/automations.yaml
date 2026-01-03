@@ -1,39 +1,25 @@
 - id: '1578943797763'
   alias: 'Notification: Garbage Collection'
   description: ''
-  trigger:
+  triggers:
   - at: '18:45:00'
-    platform: time
-  condition:
-  - condition: or
+    trigger: time
+  conditions:
+  - condition: not
     conditions:
-    - condition: numeric_state
-      attribute: Days_until
-      below: '2'
-      above: '0'
-      entity_id: sensor.recycleapp_restafval
-    - condition: numeric_state
-      attribute: Days_until
-      below: '2'
-      above: '0'
-      entity_id: sensor.recycleapp_pmd
-    - condition: numeric_state
-      below: '2'
-      attribute: Days_until
-      above: '0'
-      entity_id: sensor.recycleapp_papier
-  action:
-  - service: notify.notify
-    data:
+    - condition: state
+      entity_id: sensor.tomorrow
+      state:
+      - None
+  actions:
+  - data:
       title: AFVAL
-      message: '{% if is_state_attr(''sensor.recycleapp_restafval'', ''Days_until'',
-        1) %} Restafval {% endif %} {% if is_state_attr(''sensor.recycleapp_pmd'',
-        ''Days_until'', 1) %} PMD {% endif %} {% if is_state_attr(''sensor.recycleapp_papier'',
-        ''Days_until'', 1) %} Papier {% endif %}
+      message: '{{ states(''sensor.tomorrow'') }}
 
         '
       data:
         icon_url: https://i.pinimg.com/originals/86/d9/27/86d92784a2c535e3bd783aec01bd1475.png
+    action: notify.notify
   mode: single
 - id: '1617014339885'
   alias: 'Notification: Garage Open'
@@ -203,22 +189,22 @@
 - id: '1695750254929'
   alias: 'Automation: Lights off outside'
   description: ''
-  trigger:
-  - platform: sun
-    event: sunrise
+  triggers:
+  - event: sunrise
     id: '1'
-  - platform: time
-    at: '22:30:00'
+    trigger: sun
+  - at: '22:30:00'
     id: '2'
-  - platform: time
-    at: 08:00:00
+    trigger: time
+  - at: 08:00:00
     id: '3'
-  - platform: state
-    entity_id:
-    - binary_sensor.motion_sensor_motion_detection
+    trigger: time
+  - entity_id:
+    - binary_sensor.sp816_motion_sensor_motion_detection
     to: 'off'
     id: '4'
-  condition:
+    trigger: state
+  conditions:
   - condition: or
     conditions:
     - condition: and
@@ -234,7 +220,7 @@
       - '1'
       - '2'
       - '3'
-  action:
+  actions:
   - type: turn_off
     device_id: 5a7e24120c207c869bb3bf761cb438df
     entity_id: b87e6e421ad0896f5896243b85567a30
@@ -243,22 +229,60 @@
 - id: '1699559709033'
   alias: 'Automation: Light On Outside'
   description: ''
-  trigger:
-  - platform: sun
-    event: sunset
-  - platform: time
-    at: 06:30:00
-  - platform: state
-    entity_id:
-    - binary_sensor.motion_sensor_motion_detection
+  triggers:
+  - event: sunset
+    trigger: sun
+  - at: 06:30:00
+    trigger: time
+  - entity_id:
+    - binary_sensor.sp816_motion_sensor_motion_detection
     to: 'on'
-  condition:
+    trigger: state
+  conditions:
   - condition: sun
     before: sunrise
     after: sunset
-  action:
+  actions:
   - type: turn_on
     device_id: 5a7e24120c207c869bb3bf761cb438df
     entity_id: b87e6e421ad0896f5896243b85567a30
     domain: switch
+  mode: single
+- id: '1744783651686'
+  alias: 'Automation: Speaker Sync'
+  triggers:
+  - entity_id:
+    - media_player.kitchen_1
+    attribute: volume_level
+    trigger: state
+  actions:
+  - data_template:
+      entity_id: '{% set changed_entity = trigger.entity_id %} {% set entities = [''media_player.kitchen_2'']
+        %} {{ entities | reject(''equalto'', changed_entity) | list }}
+
+        '
+      volume_level: '{{ state_attr(trigger.entity_id, ''volume_level'') }}'
+    action: media_player.volume_set
+  mode: single
+- id: '1765702822999'
+  alias: Fingerprint
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - event.deurbel_fingerprint
+    attribute: event_type
+    to:
+    - identified
+  conditions: []
+  actions:
+  - action: notify.mobile_app_pixel_9_pro_xl
+    metadata: {}
+    data:
+      message: Test
+  - action: alarm_control_panel.alarm_disarm
+    metadata: {}
+    target:
+      entity_id: alarm_control_panel.ultrasync_alarm
+    data: {}
   mode: single

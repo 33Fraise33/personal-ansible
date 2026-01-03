@@ -1,6 +1,6 @@
 ---
 - name: Debian based Setup
-  when: ansible_os_family == "Debian"
+  when: ansible_facts["os_family"] == "Debian"
   tags: install
   block:
     - name: Install docker dependency packages
@@ -14,11 +14,11 @@
       ansible.builtin.deb822_repository:
         name: docker
         types: deb
-        uris: https://download.docker.com/linux/{{ ansible_distribution | lower }}
-        suites: "{{ ansible_distribution_release }}"
+        uris: https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }}
+        suites: "{{ ansible_facts['distribution_release'] }}"
         components: stable
         architectures: amd64
-        signed_by: https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
+        signed_by: https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }}/gpg
     - name: Install docker
       ansible.builtin.apt:
         update_cache: true

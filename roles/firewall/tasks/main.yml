@@ -33,6 +33,7 @@
     - nftables.d/sets.conf
     - nftables.d/postrouting.conf
     - nftables.d/prerouting.conf
+    - nftables.d/raw-prerouting.conf
   tags: ruleset
   register: ruleset_update
 

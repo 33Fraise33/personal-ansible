@@ -150,6 +150,13 @@ scrape_configs:
       - source_labels: [__meta_netbox_role_slug]
         target_label: device_role
       - source_labels: [__meta_netbox_primary_ip]
+        target_label: __address__
+      - source_labels: [__address__]
+        regex: '([0-9a-fA-F:]+:[0-9a-fA-F:]+)'
+        action: replace
+        target_label: __address__
+        replacement: '[$1]'
+      - source_labels: [__address__]
         regex: (.*)
         replacement: '$1:9100'
         target_label: __address__
@@ -173,6 +180,13 @@ scrape_configs:
       - source_labels: [__meta_netbox_role_slug]
         target_label: device_role
       - source_labels: [__meta_netbox_primary_ip]
+        target_label: __address__
+      - source_labels: [__address__]
+        regex: '([0-9a-fA-F:]+:[0-9a-fA-F:]+)'
+        action: replace
+        target_label: __address__
+        replacement: '[$1]'
+      - source_labels: [__address__]
         regex: (.*)
         replacement: '$1:9342'
         target_label: __address__
@@ -196,6 +210,13 @@ scrape_configs:
       - source_labels: [__meta_netbox_role_slug]
         target_label: device_role
       - source_labels: [__meta_netbox_primary_ip]
+        target_label: __address__
+      - source_labels: [__address__]
+        regex: '([0-9a-fA-F:]+:[0-9a-fA-F:]+)'
+        action: replace
+        target_label: __address__
+        replacement: '[$1]'
+      - source_labels: [__address__]
         regex: (.*)
         replacement: '$1:9323'
         target_label: __address__
