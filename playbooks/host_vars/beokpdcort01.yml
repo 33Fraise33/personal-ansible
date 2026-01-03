@@ -1,11 +1,10 @@
 ---
-# loki_uri: http://[2a12:4946:4002:1001::94]:3100
-
 firewall_sets_host:
   - name: WAN
     type: ifname
     elements:
-      - vlan770
+      - ens17
+      - wgDEFRAIFG
   - name: BGP_PEERS_v4
     type: ipv4_addr
     elements:
@@ -13,7 +12,7 @@ firewall_sets_host:
   - name: BGP_PEERS_v6
     type: ipv6_addr
     elements:
-      - 2a12:4946:80ed:1::1/128
+      - 2001:678:1080:100::/62
       - fe80::/10
   - name: v6_NPTv6_HOME
     type: ipv6_addr
@@ -37,10 +36,15 @@ firewall_filter_input_host:
       protocol: tcp
     counter: true
   - comment: "Allow frr_expoter from MONITORING"
+    type: ip6
     source:
-      ip: "@MONITORING"
+      ip: "@v6_MONITORING"
     destination:
       port: 9342
+      protocol: tcp
+  - comment: "Allow Iperf Test"
+    destination:
+      port: 51830
       protocol: tcp
   - comment: "Allow Wireguard edge sites"
     destination:
@@ -71,12 +75,6 @@ firewall:
           ip: "@AS211184"
         destination:
           interface: "@WAN"
-      - comment: "v6 - Allow to AS211184 BEJBEGIA"
-        type: ip6
-        destination:
-          ip: "2a12:4946:4000::/48"
-          interface: wgBEJBEGIA
-        counter: true
       # MGMT
       - comment: "Allow from MGMT"
         source:
@@ -98,6 +96,14 @@ firewall:
       - comment: "Allow from MONITORING"
         source:
           ip: "@MONITORING"
+        destination:
+          protocol: tcp
+          port: "{ 80,443,9100,9323,9342 }"  # http,https,node_exporter,docker_exporter,frr_exporter
+        counter: true
+      - comment: "Allow from MONITORING"
+        type: ip6
+        source:
+          ip: "@v6_MONITORING"
         destination:
           protocol: tcp
           port: "{ 80,443,9100,9323,9342 }"  # http,https,node_exporter,docker_exporter,frr_exporter
@@ -130,7 +136,7 @@ firewall:
       # PROXY/TRAEFIK
       - comment: "Allow to TRAEFIK"
         source:
-          interface: "!=@WAN"
+          ip: "@RFC1918"
         destination:
           ip: "@TRAEFIK"
         counter: true
@@ -144,7 +150,7 @@ firewall:
       - comment: "Allow to TRAEFIK"
         type: ip6
         source:
-          interface: "!=@WAN"
+          ip: "@AS211184"
         destination:
           ip: "@TRAEFIK_v6"
         counter: true
@@ -161,7 +167,7 @@ firewall:
         source:
           ip: "@TRAEFIK_v6"
         destination:
-          ip: "@MONITORING_v6"
+          ip: "@v6_MONITORING"
           protocol: tcp
           port: "{ 1 - 65000 }"
         counter: true
@@ -330,35 +336,28 @@ firewall:
           negate: true
           ip: "@RFC1918"
         counter: true
-      # ip6 saddr <local-prefix>::/64 snat ip6 prefix to <public-prefix>::/64
-      - comment: NPTv6 from prefix without inet
-        type: ip6
-        statement: snat ip6 prefix to 2a12:4946:4002:2::/64
-        source:
-          ip: "2a12:4946:80ed:1::/64"
-        destination:
-          negate: true
-          ip: "2a12:4946:80ed:1::/64"
-        counter: true
     dstnat:
       - comment: DNAT to Plex
-        statement: dnat to 10.10.48.150
+        statement: dnat ip to 10.10.48.150
+        source:
+          interface: ens17
         destination:
           port: 32400
           protocol: tcp
-          ip: 31.24.249.70
         counter: true
       - comment: DNAT to unifi - inform
-        statement: dnat to 10.10.48.190
+        statement: dnat ip to 10.10.48.190
+        source:
+          interface: ens17
         destination:
           port: 8080
           protocol: tcp
-          ip: 31.24.249.70
         counter: true
       - comment: DNAT to unifi - STUN
-        statement: dnat to 10.10.48.190
+        statement: dnat ip to 10.10.48.190
+        source:
+          interface: ens17
         destination:
           port: 3478
           protocol: udp
-          ip: 31.24.249.70
         counter: true

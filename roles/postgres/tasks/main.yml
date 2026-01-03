@@ -29,3 +29,5 @@
     pull: true
     labels:
       traefik.enable: "false"
+      wud.tag.include: '^\d+-alpine$$'
+      wud.watch.digest: "true"

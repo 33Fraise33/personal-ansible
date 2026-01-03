@@ -1,7 +1,0 @@
----
-- name: Setup postiz
-  hosts: BEOKPDCOVM01
-  connection: ssh
-  become: true
-  roles:
-    - postiz

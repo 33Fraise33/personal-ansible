@@ -20,9 +20,6 @@ firewall:
     input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"
 
 docker:
-  login:
-    username: "{{ docker_login.username }}"
-    password: "{{ docker_login.password }}"
   users:
     - fraise
   dir:

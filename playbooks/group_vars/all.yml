@@ -81,29 +81,13 @@ traefik_custom_rules:
 traefik:
   home:
     ip: 172.16.48.125
-    ipv6: 2a12:4946:4000:1002::125
+    ipv6: 2001:678:1080:1202::125
   dco:
     ip: 10.10.48.125
-    ipv6: 2a12:4946:4002:1002::125
+    ipv6: 2001:678:1080:1102::125
   media:
     ip: 10.10.48.151
-    ipv6: 2a12:4946:4002:1003::151
-
-dns_servers:
-  unbound:
-    home:
-      ip: 172.16.48.123
-      ipv6: 2a12:4946:4000:1002::123
-    dco:
-      ip: 10.10.48.123
-      ipv6: 2a12:4946:4002:1002::123
-  adguard:
-    home:
-      ip: 172.16.48.124
-      ipv6: 2a12:4946:4000:1002::124
-    dco:
-      ip: 10.10.48.124
-      ipv6: 2a12:4946:4002:1002::124
+    ipv6: 2001:678:1080:1103::151
 
 dns:
   domain: unitix.be
@@ -115,14 +99,14 @@ dns:
 
 domain:
   internal:
-    - domain: wireguard.frai.se
-      answer: 2a12:4946:4001:35::1
-    - domain: wireguard.frai.se
-      answer: 31.24.249.70
+    # - domain: wireguard.frai.se
+    #   answer: 2a12:4946:4001:35::1
+    # - domain: wireguard.frai.se
+    #   answer: 31.24.249.70
     - domain: inform.unitix.be
       answer: 10.10.48.190
     - domain: sync.frai.se
-      answer: 2a12:4946:4000:1002::120
+      answer: 2001:678:1080:1202::120
     - domain: sync.frai.se
       answer: 172.16.48.120
     # DCO
@@ -290,10 +274,10 @@ domain:
       answer: "{{ traefik.home.ipv6 }}"
   external:  # specific ipv4 at the front, no ipv4 = ddclient
     # UNITIX.BE
-    - name: beokpdcort01
-      ipv6: "2a12:4946:4002::1"
-      ipv4: "31.24.249.70"
-      domain: unitix.be
+    # - name: beokpdcort01
+    #   ipv6: "2a12:4946:4002::1"
+    #   ipv4: "31.24.249.70"
+    #   domain: unitix.be
     - name: inform
       ipv4: "31.24.249.70"
       domain: unitix.be
@@ -345,8 +329,7 @@ firewall_sets_all:
   - name: AS211184
     type: ipv6_addr
     elements:
-      - 2a12:4946:4000::/44
-      - 2a12:4946:80ed:1::2/128
+      - 2001:678:1080::/48
   # AGGREGATES
   - name: MGMT
     type: ipv4_addr
@@ -355,7 +338,11 @@ firewall_sets_all:
   - name: v6_MGMT
     type: ipv6_addr
     elements:
-      - 2a12:4946:4002:0035::/64  # Wireguard Roadwarrior
+      - 2001:678:1080:1033::/64
+  - name: v6_NPTv6_HOME
+    type: ipv6_addr
+    elements:
+      - 2a02:578:856d:1e00::/56  # EDPNET
   - name: DCO_RemoteSites
     type: ipv4_addr
     elements:
@@ -364,10 +351,10 @@ firewall_sets_all:
     type: ipv4_addr
     elements:
       - "10.10.48.64/27"
-  - name: MONITORING_v6
+  - name: v6_MONITORING
     type: ipv6_addr
     elements:
-      - "2a12:4946:4002:1001::/64"
+      - "2001:678:1080:1000::/60"
   - name: MEDIA
     type: ipv4_addr
     elements:
@@ -375,7 +362,7 @@ firewall_sets_all:
   - name: MEDIA_v6
     type: ipv6_addr
     elements:
-      - "2a12:4946:4002:1003::/64"
+      - "2001:678:1080:1103::/64"
   - name: NETWORKING
     type: ipv4_addr
     elements:
@@ -383,7 +370,7 @@ firewall_sets_all:
   - name: NETWORKING_v6
     type: ipv6_addr
     elements:
-      - "2a12:4946:4002:1004::/64"
+      - "2001:678:1080:1004::1/64"
   # HOSTS & Services
   - name: VM01
     type: ipv4_addr
@@ -413,23 +400,23 @@ firewall_sets_all:
   - name: DNS
     type: ipv4_addr
     elements:
-      - 172.16.48.124/32
-      - 10.10.48.124/32
+      - "{{ dns_servers.adguard.home.ip }}/32"
+      - "{{ dns_servers.adguard.dco.ip }}/32"
   - name: DNS_v6
     type: ipv6_addr
     elements:
-      - 2a12:4946:4000:1002::124/128
-      - 2a12:4946:4002:1002::124/128
+      - "{{ dns_servers.adguard.home.ipv6 }}/128"
+      - "{{ dns_servers.adguard.dco.ipv6 }}/128"
   - name: UNBOUND
     type: ipv4_addr
     elements:
-      - 172.16.48.123/32
-      - 10.10.48.123/32
+      - "{{ dns_servers.unbound.home.ip }}/32"
+      - "{{ dns_servers.unbound.dco.ip }}/32"
   - name: UNBOUND_v6
     type: ipv6_addr
     elements:
-      - 2a12:4946:4000:1002::123/128
-      - 2a12:4946:4002:1002::123/128
+      - "{{ dns_servers.unbound.home.ipv6 }}/128"
+      - "{{ dns_servers.unbound.dco.ipv6 }}/128"
   - name: Proxmox
     type: ipv4_addr
     elements:
@@ -454,7 +441,7 @@ firewall_sets_all:
   - name: PLEX_v6
     type: ipv6_addr
     elements:
-      - 2a12:4946:4002:1003::150/128
+      - "2001:678:1080:1103::150/128"
 
 firewall_filter_input_all:
   - comment: "Allow SSH"
@@ -469,14 +456,16 @@ firewall_filter_input_all:
       port: 9103
       protocol: tcp
   - comment: "Allow node_exporter from MONITORING"
+    type: ip6
     source:
-      ip: "@MONITORING"
+      ip: "@v6_MONITORING"
     destination:
       port: 9100
       protocol: tcp
   - comment: "Allow docker_exporter from MONITORING"
+    type: ip6
     source:
-      ip: "@MONITORING"
+      ip: "@v6_MONITORING"
     destination:
       port: 9323
       protocol: tcp
@@ -484,6 +473,9 @@ firewall_filter_input_all:
     counter: true
     statement: 'drop'
 
+firewall_filter_forward_all:
+  - counter: true
+    statement: 'log prefix "DROPPED: " drop'
 
 firewall:
   sets: "{{ firewall_sets_all }}"

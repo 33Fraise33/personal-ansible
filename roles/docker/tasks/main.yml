@@ -83,8 +83,8 @@
 
 - name: Log into DockerHub
   community.docker.docker_login:
-    username: "{{ docker.login.username }}"
-    password: "{{ docker.login.password }}"
+    username: "{{ docker_login.username }}"
+    password: "{{ docker_login.password }}"
   tags: docker_login
 
 - name: Add default_user to docker group

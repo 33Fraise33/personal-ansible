@@ -25,3 +25,5 @@
     state: started
     labels:
       traefik.enable: "false"
+      wud.tag.include: '^\d+$$'
+      wud.watch.digest: "true"

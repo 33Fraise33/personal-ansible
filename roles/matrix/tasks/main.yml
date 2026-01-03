@@ -57,7 +57,7 @@
     privs: ALL
     type: "{{ item.type }}"
     login_db: synapse
-    objs: "{{ item.objs }}"
+    objs: "{{ item.objs | default(omit) }}"
     login_host: "{{ result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
     login_password: "{{ postgres_password }}"
     login_user: "{{ postgres_user }}"
@@ -65,7 +65,6 @@
   become: false
   loop:
     - type: database
-      objs: "{{ omit }}"
     - type: schema
       objs: "public"
 
