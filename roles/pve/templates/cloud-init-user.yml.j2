@@ -1,0 +1,47 @@
+#cloud-config
+
+growpart:
+  mode: auto
+  devices: ['/']
+  ignore_growroot_disabled: false
+
+device_aliases:
+  main_disk: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0
+  swap_disk: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
+
+disk_setup:
+  swap_disk:
+    table_type: gpt
+    layout: [[100, 82]]
+    overwrite: true
+
+fs_setup:
+- label: swap
+  device: swap_disk
+  partition: 1
+  filesystem: swap
+mounts:
+- ["LABEL=swap", "none", "swap", "sw", "0", "0"]
+
+hostname: {{ pve_vm_name }}
+users:
+  - name: root
+    lock_passwd: false
+    hashed_passwd: "{{ lookup('community.general.onepassword', vm_name) | password_hash(hashtype='sha512', rounds='500000') }}"
+  - name: fraise
+    shell: /bin/bash
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    ssh_import_id:
+      - gh:33Fraise33
+
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+timezone: Etc/UTC
+
+runcmd:
+  - swapon -a
+  - "echo $(cat /etc/hostname) was born on $(date) > /birth_certificate"
+
+final_message: "cloud-init has finished"

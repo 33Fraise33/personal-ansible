@@ -1,4 +1,9 @@
 ---
+- name: Set PVE api token
+  ansible.builtin.set_fact:
+    pve_api_key: "{{ lookup('community.general.onepassword', inventory_hostname, field='api-token') }}"
+  tags: always
+
 - name: PACKAGES - Install microcode
   ansible.builtin.package:
     name: "{{ 'amd64-microcode' if 'amd' in (ansible_facts['processor'] | lower) else 'intel-microcode' }}"
@@ -13,18 +18,22 @@
       ashift: 12
     vdevs: "{{ item.vdevs }}"
   loop: "{{ zfs | default([]) }}"
-  register: result
+  register: pve_zfs_result
   failed_when:  # see https://github.com/ansible-collections/community.general/issues/10771
-    - result.rc != 0
-    - '"contains a unknown filesystem" not in result.stderr'
+    - pve_zfs_result.rc is defined and pve_zfs_result.rc != 0
+    - '"contains a unknown filesystem" not in pve_zfs_result.stderr'
 
-- name: Add ZFS Thin Provisioned Storage to Proxmox
+- name: Set snippets on local storage
+  ansible.builtin.command: "pvesm set local --content iso,vztmpl,snippets,import"
+  changed_when: false
+
+- name: Add ZFS Storage to Proxmox
   community.proxmox.proxmox_storage:
     api_host: "{{ ansible_host }}"
     api_user: root@pam
     api_token_id: ansible
     api_token_secret: "{{ pve_api_key }}"
-    name: zfs-{{ inventory_hostname | lower | replace('_', '-') }}-{{ item.pool }}
+    name: "{{ item.pool }}"
     type: zfspool
     state: present
     nodes:
@@ -38,3 +47,51 @@
   loop: "{{ zfs | default([]) }}"
   delegate_to: localhost
   become: false
+
+- name: Get ZFS thin provisioned status
+  ansible.builtin.command: "pvesh get /storage --output-format json"
+  register: pve_storage_result
+  changed_when: false
+
+- name: Make ZFS Storage thin provisioned
+  ansible.builtin.command: "pvesm set {{ item.pool }} --sparse 1"
+  when: (pve_storage_result.stdout | from_json | community.general.json_query(pve_storage_query) | first).sparse is not defined
+  changed_when: true
+  vars:
+    pve_storage_query: "[?storage=='{{ item.pool }}']"
+  loop: "{{ zfs | default([]) }}"
+
+# - name: Run PCIe Passthrough
+#   ansible.builtin.import_tasks:
+#     file: pcie-passthrough.yml
+#   tags: passthrough
+
+- name: Make cloud init & import directories
+  ansible.builtin.file:
+    path: /var/lib/vz/{{ item }}
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+  loop:
+    - snippets
+    - import
+
+- name: Make sure latest cloud init image is available
+  ansible.builtin.get_url:
+    url: https://cdimage.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.qcow2
+    dest: /var/lib/vz/import/
+    mode: '0644'
+
+- name: Run VMs task
+  ansible.builtin.include_tasks:
+    file: vms.yml
+    apply:
+      tags:
+        - vms
+  tags: always
+  when:
+    - hostvars[vm_name].cluster_device.name|default("") == inventory_hostname  # when VM is running on this pve host
+  loop: "{{ groups['site_' + hostvars[inventory_hostname].sites[0]] }}"  # gather all hosts from current site
+  loop_control:
+    loop_var: vm_name

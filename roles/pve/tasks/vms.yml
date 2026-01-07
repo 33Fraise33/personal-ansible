@@ -1,0 +1,198 @@
+---
+- name: Set pve_vm_item to host vars
+  ansible.builtin.set_fact:
+    pve_vm_item: "{{ hostvars[vm_name] }}"
+    pve_vm_name: "{{ vm_name | lower | replace('_', '-') }}"
+
+- name: Get VM current state
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: root@pam
+    api_token_id: ansible
+    api_token_secret: "{{ pve_api_key }}"
+    name: "{{ pve_vm_name }}"
+    node: "{{ inventory_hostname | lower | replace('_', '-') }}"
+    state: current
+  register: pve_vm_current_state
+  delegate_to: localhost
+  become: false
+  failed_when: false
+
+- name: Check if we should create the vm or if it already exists
+  ansible.builtin.set_fact:
+    pve_current_vm_to_create: "{{ 'does not exist in cluster' in pve_vm_current_state.msg }}"
+
+- name: Template VM Cloud Init
+  ansible.builtin.template:
+    src: cloud-init-{{ item }}.yml.j2
+    dest: /var/lib/vz/snippets/{{ pve_vm_name }}-{{ item }}.yml
+    mode: "0644"
+    owner: root
+    group: root
+  when: pve_current_vm_to_create
+  loop:
+    - user
+    - net
+
+- name: Create new VM including cloud-init
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: root@pam
+    api_token_id: ansible
+    api_token_secret: "{{ pve_api_key }}"
+    state: present
+    name: "{{ pve_vm_name }}"
+    node: "{{ inventory_hostname | lower | replace('_', '-') }}"
+    net: "{{ lookup('template', 'net-interfaces.json.j2') | from_json }}"
+    ide:
+      ide2: 'vm-storage:cloudinit'
+    cicustom: "user=local:snippets/{{ pve_vm_name }}-user.yml,network=local:snippets/{{ pve_vm_name }}-net.yml"
+    cpu: "{{ pve_vm_item.cpu_type | default('host') }}"
+    cores: "{{ pve_vm_item.vcpus | int }}"
+    memory: "{{ pve_vm_item.memory }}"
+    agent: "{{ pve_vm_item.agent | default(true) }}"
+    onboot: "{{ pve_vm_item.autostart | default(true) }}"
+    scsihw: virtio-scsi-single
+    hotplug: "network, disk, cpu, memory, usb"
+    numa_enabled: true
+    tablet: false
+    serial:
+      serial0: socket
+    ostype: "{{ pve_vm_item.os_type | default('l26') }}"  # linux 2.6+
+  delegate_to: localhost
+  when: pve_current_vm_to_create
+  become: false
+
+- name: Wait for vm to be fully created
+  ansible.builtin.pause:
+    seconds: 10
+  when: pve_current_vm_to_create
+
+- name: Import Disk & add swap disk
+  community.proxmox.proxmox_disk:
+    api_host: "{{ ansible_host }}"
+    api_user: root@pam
+    api_token_id: ansible
+    api_token_secret: "{{ pve_api_key }}"
+    state: present
+    name: "{{ pve_vm_name }}"
+    disk: "{{ item.name }}"
+    backup: "{{ false if (item.tags | community.general.json_query(pve_swap_query) | length > 0) else true }}"
+    storage: "{{ 'local-lvm' if item.tags | community.general.json_query(pve_swap_query) | length > 0
+      else 'vm-storage' }}"
+    size: "{{ (item.size | int) / 1000 if item.tags | community.general.json_query(pve_root_query) | length == 0 else omit }}"
+    ssd: true
+    import_from: "{{ 'local:import/debian-13-generic-amd64.qcow2' if item.tags | community.general.json_query(pve_root_query) | length > 0 else omit }}"
+  delegate_to: localhost
+  become: false
+  vars:
+    pve_swap_query: "[?name=='swap']"
+    pve_root_query: "[?name=='root']"
+  loop: "{{ pve_vm_item.virtual_disks }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: pve_current_vm_to_create
+
+- name: Resize Disk
+  community.proxmox.proxmox_disk:
+    api_host: "{{ ansible_host }}"
+    api_user: root@pam
+    api_token_id: ansible
+    api_token_secret: "{{ pve_api_key }}"
+    state: resized
+    name: "{{ pve_vm_name }}"
+    disk: "{{ item.name }}"
+    size: "{{ (item.size | int) / 1000 }}G"
+  delegate_to: localhost
+  become: false
+  loop: "{{ pve_vm_item.virtual_disks }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: pve_current_vm_to_create
+
+- name: Update VM to use correct boot order
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: root@pam
+    api_token_id: ansible
+    api_token_secret: "{{ pve_api_key }}"
+    state: present
+    name: "{{ pve_vm_name }}"
+    node: "{{ inventory_hostname | lower | replace('_', '-') }}"
+    boot: "order=scsi0"
+    update: true
+  delegate_to: localhost
+  become: false
+  when: pve_current_vm_to_create
+
+- name: Start VM
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: root@pam
+    api_token_id: ansible
+    api_token_secret: "{{ pve_api_key }}"
+    state: started
+    name: "{{ pve_vm_name }}"
+    node: "{{ inventory_hostname | lower | replace('_', '-') }}"
+  delegate_to: localhost
+  become: false
+  when: pve_current_vm_to_create
+
+- name: Existing VM - Resize Disk
+  community.proxmox.proxmox_disk:
+    api_host: "{{ ansible_host }}"
+    api_user: root@pam
+    api_token_id: ansible
+    api_token_secret: "{{ pve_api_key }}"
+    state: resized
+    name: "{{ pve_vm_name }}"
+    disk: "{{ item.name }}"
+    size: "{{ (item.size | int) / 1000 }}G"
+  delegate_to: localhost
+  become: false
+  loop: "{{ pve_vm_item.virtual_disks }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: not pve_current_vm_to_create
+
+- name: Existing VM - Remove items that should not exist
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: root@pam
+    api_token_id: ansible
+    api_token_secret: "{{ pve_api_key }}"
+    state: present
+    name: "{{ pve_vm_name }}"
+    node: "{{ inventory_hostname | lower | replace('_', '-') }}"
+    delete: 'ide2,cicustom'
+  delegate_to: localhost
+  become: false
+  when: not pve_current_vm_to_create
+
+- name: Existing VM - Update
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: root@pam
+    api_token_id: ansible
+    api_token_secret: "{{ pve_api_key }}"
+    state: present
+    name: "{{ pve_vm_name }}"
+    node: "{{ inventory_hostname | lower | replace('_', '-') }}"
+    net: "{{ lookup('template', 'net-interfaces.json.j2') | from_json }}"
+    cpu: "{{ pve_vm_item.cpu_type | default('host') }}"
+    cores: "{{ pve_vm_item.vcpus | int }}"
+    memory: "{{ pve_vm_item.memory }}"
+    agent: "{{ pve_vm_item.agent | default(true) }}"
+    onboot: "{{ pve_vm_item.autostart | default(true) }}"
+    scsihw: virtio-scsi-single
+    hotplug: "network, disk, cpu, memory, usb"
+    numa_enabled: true
+    tablet: false
+    serial:
+      serial0: socket
+    ostype: "{{ pve_vm_item.os_type | default('l26') }}"  # linux 2.6+
+    update: true
+    update_unsafe: true
+  delegate_to: localhost
+  become: false
+  when: not pve_current_vm_to_create

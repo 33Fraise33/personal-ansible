@@ -1,0 +1,5 @@
+{
+{% for intf in pve_vm_item.interfaces|default([]) %}
+"net{{ loop.index0 }}": "virtio,bridge=vmbr0{% if intf.untagged_vlan is defined and intf.untagged_vlan is not none %},tag={{ intf.untagged_vlan.vid }}{% endif %}"{% if not loop.last %},{% endif %}
+{% endfor %}
+}

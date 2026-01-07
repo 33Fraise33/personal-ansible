@@ -18,7 +18,7 @@ iface {{ intf.name }} inet {{ 'static' if intf.ip_addresses|length>0 else 'manua
 {%    if addr_obj.address is not none %}
 	address {{ addr_obj.address }}
 {%      if (addr_obj.address | ansible.utils.ipaddr('address')) == primary_ip4 or 
-	 (addr_obj.address | ansible.utils.ipaddr('address')) == primary_ip6 %}
+	 (addr_obj.address | ansible.utils.ipaddr('address')) == primary_ip6|default("") %}
 	gateway {{ addr_obj.address | ansible.utils.ipaddr('subnet') | ansible.utils.ipaddr('net') | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
 {%      endif%}
 {%    endif%}
@@ -53,7 +53,7 @@ iface {{ intf.name }} inet {{ 'static' if intf.ip_addresses|length>0 else 'manua
 	bond-miimon 100
 	bond-xmit-hash-policy layer3+4
 {%  endif %}
-{%  if intf.description != "" or (intf.connected_ednpoints is defined and intf.connected_endpoints is not none) %}
+{%  if intf.description != "" or (intf.connected_endpoints is defined and intf.connected_endpoints is not none) %}
 # {{ intf.description if intf.description!= "" else (intf.connected_endpoints[0].device.name + '-' + intf.connected_endpoints[0].name) }}
 {%  endif%}
 
