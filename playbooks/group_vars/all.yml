@@ -138,9 +138,9 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: mas.frai.se
       answer: "{{ traefik.dco.ip }}"
-    - domain: netbox.frai.se
+    - domain: netbox.unitix.be
       answer: "{{ traefik.dco.ipv6 }}"
-    - domain: netbox.frai.se
+    - domain: netbox.unitix.be
       answer: "{{ traefik.dco.ip }}"
     - domain: frai.se
       answer: "{{ traefik.dco.ipv6 }}"

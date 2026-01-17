@@ -1,0 +1,28 @@
+zfs:
+  # - pool: rpool
+  #   vdevs:
+  #     - disks:
+  #         - /dev/disk/by-id/ata-CT2000MX500SSD1_2407E898624C
+  #         - /dev/disk/by-id/ata-Samsung_SSD_870_EVO_2TB_S754NS0X115608W
+  #       type: mirror
+  # TODO THROUGH OOB
+  - pool: vm-storage
+    vdevs:
+      - disks:
+          - /dev/disk/by-id/ata-CT2000MX500SSD1_2407E898624C
+          - /dev/disk/by-id/ata-Samsung_SSD_870_EVO_2TB_S754NS0X115608W
+        type: mirror
+  - pool: ssd-storage
+    vdevs:
+      - disks:
+          - /dev/disk/by-id/scsi-35002538a479788d0
+          - /dev/disk/by-id/scsi-35002538a071232b0
+          - /dev/disk/by-id/scsi-35002538a479e0a70
+        type: raidz1
+  - pool: bulk-storage
+    vdevs:
+      - disks:
+          - /dev/disk/by-id/ata-ST5000LM000-2AN170_WCJ96L20
+          - /dev/disk/by-id/ata-ST5000LM000-2AN170_WCJ9DQKZ
+          - /dev/disk/by-id/ata-ST5000LM000-2AN170_WCJ99VTL
+        type: raidz1

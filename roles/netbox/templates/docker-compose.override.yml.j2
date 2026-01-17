@@ -7,13 +7,9 @@ services:
       dockerfile: Dockerfile-Plugins
       network: host
     restart: always
-    dns:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
+    dns: {{ dns.servers }}
     labels:
-      traefik.http.routers.netbox.rule: "Host(`netbox.frai.se`)"
+      traefik.http.routers.netbox.rule: "Host(`netbox.unitix.be`)"
       traefik.http.routers.netbox.tls: "true"
       traefik.http.routers.netbox.tls.certresolver: "le"
       traefik.http.services.netbox.loadbalancer.server.port: "8080"
@@ -24,11 +20,7 @@ services:
       dockerfile: Dockerfile-Plugins
       network: host
     restart: always
-    dns:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
+    dns: {{ dns.servers }}
     labels:
       traefik.enable: "false"
   postgres: !reset null
