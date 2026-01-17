@@ -110,10 +110,6 @@ domain:
     - domain: sync.frai.se
       answer: 172.16.48.120
     # DCO
-    - domain: postiz.unitix.gg
-      answer: "{{ traefik.dco.ipv6 }}"
-    - domain: postiz.unitix.gg
-      answer: "{{ traefik.dco.ip }}"
     - domain: alertmanager.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: alertmanager.frai.se
@@ -122,9 +118,9 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: prometheus.frai.se
       answer: "{{ traefik.dco.ip }}"
-    - domain: grafana.frai.se
+    - domain: grafana.unitix.be
       answer: "{{ traefik.dco.ipv6 }}"
-    - domain: grafana.frai.se
+    - domain: grafana.unitix.be
       answer: "{{ traefik.dco.ip }}"
     - domain: proxmox.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
@@ -339,6 +335,7 @@ firewall_sets_all:
     type: ipv6_addr
     elements:
       - 2001:678:1080:1033::/64
+firewall_sets_internal:
   - name: v6_NPTv6_HOME
     type: ipv6_addr
     elements:
@@ -456,6 +453,18 @@ firewall_filter_input_all:
       port: 9103
       protocol: tcp
   - comment: "Allow node_exporter from MONITORING"
+    source:
+      ip: "@MONITORING"
+    destination:
+      port: 9100
+      protocol: tcp
+  - comment: "Allow docker_exporter from MONITORING"
+    source:
+      ip: "@MONITORING"
+    destination:
+      port: 9323
+      protocol: tcp
+  - comment: "Allow node_exporter from MONITORING"
     type: ip6
     source:
       ip: "@v6_MONITORING"
@@ -478,6 +487,6 @@ firewall_filter_forward_all:
     statement: 'log prefix "DROPPED: " drop'
 
 firewall:
-  sets: "{{ firewall_sets_all }}"
+  sets: "{{ firewall_sets_all + firewall_sets_internal }}"
   filter:
     input: "{{ firewall_filter_input_all }}"

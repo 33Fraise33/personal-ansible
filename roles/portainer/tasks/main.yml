@@ -12,11 +12,7 @@
     image: portainer/{{ portainer.type | default('agent') }}:latest
     networks:
       - name: "{{ portainer.network | default('host') }}"
-    dns_servers:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
+    dns_servers: "{{ dns.servers }}"
     ports: "{{ portainer_ports.agent if (portainer.type | default('agent')) == 'agent' else omit }}"
     volumes:
       - config_portainer:/data

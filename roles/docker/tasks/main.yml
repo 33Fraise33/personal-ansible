@@ -70,8 +70,8 @@
   when: docker.networks is defined
 
 - name: Change docker vars (including default subnet)
-  ansible.builtin.copy:
-    src: "{{ item.file }}"
+  ansible.builtin.template:
+    src: "{{ item.file }}.j2"
     dest: "{{ item.location }}{{ item.file }}"
     owner: root
     group: root

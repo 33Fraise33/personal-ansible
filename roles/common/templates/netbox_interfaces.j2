@@ -39,7 +39,7 @@ iface {{ intf.name }} inet {{ 'static' if intf.ip_addresses|length>0 else 'manua
 	bridge-vids 2-4094
 {%    endif %}
 {%  endif %}
-{%  if intf.mode is not none and intf.mode.value == 'access' %}
+{%  if intf.mode is not none and intf.mode.value == 'access' and not is_virtual|default(false) %}
 	vlan-id {{ intf.untagged_vlan.vid }}
 	vlan-raw-device {{ intf.parent.name }}
 {%  endif %}

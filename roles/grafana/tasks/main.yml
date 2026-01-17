@@ -19,7 +19,7 @@
     volumes:
       - "data_grafana:/var/lib/grafana"
     env:
-      GF_SERVER_ROOT_URL: "https://grafana.frai.se"
+      GF_SERVER_ROOT_URL: "https://grafana.unitix.be"
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
       GF_LOG_LEVEL: error
       GF_ANALYTICS_REPORTING_ENABLED: "false"
@@ -29,6 +29,7 @@
     pull: true
     user: 0:0
     labels:
+      traefik.http.routers.grafana.rule: "Host(`grafana.unitix.be`)"
       traefik.http.routers.grafana.tls: "true"
       traefik.http.routers.grafana.tls.certresolver: "le"
       traefik.http.services.grafana.loadbalancer.server.port: "3000"

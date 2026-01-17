@@ -1,0 +1,10 @@
+{
+  "iptables": {{ docker.firewall|default(false) | to_json }},
+  "ip6tables": {{ docker.firewall|default(false) | to_json }},
+  "bip": "169.254.1.1/24",
+  "metrics-addr" : "[::]:9323",
+  "ipv6": {{ docker.ipv6|default(true) | to_json }},
+  "hosts": [
+    "unix:///var/run/docker.sock"
+  ]
+}

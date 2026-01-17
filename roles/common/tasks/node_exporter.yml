@@ -36,12 +36,23 @@
     group: prometheus
   notify: Restart node_exporter
 
+- name: NODE_EXPORTER - Create node_exporter file directory
+  ansible.builtin.file:
+    path: /var/lib/node_exporter/textfile_collector
+    state: directory
+    mode: "0755"
+    owner: prometheus
+    group: prometheus
+    recurse: true
+  when: node_file_exporter | default(false)
+
 - name: NODE_EXPORTER - Make sure service is started
   ansible.builtin.systemd:
     daemon_reload: true
     name: node_exporter
     state: started
     enabled: true
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: NODE_EXPORTER - Flush handlers
   ansible.builtin.meta: flush_handlers

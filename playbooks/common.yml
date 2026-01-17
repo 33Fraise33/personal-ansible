@@ -3,7 +3,7 @@
 
 - name: Run common role
   hosts:
-    - platform_debian_12
+    - platform_debian_13
     - platform_proxmox
   gather_facts: false
   connection: ssh

@@ -5,6 +5,7 @@
     image: ghcr.io/getwud/wud:latest
     networks:
       - name: host
+    dns_servers: "{{ dns.servers }}"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     healthcheck:

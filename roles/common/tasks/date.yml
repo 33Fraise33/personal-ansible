@@ -19,6 +19,7 @@
     name: chronyd
     state: started
     enabled: true
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: DATE - Set Chrony config
   ansible.builtin.template:

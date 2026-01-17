@@ -1,6 +1,6 @@
 ---
 - name: Setup monitoring (grafana & prometheus)
-  hosts: BEOKPDCOVM01
+  hosts: tag_prometheus
   connection: ssh
   become: true
   roles:

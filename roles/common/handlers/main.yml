@@ -4,6 +4,7 @@
     name: node_exporter
     state: restarted
   become: true
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Restart sshd
   ansible.builtin.systemd:
@@ -22,9 +23,11 @@
     name: chronyd
     state: restarted
   become: true
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Restart alloy  # reload does not work for new unix groups
   ansible.builtin.systemd:
     name: alloy
     state: restarted
   become: true
+  ignore_errors: "{{ ansible_check_mode }}"
