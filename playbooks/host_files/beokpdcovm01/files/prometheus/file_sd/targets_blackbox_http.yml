@@ -1,62 +1,57 @@
 ---
 - labels:
-    site: "BEJBEGIA"
+    site: "BEOKPDCO"
     node_name: "UISP"
   targets:
     - https://uisp.unitix.be
 - labels:
-    site: "BEJBEGIA"
+    site: "BEOKPDCO"
     node_name: "UNIFI"
   targets:
     - https://unifi.unitix.be
 - labels:
-    site: "BEJBEGIA"
+    site: "BEOKPDCO"
     node_name: "Portainer"
   targets:
     - https://portainer.frai.se
 - labels:
-    site: "BEJBEGIA"
+    site: "BEOKPDCO"
     node_name: "n8n"
   targets:
     - https://n8n.frai.se
 - labels:
-    site: "BEJBEGIA"
+    site: "BEOKPDCO"
     node_name: "Plex"
   targets:
     - https://plex.frai.se/web/index.html
 - labels:
-    site: "BEJBEGIA"
+    site: "BEOKPDCO"
     node_name: "Unitix"
   targets:
     - https://unitix.be
 - labels:
-    site: "BEJBEGIA"
+    site: "BEOKPDCO"
     node_name: "Homer"
   targets:
     - https://frai.se
 - labels:
-    site: "BEJBEGIA"
+    site: "BEOKPDCO"
     node_name: "Grafana"
   targets:
-    - https://grafana.frai.se
+    - https://grafana.unitix.be
 - labels:
     site: "BEJBEGIA"
     node_name: "Home Assistant"
   targets:
     - https://ha.frai.se
 - labels:
-    site: "BEJBEGIA"
+    site: "BEOKPDCO"
     node_name: "Netbox"
   targets:
-    - https://netbox.frai.se
+    - https://netbox.unitix.be
 - labels:
-    site: "BEJBEGIA"
+    site: "BEOKPDCO"
     node_name: "matrix"
   targets:
     - https://matrix.frai.se/_matrix/static/
 
-- labels:
-    site: "Github"
-    node_name: "Status"
-  targets:
-    - https://status.frai.se

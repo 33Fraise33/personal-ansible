@@ -45,11 +45,7 @@
     image: quay.io/prometheus/snmp-exporter:latest
     networks:
       - name: monitoring
-    dns_servers:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
+    dns_servers: "{{ dns.servers }}"
     volumes:
       - "{{ docker.dir.config }}/prometheus_snmp/snmp.yml:/snmp.yml:ro"
     command: "--config.file=/snmp.yml"
@@ -58,7 +54,6 @@
     state: started
     pull: true
     labels:
-      labels:
       traefik.http.routers.snmp.tls: "true"
       traefik.http.routers.snmp.tls.certresolver: "le"
       traefik.http.services.snmp.loadbalancer.server.port: "9116"

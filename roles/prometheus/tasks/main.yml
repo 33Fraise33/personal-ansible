@@ -34,4 +34,4 @@
 
 - name: Setup prometheus
   ansible.builtin.import_tasks: base.yml
-  tags: prometheus,base
+  tags: prometheus_base,base

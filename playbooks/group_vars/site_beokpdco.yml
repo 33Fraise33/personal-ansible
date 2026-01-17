@@ -1,0 +1,8 @@
+---
+dns:
+  domain: unitix.be
+  servers:
+    - "{{ dns_servers.adguard.dco.ipv6 }}"
+    - "{{ dns_servers.adguard.dco.ip }}"
+    - "{{ dns_servers.adguard.home.ipv6 }}"
+    - "{{ dns_servers.adguard.home.ip }}"

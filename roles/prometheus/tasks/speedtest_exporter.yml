@@ -8,11 +8,7 @@
     healthcheck:
       test: "wget --no-verbose --tries=1 --spider http://0.0.0.0:9798/"
       timeout: 10s
-    dns_servers:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
+    dns_servers: "{{ dns.servers }}"
     restart: true
     restart_policy: always
     state: started

@@ -17,7 +17,7 @@
 
 - name: Copy prometheus config
   ansible.builtin.template:
-    src: "{{ item }}.j2"
+    src: "{{ playbook_dir }}/host_files/{{ inventory_hostname | lower }}/templates/prometheus/{{ item }}.j2"
     dest: "{{ docker.dir.config }}/prometheus/{{ item }}"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
@@ -34,8 +34,8 @@
     group: "{{ nobody.group }}"
     mode: "0755"
   loop:
-    - file_sd/
-    - alerts.d/
+    - "{{ playbook_dir }}/host_files/{{ inventory_hostname | lower }}/files/prometheus/file_sd/"
+    - "{{ playbook_dir }}/host_files/{{ inventory_hostname | lower }}/files/prometheus/alerts.d/"
   tags: config,targets
 
 - name: Setup prometheus docker container
@@ -44,11 +44,7 @@
     image: quay.io/prometheus/prometheus:latest
     networks:
       - name: monitoring
-    dns_servers:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
+    dns_servers: "{{ dns.servers }}"
     volumes:
       - "{{ docker.dir.config }}/prometheus:/config:ro"
       - "data_prometheus:/prometheus"
