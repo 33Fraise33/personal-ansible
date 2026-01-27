@@ -162,7 +162,7 @@
         key: "{{ portainer_api_key }}"
   - Netbox:
       icon: sh-netbox
-      href: https://netbox.frai.se
+      href: https://netbox.unitix.be
       description: Network Documentation & IPAM
   - Mikrotik: 
       icon: si-mikrotik-#ffffff

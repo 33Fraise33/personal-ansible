@@ -4,58 +4,30 @@ global:
   evaluation_interval: 15s
   scrape_timeout: 10s
 
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-            - "prometheus-alertmanager:9093"
-
 rule_files:
   - "alerts.d/*.yml"
 
 scrape_configs:
-  - job_name: 'blackbox_icmp'
-    metrics_path: /probe
-    params:
-      module: [icmp]
-    file_sd_configs:
-      - files:
-          - '/config/file_sd/targets_blackbox_icmp.yml'
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: "prometheus-blackbox_exporter:9115"
-  
-  - job_name: 'blackbox_dns'
-    metrics_path: /probe
-    params:
-      module: [dns]
-    file_sd_configs:
-      - files:
-          - '/config/file_sd/targets_blackbox_dns.yml'
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: "prometheus-blackbox_exporter:9115"
-  
   - job_name: 'general-icmp'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&site=otgkit01
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&site__n=otgkit01
+        http_headers: &auth_headers
+          CF-Access-Client-Id:
+            values:
+              - "702bdf6890e41f6c3ee92c0ae2f51e45.access"
+          CF-Access-Client-Secret:
+            secrets:
+              - "{{ prometheus_cloudflare_secret }}"
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&site=otgkit01
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
+        http_headers: *auth_headers
     metrics_path: /probe
     params:
       module:
@@ -75,69 +47,21 @@ scrape_configs:
         target_label: device_role
       - target_label: __address__
         replacement: "prometheus-blackbox_exporter:9115"
-  
-  - job_name: 'public-icmp'
-    http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&cf_dyndns=.
-        refresh_interval: 5m
-        authorization: 
-          type: "Token"
-          credentials: "{{ netbox_api_token }}"
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&cf_dyndns=.
-        refresh_interval: 5m
-        authorization: 
-          type: "Token"
-          credentials: "{{ netbox_api_token }}"
-    metrics_path: /probe
-    params:
-      module:
-        - icmp
-    relabel_configs:
-      - source_labels: [__meta_netbox_custom_field_dyndns]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - source_labels: [__meta_netbox_name]
-        regex: (.*)
-        replacement: 'PUB - $1'
-        target_label: node_name
-      - source_labels: [__meta_netbox_site]
-        target_label: site
-      - source_labels: [__meta_netbox_tenant]
-        target_label: tenant
-      - source_labels: [__meta_netbox_role_slug]
-        target_label: device_role
-      - target_label: __address__
-        replacement: "prometheus-blackbox_exporter:9115"
-
-  - job_name: 'blackbox_http'
-    scrape_interval: 5m
-    metrics_path: /probe
-    params:
-      module: [http_2xx]
-    file_sd_configs:
-      - files:
-          - '/config/file_sd/targets_blackbox_http.yml'
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: "prometheus-blackbox_exporter:9115"
 
   - job_name: 'node_exporter'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&platform=debian&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&platform=debian&site=otgkit01
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&platform=proxmox&site__n=otgkit01
+        http_headers: *auth_headers
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&platform=proxmox&site=otgkit01
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
+        http_headers: *auth_headers
     relabel_configs:
       - source_labels: [__meta_netbox_primary_ip]
         target_label: instance
@@ -160,44 +84,15 @@ scrape_configs:
         regex: (.*)
         replacement: '$1:9100'
         target_label: __address__
-
-  - job_name: 'frr_exporter'
-    http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=frr
-        refresh_interval: 5m
-        authorization: 
-          type: "Token"
-          credentials: "{{ netbox_api_token }}"
-    relabel_configs:
-      - source_labels: [__meta_netbox_primary_ip]
-        target_label: instance
-      - source_labels: [__meta_netbox_name]
-        target_label: node_name
-      - source_labels: [__meta_netbox_site]
-        target_label: site
-      - source_labels: [__meta_netbox_tenant]
-        target_label: tenant
-      - source_labels: [__meta_netbox_role_slug]
-        target_label: device_role
-      - source_labels: [__meta_netbox_primary_ip]
-        target_label: __address__
-      - source_labels: [__address__]
-        regex: '([0-9a-fA-F:]+:[0-9a-fA-F:]+)'
-        action: replace
-        target_label: __address__
-        replacement: '[$1]'
-      - source_labels: [__address__]
-        regex: (.*)
-        replacement: '$1:9342'
-        target_label: __address__
   
   - job_name: 'docker_exporter'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=docker&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=docker&site=otgkit01
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
+        http_headers: *auth_headers
     relabel_configs:
       - source_labels: [__meta_netbox_primary_ip]
         target_label: instance
@@ -220,15 +115,47 @@ scrape_configs:
         regex: (.*)
         replacement: '$1:9323'
         target_label: __address__
-  
-  - job_name: 'ipmi_exporter'
-    metrics_path: /ipmi
+
+  - job_name: 'cadvisor_exporter'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&role_id=7&has_oob_ip=True&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=docker&site=otgkit01
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
+        http_headers: *auth_headers
+    relabel_configs:
+      - source_labels: [__meta_netbox_primary_ip]
+        target_label: instance
+      - source_labels: [__meta_netbox_name]
+        target_label: node_name
+      - source_labels: [__meta_netbox_site]
+        target_label: site
+      - source_labels: [__meta_netbox_tenant]
+        target_label: tenant
+      - source_labels: [__meta_netbox_role_slug]
+        target_label: device_role
+      - source_labels: [__meta_netbox_primary_ip]
+        target_label: __address__
+      - source_labels: [__address__]
+        regex: '([0-9a-fA-F:]+:[0-9a-fA-F:]+)'
+        action: replace
+        target_label: __address__
+        replacement: '[$1]'
+      - source_labels: [__address__]
+        regex: (.*)
+        replacement: '$1:9338'
+        target_label: __address__
+  
+  - job_name: 'ipmi_exporter'
+    metrics_path: /ipmi
+    http_sd_configs:
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&role_id=7&has_oob_ip=True&site=otgkit01
+        refresh_interval: 5m
+        authorization: 
+          type: "Token"
+          credentials: "{{ netbox_api_token }}"
+        http_headers: *auth_headers
     relabel_configs:
       - source_labels: [__meta_netbox_oob_ip]
         target_label: __param_target
@@ -245,63 +172,16 @@ scrape_configs:
       - target_label: __address__
         replacement: "prometheus-ipmi_exporter:9290"
 
-  - job_name: 'federate'
-    scrape_interval: 30s
-    honor_labels: true
-    metrics_path: '/federate'
-    params:
-      'match[]':
-        - '{job=~".*"}'
-    http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=prometheus_federate
-        refresh_interval: 5m
-        authorization: 
-          type: "Token"
-          credentials: "{{ netbox_api_token }}"
-    relabel_configs:
-      - target_label: external
-        replacement: "true"
-      - source_labels: [__meta_netbox_primary_ip]
-        target_label: __address__
-      - source_labels: [__address__]
-        regex: '([0-9a-fA-F:]+:[0-9a-fA-F:]+)'
-        action: replace
-        target_label: __address__
-        replacement: '[$1]'
-      - source_labels: [__address__]
-        regex: (.*)
-        replacement: '$1:9090'
-        target_label: __address__
-
-  - job_name: 'speedtest'
-    scrape_interval: 3h
-    scrape_timeout: 3m
-    static_configs:
-      - targets:
-          - "prometheus-speedtest_exporter:9798"
-  
-  - job_name: 'adguard'
-    static_configs:
-      - targets:
-          - "prometheus-adguard_exporter:9618"
-
-  - job_name: "hass"
-    metrics_path: /api/prometheus
-    authorization:
-      credentials: "{{ home_assistant_access_token }}"
-    scheme: https
-    static_configs:
-      - targets: ['ha.frai.se']
-
 ### SNMP
 
   - job_name: 'mikrotik-snmp'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik&site=otgkit01
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
+        http_headers: *auth_headers
     metrics_path: /snmp
     params:
       module:
@@ -326,16 +206,18 @@ scrape_configs:
 
   - job_name: 'generic-snmp'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik&site=otgkit01
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch&site__n=otgkit01
+        http_headers: *auth_headers
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch&site=otgkit01
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
+        http_headers: *auth_headers
     metrics_path: /snmp
     params:
       module:

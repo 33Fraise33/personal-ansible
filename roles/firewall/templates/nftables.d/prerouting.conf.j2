@@ -1,5 +1,5 @@
 #jinja2: trim_blocks:True
-{% for nft_item in firewall.nat.dstnat|default([]) %}
+{% for nft_item in firewall_nat.dstnat|default([]) %}
 {% set statement = 'accept' %}
 {% include './nft_item.j2' %}
 

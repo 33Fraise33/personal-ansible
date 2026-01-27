@@ -10,6 +10,6 @@ firewall_filter_input_proxmox:
     counter: true
 
 firewall:
-  sets: "{{ firewall_sets_all }}"
+  sets: "{{ firewall_sets_all + firewall_sets_internal }}"
   filter:
     input: "{{ firewall_filter_input_proxmox + firewall_filter_input_all }}"

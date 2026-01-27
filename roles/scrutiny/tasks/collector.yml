@@ -15,7 +15,7 @@
       scrutiny-collector-metrics-linux-amd64"
     dest: "/usr/local/bin/scrutiny-collector"
     mode: '0755'
-  
+
 - name: SCRUTINY - Copy the scrutiny systemd service files
   ansible.builtin.template:
     src: "{{ item }}.j2"

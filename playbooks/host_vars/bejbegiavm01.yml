@@ -15,7 +15,7 @@ firewall_filter_input_host:
     counter: true
 
 firewall:
-  sets: "{{ firewall_sets_all }}"
+  sets: "{{ firewall_sets_all + firewall_sets_internal }}"
   filter:
     input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"
 

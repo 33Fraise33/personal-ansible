@@ -28,14 +28,14 @@
 
 - name: Copy prometheus files
   ansible.builtin.copy:
-    src: "{{ item }}"
+    src: "{{ playbook_dir }}/host_files/{{ inventory_hostname | lower }}/files/prometheus/{{ item }}"
     dest: "{{ docker.dir.config }}/prometheus/{{ item }}"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"
     mode: "0755"
   loop:
-    - "{{ playbook_dir }}/host_files/{{ inventory_hostname | lower }}/files/prometheus/file_sd/"
-    - "{{ playbook_dir }}/host_files/{{ inventory_hostname | lower }}/files/prometheus/alerts.d/"
+    - "file_sd/"
+    - "alerts.d/"
   tags: config,targets
 
 - name: Setup prometheus docker container
@@ -44,6 +44,12 @@
     image: quay.io/prometheus/prometheus:latest
     networks:
       - name: monitoring
+        ipv4_address: "{{ docker.networks.monitoring.ipam[0].subnet \
+          | ansible.utils.ipsubnet(24, 0) \
+          | ansible.utils.ipaddr(docker.networks.monitoring.hosts.prometheus) \
+          | ansible.utils.ipaddr('address') if docker.networks.monitoring.hosts.prometheus is defined else omit }}"
+        ipv6_address: "{{ (docker.networks.monitoring.ipam[1].subnet | ansible.utils.ipaddr('network') \
+          + docker.networks.monitoring.hosts.prometheus) if docker.ipv6|default(true) and docker.networks.monitoring.hosts.prometheus is defined else omit }}"
     dns_servers: "{{ dns.servers }}"
     volumes:
       - "{{ docker.dir.config }}/prometheus:/config:ro"

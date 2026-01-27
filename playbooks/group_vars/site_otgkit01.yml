@@ -1,5 +1,0 @@
----
-firewall:
-  sets: "{{ firewall_sets_all + firewall_sets_internal }}"
-  filter:
-    input: "{{ firewall_filter_input_all }}"

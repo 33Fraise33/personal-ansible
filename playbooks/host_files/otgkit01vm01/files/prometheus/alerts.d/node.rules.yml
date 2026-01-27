@@ -1,0 +1,18 @@
+---
+groups:
+  - name: node.rules
+    rules:
+      - alert: ZFS Zpool State Issue
+        expr: node_zfs_zpool_state{state!="online"} == 1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Device {{ $labels.node_name }} ZFS pool {{ $labels.zpool }} state is now {{ $labels.state }}"
+      - alert: High Storage Usage
+        expr: 100 - ((node_filesystem_avail_bytes{device!~'rootfs'} * 100) / node_filesystem_size_bytes{device!~'rootfs'}) > 90
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Device {{ $labels.node_name }} with disk {{ $labels.device }} has high storage usage at {{ $labels.mountpoint }}, current {{ $value }}%"

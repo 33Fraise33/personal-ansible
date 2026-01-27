@@ -1,10 +1,10 @@
 ---
-- name: Set pve_vm_item to host vars
+- name: PVE - set pve_vm_item to host vars - {{ vm_name }}
   ansible.builtin.set_fact:
     pve_vm_item: "{{ hostvars[vm_name] }}"
     pve_vm_name: "{{ vm_name | lower | replace('_', '-') }}"
 
-- name: Get VM current state
+- name: PVE - get VM current state - {{ vm_name }}
   community.proxmox.proxmox_kvm:
     api_host: "{{ ansible_host }}"
     api_user: root@pam
@@ -18,11 +18,11 @@
   become: false
   failed_when: false
 
-- name: Check if we should create the vm or if it already exists
+- name: PVE - check if we should create the vm or if it already exists - {{ vm_name }}
   ansible.builtin.set_fact:
     pve_current_vm_to_create: "{{ 'does not exist in cluster' in pve_vm_current_state.msg }}"
 
-- name: Template VM Cloud Init
+- name: PVE - template VM Cloud Init - {{ vm_name }}
   ansible.builtin.template:
     src: cloud-init-{{ item }}.yml.j2
     dest: /var/lib/vz/snippets/{{ pve_vm_name }}-{{ item }}.yml
@@ -34,7 +34,7 @@
     - user
     - net
 
-- name: Create new VM including cloud-init
+- name: PVE - create new VM including cloud-init - {{ vm_name }}
   community.proxmox.proxmox_kvm:
     api_host: "{{ ansible_host }}"
     api_user: root@pam
@@ -63,12 +63,12 @@
   when: pve_current_vm_to_create
   become: false
 
-- name: Wait for vm to be fully created
+- name: PVE - wait for vm to be fully created - {{ vm_name }}
   ansible.builtin.pause:
     seconds: 10
   when: pve_current_vm_to_create
 
-- name: Import Disk & add swap disk
+- name: PVE - import disk & add swap disk - {{ vm_name }}
   community.proxmox.proxmox_disk:
     api_host: "{{ ansible_host }}"
     api_user: root@pam
@@ -78,7 +78,7 @@
     name: "{{ pve_vm_name }}"
     disk: "{{ item.name }}"
     backup: "{{ false if (item.tags | community.general.json_query(pve_swap_query) | length > 0) else true }}"
-    storage: "{{ 'local-lvm' if item.tags | community.general.json_query(pve_swap_query) | length > 0
+    storage: "{{ 'local-zfs' if item.tags | community.general.json_query(pve_swap_query) | length > 0
       else 'vm-storage' }}"
     size: "{{ (item.size | int) / 1000 if item.tags | community.general.json_query(pve_root_query) | length == 0 else omit }}"
     ssd: true
@@ -93,7 +93,7 @@
     label: "{{ item.name }}"
   when: pve_current_vm_to_create
 
-- name: Resize Disk
+- name: PVE - Resize disk - {{ vm_name }}
   community.proxmox.proxmox_disk:
     api_host: "{{ ansible_host }}"
     api_user: root@pam
@@ -110,7 +110,7 @@
     label: "{{ item.name }}"
   when: pve_current_vm_to_create
 
-- name: Update VM to use correct boot order
+- name: PVE - Update VM to use correct boot order - {{ vm_name }}
   community.proxmox.proxmox_kvm:
     api_host: "{{ ansible_host }}"
     api_user: root@pam
@@ -125,7 +125,7 @@
   become: false
   when: pve_current_vm_to_create
 
-- name: Start VM
+- name: PVE - Start VM - {{ vm_name }}
   community.proxmox.proxmox_kvm:
     api_host: "{{ ansible_host }}"
     api_user: root@pam
@@ -138,7 +138,7 @@
   become: false
   when: pve_current_vm_to_create
 
-- name: Existing VM - Resize Disk
+- name: PVE - Existing VM - Resize Disk - {{ vm_name }}
   community.proxmox.proxmox_disk:
     api_host: "{{ ansible_host }}"
     api_user: root@pam
@@ -155,7 +155,7 @@
     label: "{{ item.name }}"
   when: not pve_current_vm_to_create
 
-- name: Existing VM - Remove items that should not exist
+- name: PVE - Existing VM - Remove items that should not exist - {{ vm_name }}
   community.proxmox.proxmox_kvm:
     api_host: "{{ ansible_host }}"
     api_user: root@pam
@@ -169,7 +169,7 @@
   become: false
   when: not pve_current_vm_to_create
 
-- name: Existing VM - Update
+- name: PVE - Existing VM - Update - {{ vm_name }}
   community.proxmox.proxmox_kvm:
     api_host: "{{ ansible_host }}"
     api_user: root@pam

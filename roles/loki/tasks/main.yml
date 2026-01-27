@@ -31,13 +31,9 @@
           | ansible.utils.ipsubnet(24, 0) \
           | ansible.utils.ipaddr(docker.networks.monitoring.hosts.loki) \
           | ansible.utils.ipaddr('address') }}"
-        ipv6_address: "{{ docker.networks.monitoring.ipam[1].subnet | ansible.utils.ipaddr('network') }}\
-          {{ docker.networks.monitoring.hosts.loki }}"
-    dns_servers:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
+        ipv6_address: "{{ (docker.networks.monitoring.ipam[1].subnet | ansible.utils.ipaddr('network') \
+          + docker.networks.monitoring.hosts.loki) if docker.ipv6|default(true) else omit }}"
+    dns_servers: "{{ dns.servers }}"
     volumes:
       - "{{ docker.dir.config }}/loki:/mnt/config"
       - "data_loki:/loki"

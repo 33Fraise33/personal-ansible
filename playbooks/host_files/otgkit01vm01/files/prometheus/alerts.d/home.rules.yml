@@ -1,0 +1,9 @@
+---
+groups:
+  - name: home.rules
+    rules:
+      - alert: Solar panels broken
+        expr: homeassistant_sensor_power_w{entity="sensor.solaredge_ac_power"} == 0
+        for: 3d
+        annotations:
+          summary: "Check solar panel production"

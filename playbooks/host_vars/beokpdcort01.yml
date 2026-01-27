@@ -58,7 +58,7 @@ firewall_filter_input_host:
     counter: true
 
 firewall:
-  sets: "{{ firewall_sets_all + firewall_sets_host }}"
+  sets: "{{ firewall_sets_all + firewall_sets_internal + firewall_sets_host }}"
   filter:
     input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"
     forward:
@@ -98,7 +98,7 @@ firewall:
           ip: "@MONITORING"
         destination:
           protocol: tcp
-          port: "{ 80,443,9100,9323,9342 }"  # http,https,node_exporter,docker_exporter,frr_exporter
+          port: "{ 80,443,9090,9100,9323,9342 }"  # http,https,federate,node_exporter,docker_exporter,frr_exporter
         counter: true
       - comment: "Allow from MONITORING"
         type: ip6
@@ -106,7 +106,7 @@ firewall:
           ip: "@v6_MONITORING"
         destination:
           protocol: tcp
-          port: "{ 80,443,9100,9323,9342 }"  # http,https,node_exporter,docker_exporter,frr_exporter
+          port: "{ 80,443,9090,9100,9323,9342 }"  # http,https,node_exporter,docker_exporter,frr_exporter
         counter: true
       # DNS
       - comment: "Allow Adguard to Recursive"
@@ -326,38 +326,38 @@ firewall:
         statement: 'drop'
       - counter: true
         statement: 'log prefix "DROPPED: " drop'
-  nat:
-    srcnat:  # default masquerade
-      - comment: SNAT to inet
-        source:
-          ip: "@RFC1918"
-        destination:
-          interface: "@WAN"
-          negate: true
-          ip: "@RFC1918"
-        counter: true
-    dstnat:
-      - comment: DNAT to Plex
-        statement: dnat ip to 10.10.48.150
-        source:
-          interface: ens17
-        destination:
-          port: 32400
-          protocol: tcp
-        counter: true
-      - comment: DNAT to unifi - inform
-        statement: dnat ip to 10.10.48.190
-        source:
-          interface: ens17
-        destination:
-          port: 8080
-          protocol: tcp
-        counter: true
-      - comment: DNAT to unifi - STUN
-        statement: dnat ip to 10.10.48.190
-        source:
-          interface: ens17
-        destination:
-          port: 3478
-          protocol: udp
-        counter: true
+firewall_nat:
+  srcnat:  # default masquerade
+    - comment: SNAT to inet
+      source:
+        ip: "@RFC1918"
+      destination:
+        interface: "@WAN"
+        negate: true
+        ip: "@RFC1918"
+      counter: true
+  dstnat:
+    - comment: DNAT to Plex
+      statement: dnat ip to 10.10.48.150
+      source:
+        interface: ens17
+      destination:
+        port: 32400
+        protocol: tcp
+      counter: true
+    - comment: DNAT to unifi - inform
+      statement: dnat ip to 10.10.48.190
+      source:
+        interface: ens17
+      destination:
+        port: 8080
+        protocol: tcp
+      counter: true
+    - comment: DNAT to unifi - STUN
+      statement: dnat ip to 10.10.48.190
+      source:
+        interface: ens17
+      destination:
+        port: 3478
+        protocol: udp
+      counter: true

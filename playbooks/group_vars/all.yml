@@ -444,35 +444,23 @@ firewall_filter_input_all:
     destination:
       port: 9103
       protocol: tcp
-  - comment: "Allow node_exporter from MONITORING"
+  - comment: "Allow node_exporter,docker_exporte,cadvisor from MONITORING"
     source:
       ip: "@MONITORING"
     destination:
-      port: 9100
+      port: "{9100, 9323, 9338}"
       protocol: tcp
-  - comment: "Allow docker_exporter from MONITORING"
-    source:
-      ip: "@MONITORING"
-    destination:
-      port: 9323
-      protocol: tcp
-  - comment: "Allow node_exporter from MONITORING"
+  - comment: "Allow node_exporter,docker_exporte,cadvisor from MONITORING"
     type: ip6
     source:
       ip: "@v6_MONITORING"
     destination:
-      port: 9100
-      protocol: tcp
-  - comment: "Allow docker_exporter from MONITORING"
-    type: ip6
-    source:
-      ip: "@v6_MONITORING"
-    destination:
-      port: 9323
+      port: "{9100, 9323, 9338}"
       protocol: tcp
   - comment: "Explicit DROP"
     counter: true
     statement: 'drop'
+firewall_filter_input_host: []
 
 firewall_filter_forward_all:
   - counter: true
@@ -481,4 +469,4 @@ firewall_filter_forward_all:
 firewall:
   sets: "{{ firewall_sets_all + firewall_sets_internal }}"
   filter:
-    input: "{{ firewall_filter_input_all }}"
+    input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"

@@ -1,6 +1,6 @@
 ---
 - name: Patch systems gradually
-  hosts: linux,!proxmox
+  hosts: platform_debian
   gather_facts: false
   become: true
   serial:
@@ -11,7 +11,7 @@
     - role: patch
 
 - name: Patch systems gradually
-  hosts: proxmox
+  hosts: platform_proxmox
   gather_facts: false
   become: true
   serial:

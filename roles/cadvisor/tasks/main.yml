@@ -1,0 +1,24 @@
+---
+- name: CADVISOR - Set up container
+  community.docker.docker_container:
+    name: cadvisor
+    image: ghcr.io/google/cadvisor:latest
+    networks:
+      - name: host
+    dns_servers: "{{ dns.servers }}"
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - "{{ docker.dir.data }}/docker/:{{ docker.dir.data }}/docker/:ro"
+      - /dev/disk/:/dev/disk:ro
+    command:
+      - "--port=9338"
+    env:
+    restart: true
+    state: healthy
+    restart_policy: always
+    pull: true
+    labels:
+      traefik.enable: "false"

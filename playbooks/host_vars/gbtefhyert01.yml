@@ -6,9 +6,6 @@ firewall_sets_host:
     type: ifname
     elements:
       - ens18
-      - ens19
-      - ens20
-      - ens21
   - name: BGP_PEERS_v4
     type: ipv4_addr
     elements:
@@ -16,12 +13,9 @@ firewall_sets_host:
   - name: BGP_PEERS_v6
     type: ipv6_addr
     elements:
-      - 2a0c:9a40:1::1/128  # IFOG
-      - 2001:678:1080:101::/64  # WIREGUARD TRANSPORTS
+      - 2a0f:6280:1f::10/128  # HYE
+      - 2001:678:1080:103::/64  # WIREGUARD TRANSPORTS
       - fe80::/10 # VETH
-      - 2001:7f8:33::/64  # KLEYREX
-      - 2001:7f8:f2:e1::/64  # LOCIX
-      - 2001:7f8:ca:1::/64  # FOGIXP
 
 firewall_filter_input_host:
   - comment: "Allow BGP from PEERS_v4"
@@ -78,7 +72,7 @@ firewall_filter_forward_host:
       ip: "@AS211184"
   - comment: "Allow to DNAT IP"
     destination:
-      ip: 10.48.0.1
+      ip: 10.48.0.4
     counter: true
   - comment: "Allow from DCO"
     source:
@@ -100,7 +94,7 @@ firewall:
   raw:
     prerouting:
       - source:
-          interface: vthIfog
+          interface: vthTransit
         statement: ct zone set 2
       - source:
           interface: ens18
@@ -118,7 +112,7 @@ firewall_nat:
       counter: true
   dstnat:
     - comment: DNAT to Default VRF
-      statement: dnat to 10.48.0.1
+      statement: dnat to 10.48.0.4
       destination:
-        ip: 193.148.249.172
+        ip: 199.47.240.182
       counter: true

@@ -11,3 +11,5 @@
       tags: portainer
     - role: wud
       tags: wud
+    - role: cadvisor
+      tags: cadvisor
