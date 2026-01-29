@@ -93,6 +93,14 @@ firewall:
           protocol: udp
           port: "{ 161, 623 }"  # snmp, ipmi
         counter: true
+      - comment: "Allow from v6_MONITORING"
+        type: ip6
+        source:
+          ip: "@v6_MONITORING"
+        destination:
+          protocol: udp
+          port: "{ 161, 623 }"  # snmp, ipmi
+        counter: true
       - comment: "Allow from MONITORING"
         source:
           ip: "@MONITORING"
