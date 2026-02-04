@@ -1,0 +1,47 @@
+---
+- name: Create a volume for atlas config
+  community.docker.docker_volume:
+    name: "{{ item }}"
+  loop:
+    - config_atlas
+    - spool_atlas
+    - run_atlas
+
+- name: Setup Ripe Atlas
+  community.docker.docker_container:
+    name: ripe-atlas
+    image: docker.io/jamesits/ripe-atlas:latest
+    networks:
+      - name: host
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+    volumes:
+      - "config_atlas:/etc/ripe-atlas"
+      - "run_atlas:/run/ripe-atlas"
+      - "spool_atlas:/var/spool/ripe-atlas"
+    env:
+      RXTXRPT: "yes"
+    cap_drop:
+      - ALL
+    capabilities:
+      - NET_RAW
+      # required for tini
+      - KILL
+      # required for `setpriv` to work
+      - SETUID
+      - SETGID
+      # required for the entrypoint script to auto-fix the permissions of the directories
+      - CHOWN
+      - FOWNER
+      - DAC_OVERRIDE
+    memory: "64000000000"
+    memory_reservation: 64m
+    restart: true
+    restart_policy: always
+    state: started
+    labels:
+      traefik.enable: "false"
+

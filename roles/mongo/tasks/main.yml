@@ -10,16 +10,15 @@
     image: mongo:{{ mongo_major_version }}
     networks:
       - name: networking
-    dns_servers:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
+    dns_servers: "{{ dns.servers }}"
     volumes:
       - "data_mongo_{{ mongo_major_version }}:/data/db"
     env:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: "{{ mongo_root_password }}"
+    ulimits:
+      - "nproc:64000:64000"
+      - "nofile:64000:64000"
     restart: true
     restart_policy: always
     state: started

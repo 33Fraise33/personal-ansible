@@ -18,6 +18,10 @@
         role: dbOwner
       - db: unifi_stat
         role: dbOwner
+      - db: unifi_audit
+        role: dbOwner
+      - db: admin
+        role: clusterMonitor
   delegate_to: localhost
   become: false
 
