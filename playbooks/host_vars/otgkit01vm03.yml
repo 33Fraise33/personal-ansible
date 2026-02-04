@@ -1,0 +1,55 @@
+---
+firewall:
+  sets: "{{ firewall_sets_all + firewall_sets_internal }}"
+  filter:
+    input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"
+    forward:
+      # WAN
+      - comment: "Allow to WAN"
+        destination:
+          interface: "ens18"
+        counter: true
+      - comment: "Allow from MGMT"
+        source:
+          ip: "@MGMT"
+        counter: true
+      # MONITORING
+      - comment: "Allow from MONITORING"
+        source:
+          ip: "@MONITORING"
+      # UNITE
+      - comment: "Allow to Unite"
+        destination:
+          ip: 10.10.41.64/26
+      - counter: true
+        statement: 'log prefix "DROPPED: " drop'
+firewall_nat:
+  srcnat: []
+  dstnat:
+    - comment: DNAT to unite01 - 56507
+      statement: dnat ip to 10.10.41.66:6650
+      source:
+        interface: ens18
+      destination:
+        ip: 10.10.41.66
+        port: 56507
+        protocol: udp
+      counter: true
+    - comment: DNAT to unite01 - 56508
+      statement: dnat ip to 10.10.41.66:6788
+      source:
+        interface: ens18
+      destination:
+        ip: 10.10.41.66
+        port: 56508
+        protocol: udp
+      counter: true
+    - comment: DNAT to unite01 - 56509
+      statement: dnat ip to 10.10.41.66:10030
+      source:
+        interface: ens18
+      destination:
+        ip: 10.10.41.66
+        port: 56509
+        protocol: udp
+      counter: true

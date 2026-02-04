@@ -1,0 +1,64 @@
+---
+firewall:
+  sets: "{{ firewall_sets_all + firewall_sets_internal }}"
+  filter:
+    input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"
+    forward:
+      # WAN
+      - comment: "Allow to WAN"
+        destination:
+          interface: "ens18"
+          negate: true
+          ip: "@RFC1918"
+        counter: true
+      - comment: "Allow from MGMT"
+        source:
+          ip: "@MGMT"
+        counter: true
+      # MONITORING
+      - comment: "Allow from MONITORING"
+        source:
+          ip: "@MONITORING"
+      - comment: "Allow to Loki"
+        destination:
+          ip: 10.10.40.94
+          protocol: tcp
+          port: "{ 3100 }"  # http,https,federate,node_exporter,docker_exporter,cadvisor,frr_exporter
+        counter: true
+      # PROXY/TRAEFIK
+      - comment: "Allow to TRAEFIK"
+        source:
+          ip: "@RFC1918"
+        destination:
+          ip: "@TRAEFIK"
+        counter: true
+      - comment: "Allow from TRAEFIK to monitoring vlan tcp"
+        source:
+          ip: "@TRAEFIK"
+        destination:
+          ip: "@MONITORING"
+          protocol: tcp
+          port: "{ 1 - 65000 }"
+        counter: true
+      # SERVICES
+      - comment: "Allow Portainer to Captain"
+        source:
+          ip: 10.10.40.96/27
+        destination:
+          ip: "10.10.40.0/27"
+          port: 9001
+          protocol: tcp
+        counter: true
+      - counter: true
+        statement: 'log prefix "DROPPED: " drop'
+firewall_nat:
+  srcnat: []
+  dstnat:
+    - comment: DNAT to Prometheus
+      statement: dnat ip to 10.10.40.93
+      source:
+        interface: ens18
+      destination:
+        port: 9090
+        protocol: tcp
+      counter: true
