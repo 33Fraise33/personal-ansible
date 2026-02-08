@@ -6,14 +6,10 @@
 - name: Setup scrutiny
   community.docker.docker_container:
     name: scrutiny
-    image: ghcr.io/analogj/scrutiny:master-web
+    image: ghcr.io/analogj/scrutiny:v0-web
     networks:
       - name: services
-    dns_servers:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
+    dns_servers: "{{ dns.servers }}"
     volumes:
       - "config_scrutiny:/opt/scrutiny/config"
     env:

@@ -11,7 +11,7 @@
     scrutiny_hub: true
 
 - name: Setup Scrutiny collector
-  hosts: proxmox
+  hosts: platform_proxmox
   connection: ssh
   become: true
   roles:

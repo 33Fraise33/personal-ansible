@@ -1,4 +1,4 @@
-scrutiny_collector_version: 0.8.1
+scrutiny_collector_version: 0.8.2
 scrutiny_influxdb_user: scrutiny
 scrutiny_influxdb_token: !vault |
   $ANSIBLE_VAULT;1.1;AES256
