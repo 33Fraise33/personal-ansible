@@ -1,0 +1,40 @@
+---
+## Cloud
+- labels:
+    tenant: "Unitix"
+    site: "Cloud"
+    node_name: "PUB - Cloudflare DNS"
+  targets:
+    - 1.1.1.1
+- labels:
+    tenant: "Unitix"
+    site: "Cloud"
+    node_name: "PUB - Google DNS"
+  targets:
+    - 8.8.8.8
+- labels:
+    tenant: "Unitix"
+    site: "Cloud"
+    node_name: "PUB - Citymesh"
+  targets:
+    - 31.31.132.249
+- labels:
+    tenant: "Unitix"
+    site: "Cloud"
+    node_name: "PUB - BEOKPDCORT01"
+  targets:
+    - 185.174.7.52
+
+# LOCAL
+- labels:
+    tenant: "Unitix"
+    site: "UNITE"
+    node_name: "VIRGIN - Citymesh GW"
+  targets:
+    - 86.28.74.2
+- labels:
+    tenant: "Unitix"
+    site: "UNITE"
+    node_name: "VLAN23 - UNITIX - GW"
+  targets:
+    - 10.123.0.1

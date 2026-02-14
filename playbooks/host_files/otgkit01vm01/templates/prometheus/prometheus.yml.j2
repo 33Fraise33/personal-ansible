@@ -8,6 +8,21 @@ rule_files:
   - "alerts.d/*.yml"
 
 scrape_configs:
+  - job_name: 'blackbox_icmp'
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    file_sd_configs:
+      - files:
+          - '/config/file_sd/targets_blackbox_icmp.yml'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "prometheus-blackbox_exporter:9115"
+
   - job_name: 'general-icmp'
     http_sd_configs:
       - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&site=otgkit01
