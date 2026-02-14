@@ -6,7 +6,7 @@
 - name: Setup scrutiny
   community.docker.docker_container:
     name: scrutiny
-    image: ghcr.io/analogj/scrutiny:v0-web
+    image: ghcr.io/analogj/scrutiny:{{ scrutiny_hub_version }}
     networks:
       - name: services
     dns_servers: "{{ dns.servers }}"
