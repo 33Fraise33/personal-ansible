@@ -246,8 +246,21 @@ firewall:
         counter: true
       # BACKUPS
       - comment: "Allow from PVE to PBS"
+        type: ip6
+        source:
+          ip: "@v6_PVE"
+        destination:
+          ip: "@v6_PBS"
+        counter: true
+      - comment: "Allow from PVE to PBS"
         source:
           ip: "@Proxmox"
+        destination:
+          ip: "@PBS"
+        counter: true
+      - comment: "Allow PBS to PBS"
+        source:
+          ip: "@PBS"
         destination:
           ip: "@PBS"
         counter: true

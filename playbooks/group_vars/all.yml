@@ -417,6 +417,16 @@ firewall_sets_internal:
     type: ipv4_addr
     elements:
       - 172.16.33.7/32
+      - 10.10.48.36/32
+  - name: v6_PBS
+    type: ipv6_addr
+    elements:
+      - 2001:678:1080:2202::4/128
+  - name: v6_PVE
+    type: ipv6_addr
+    elements:
+      - 2001:678:1080:4033::3/128
+      - 2001:678:1080:2201::2/128
   - name: UNIFI
     type: ipv4_addr
     elements:

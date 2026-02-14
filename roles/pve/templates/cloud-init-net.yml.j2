@@ -2,16 +2,23 @@
 version: 2
 ethernets:
 {% for intf in pve_vm_item.interfaces|default([]) %}
+{% if not ('vmbr' in intf.name) %}
+  {{ intf.name }}:
+    addresses:
+{%   for ipaddr in intf.ip_addresses %}
+      - {{ ipaddr.address }}
+{%   endfor %}
 {%   for ipaddr in intf.ip_addresses %}
 {%     if (ipaddr.address | ansible.utils.ipaddr('address')) == pve_vm_item.primary_ip4 %}
-  ens18:
-    addresses:
-      - {{ ipaddr.address }}
     gateway4: {{ ipaddr.address | ansible.utils.ipaddr('subnet') | ansible.utils.ipaddr('net') | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
     nameservers:
       addresses: 
         - 1.1.1.1
         - 1.0.0.1
 {%     endif %}
+{%     if (ipaddr.address | ansible.utils.ipaddr('address')) == pve_vm_item.primary_ip6 %}
+    gateway6: {{ ipaddr.address | ansible.utils.ipaddr('subnet') | ansible.utils.ipaddr('net') | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
+{%     endif %}
 {%   endfor %}
+{% endif %}
 {% endfor %}

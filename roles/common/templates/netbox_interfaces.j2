@@ -8,7 +8,7 @@ iface lo inet loopback
 # Loopback interface
 
 {% for intf in interfaces %}
-{% if not intf.mgmt_only|default(false) %}
+{% if not intf.mgmt_only|default(false) and not (is_virtual and 'vmbr' in intf.name) %}
 auto {{ intf.name }}
 iface {{ intf.name }} inet {{ 'static' if intf.ip_addresses|length>0 else 'manual' }}
 {% if intf.enabled is not none and not intf.enabled %}

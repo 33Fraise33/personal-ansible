@@ -1,0 +1,12 @@
+---
+firewall_filter_input_pbs:
+  - comment: "Allow PBS Web"
+    destination:
+      port: 8007
+      protocol: tcp
+    counter: true
+
+firewall:
+  sets: "{{ firewall_sets_all + firewall_sets_internal }}"
+  filter:
+    input: "{{ firewall_filter_input_pbs + firewall_filter_input_all }}"
