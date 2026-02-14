@@ -41,7 +41,7 @@ firewall:
           port: "{ 1 - 65000 }"
         counter: true
       # SERVICES
-      - comment: "Allow Portainer to Captain"
+      - comment: "Allow Portainer to hosts"
         source:
           ip: 10.10.40.96/27
         destination:

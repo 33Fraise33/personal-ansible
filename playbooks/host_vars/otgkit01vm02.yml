@@ -28,198 +28,198 @@ firewall:
       # UNITE
       - comment: "Allow to Unite"
         destination:
-          ip: 10.10.41.64/26
+          ip: 10.10.41.0/26
       - counter: true
         statement: 'log prefix "DROPPED: " drop'
 firewall_nat:
   srcnat: []
   dstnat:
-    - comment: DNAT to unite01 - 56507
-      statement: dnat ip to 10.10.41.66:6650
+    - comment: DNAT to unite02 - 56507
+      statement: dnat ip to 10.10.41.2:6650
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.66
+        ip: 10.10.41.2
         port: 56507
         protocol: udp
       counter: true
-    - comment: DNAT to unite01 - 56508
-      statement: dnat ip to 10.10.41.66:6788
+    - comment: DNAT to unite02 - 56508
+      statement: dnat ip to 10.10.41.2:6788
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.66
+        ip: 10.10.41.2
         port: 56508
         protocol: udp
       counter: true
-    - comment: DNAT to unite01 - 56509
-      statement: dnat ip to 10.10.41.66:10030
+    - comment: DNAT to unite02 - 56509
+      statement: dnat ip to 10.10.41.2:10030
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.66
+        ip: 10.10.41.2
         port: 56509
         protocol: udp
       counter: true
-    - comment: DNAT to unite03 - 56507
-      statement: dnat ip to 10.10.41.67:6650
+    - comment: DNAT to unite04 - 56507
+      statement: dnat ip to 10.10.41.3:6650
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.67
+        ip: 10.10.41.3
         port: 56507
         protocol: udp
       counter: true
-    - comment: DNAT to unite03 - 56508
-      statement: dnat ip to 10.10.41.67:6788
+    - comment: DNAT to unite04 - 56508
+      statement: dnat ip to 10.10.41.3:6788
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.67
+        ip: 10.10.41.3
         port: 56508
         protocol: udp
       counter: true
-    - comment: DNAT to unite03 - 56509
-      statement: dnat ip to 10.10.41.67:10030
+    - comment: DNAT to unite04 - 56509
+      statement: dnat ip to 10.10.41.3:10030
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.67
+        ip: 10.10.41.3
         port: 56509
         protocol: udp
       counter: true
-    - comment: DNAT to unite05 - 56507
-      statement: dnat ip to 10.10.41.68:6650
+    - comment: DNAT to unite06 - 56507
+      statement: dnat ip to 10.10.41.4:6650
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.68
+        ip: 10.10.41.4
         port: 56507
         protocol: udp
       counter: true
-    - comment: DNAT to unite05 - 56508
-      statement: dnat ip to 10.10.41.68:6788
+    - comment: DNAT to unite06 - 56508
+      statement: dnat ip to 10.10.41.4:6788
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.68
+        ip: 10.10.41.4
         port: 56508
         protocol: udp
       counter: true
-    - comment: DNAT to unite05 - 56509
-      statement: dnat ip to 10.10.41.68:10030
+    - comment: DNAT to unite06 - 56509
+      statement: dnat ip to 10.10.41.4:10030
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.68
+        ip: 10.10.41.4
         port: 56509
         protocol: udp
       counter: true
-    - comment: DNAT to unite07 - 56507
-      statement: dnat ip to 10.10.41.69:6650
+    - comment: DNAT to unite08 - 56507
+      statement: dnat ip to 10.10.41.5:6650
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.69
+        ip: 10.10.41.5
         port: 56507
         protocol: udp
       counter: true
-    - comment: DNAT to unite07 - 56508
-      statement: dnat ip to 10.10.41.69:6788
+    - comment: DNAT to unite08 - 56508
+      statement: dnat ip to 10.10.41.5:6788
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.69
+        ip: 10.10.41.5
         port: 56508
         protocol: udp
       counter: true
-    - comment: DNAT to unite07 - 56509
-      statement: dnat ip to 10.10.41.69:10030
+    - comment: DNAT to unite08 - 56509
+      statement: dnat ip to 10.10.41.5:10030
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.69
+        ip: 10.10.41.5
         port: 56509
         protocol: udp
       counter: true
-    - comment: DNAT to unite09 - 56507
-      statement: dnat ip to 10.10.41.70:6650
+    - comment: DNAT to unite10 - 56507
+      statement: dnat ip to 10.10.41.6:6650
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.70
+        ip: 10.10.41.6
         port: 56507
         protocol: udp
       counter: true
-    - comment: DNAT to unite09 - 56508
-      statement: dnat ip to 10.10.41.70:6788
+    - comment: DNAT to unite10 - 56508
+      statement: dnat ip to 10.10.41.6:6788
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.70
+        ip: 10.10.41.6
         port: 56508
         protocol: udp
       counter: true
-    - comment: DNAT to unite09 - 56509
-      statement: dnat ip to 10.10.41.70:10030
+    - comment: DNAT to unite10 - 56509
+      statement: dnat ip to 10.10.41.6:10030
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.70
+        ip: 10.10.41.6
         port: 56509
         protocol: udp
       counter: true
-    - comment: DNAT to unite11 - 56507
-      statement: dnat ip to 10.10.41.71:6650
+    - comment: DNAT to unite12 - 56507
+      statement: dnat ip to 10.10.41.7:6650
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.71
+        ip: 10.10.41.7
         port: 56507
         protocol: udp
       counter: true
-    - comment: DNAT to unite11 - 56508
-      statement: dnat ip to 10.10.41.71:6788
+    - comment: DNAT to unite12 - 56508
+      statement: dnat ip to 10.10.41.7:6788
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.71
+        ip: 10.10.41.7
         port: 56508
         protocol: udp
       counter: true
-    - comment: DNAT to unite11 - 56509
-      statement: dnat ip to 10.10.41.71:10030
+    - comment: DNAT to unite12 - 56509
+      statement: dnat ip to 10.10.41.7:10030
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.71
+        ip: 10.10.41.7
         port: 56509
         protocol: udp
       counter: true
-    - comment: DNAT to unite13 - 56507
-      statement: dnat ip to 10.10.41.72:6650
+    - comment: DNAT to unite14 - 56507
+      statement: dnat ip to 10.10.41.8:6650
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.72
+        ip: 10.10.41.8
         port: 56507
         protocol: udp
       counter: true
-    - comment: DNAT to unite13 - 56508
-      statement: dnat ip to 10.10.41.72:6788
+    - comment: DNAT to unite14 - 56508
+      statement: dnat ip to 10.10.41.8:6788
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.72
+        ip: 10.10.41.8
         port: 56508
         protocol: udp
       counter: true
-    - comment: DNAT to unite13 - 56509
-      statement: dnat ip to 10.10.41.72:10030
+    - comment: DNAT to unite14 - 56509
+      statement: dnat ip to 10.10.41.8:10030
       source:
         interface: ens18
       destination:
-        ip: 10.10.41.72
+        ip: 10.10.41.8
         port: 56509
         protocol: udp
       counter: true
