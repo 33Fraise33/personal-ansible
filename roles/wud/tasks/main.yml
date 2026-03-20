@@ -22,6 +22,7 @@
       WUD_TRIGGER_HTTP_NOTIFYANY_AUTO: "true"
       WUD_TRIGGER_HTTP_NOTIFYANY_URL: https://n8n.frai.se/webhook/{{ wud_n8n_path }}
       WUD_TRIGGER_HTTP_NOTIFYANY_SIMPLETITLE: "{{ inventory_hostname }}"
+      WUD_TRIGGER_HTTP_NOTIFYANY_SIMPLEBODY: "{{ inventory_hostname }}"
       WUD_TRIGGER_HTTP_NOTIFYANY_AUTH_TYPE: BEARER
       WUD_TRIGGER_HTTP_NOTIFYANY_AUTH_BEARER: "{{ wud_n8n_bearer }}"
     restart: true

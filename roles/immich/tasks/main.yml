@@ -1,0 +1,86 @@
+# see postgres role for backup and restore
+---
+- name: Create a volume for immich_postgres data
+  community.docker.docker_volume:
+    name: data_immich_postgres{{ immich_postgres_major_version }}
+
+- name: Setup immich postgres
+  community.docker.docker_container:
+    name: immich_postgres
+    image: ghcr.io/immich-app/postgres:{{ immich_postgres_major_version }}-{{ immich_postgres_specific_tag }}
+    networks:
+      - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+    volumes:
+      # - "data_postgres_16:/old_data"
+      - "data_immich_postgres{{ immich_postgres_major_version }}:/var/lib/postgresql/data"
+    env:
+      POSTGRES_USER: "{{ immich_postgres_user }}"
+      POSTGRES_PASSWORD: "{{ immich_postgres_password }}"
+      POSTGRES_DB: immich
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    restart: true
+    restart_policy: always
+    state: healthy
+    pull: true
+    labels:
+      traefik.enable: "false"
+      wud.trigger.exclude: "docker.upgradeany"
+
+- name: Create a volume for model cache
+  community.docker.docker_volume:
+    name: data_immich_model_cache
+
+- name: Setup immich machine learning
+  community.docker.docker_container:
+    name: immich_machine_learning
+    image: ghcr.io/immich-app/immich-machine-learning:{{ immich_version }}
+    networks:
+      - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+    volumes:
+      - "data_immich_model_cache:/cache"
+    restart: true
+    restart_policy: always
+    state: healthy
+    pull: true
+    labels:
+      traefik.enable: "false"
+      wud.tag.include: '^{{ immich_version }}$'
+
+- name: Setup immich
+  community.docker.docker_container:
+    name: immich
+    image: ghcr.io/immich-app/immich-server:{{ immich_version }}
+    networks:
+      - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+    volumes:
+      - "/media/photos:/data"
+      - /etc/localtime:/etc/localtime:ro
+    env:
+      REDIS_HOSTNAME: valkey
+      DB_HOSTNAME: immich_postgres
+      DB_USERNAME: "{{ immich_postgres_user }}"
+      DB_PASSWORD: "{{ immich_postgres_password }}"
+    restart: true
+    restart_policy: always
+    state: healthy
+    pull: true
+    labels:
+      wud.tag.include: '^{{ immich_version }}$'
+      traefik.http.routers.immich.tls: "true"
+      traefik.http.routers.immich.tls.certresolver: "le"
+      traefik.http.services.immich.loadbalancer.server.port: "2283"

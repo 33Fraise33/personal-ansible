@@ -11,6 +11,8 @@
   community.docker.docker_container:
     name: valkey
     image: ghcr.io/valkey-io/valkey:alpine
+    healthcheck:
+      test: "redis-cli ping || exit 1"
     networks:
       - name: services
     dns_servers:
@@ -20,7 +22,7 @@
       - "{{ dns_servers.adguard.home.ip }}"
     restart: true
     restart_policy: always
-    state: started
+    state: healthy
     pull: true
     labels:
       traefik.enable: "false"

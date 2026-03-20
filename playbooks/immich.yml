@@ -1,0 +1,10 @@
+---
+- name: Setup valkey & immich
+  hosts: BEJBEGIAVM01
+  connection: ssh
+  become: true
+  roles:
+    - role: valkey
+      tags: valkey
+    - role: immich
+      tags: immich
