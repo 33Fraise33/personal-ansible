@@ -37,6 +37,7 @@ iface {{ intf.name }} inet6 auto
 	bridge-ports {{ intf.bridge.ports }}
 	bridge-stp {{ intf.bridge.stp }}
 	bridge-fd {{ intf.bridge.fd | default('0') }}
+	bridge-mcsnoop 0
 {%    if intf.bridge.vlan is defined %}
 	bridge-vlan-aware yes
 	bridge-vids {{ intf.bridge.vlan.vids }}

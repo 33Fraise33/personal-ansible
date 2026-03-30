@@ -34,6 +34,7 @@ iface {{ intf.name }} inet {{ 'static' if intf.ip_addresses|length>0 else 'manua
 	bridge-ports {{ bridge_ports|join(' ') if bridge_ports|length > 0 else 'none' }}
 	bridge-stp off
 	bridge-fd 0
+	bridge-mcsnoop 0
 {%    if intf.mode is not none and intf.mode.value == 'tagged-all' %}
 	bridge-vlan-aware yes
 	bridge-vids 2-4094
