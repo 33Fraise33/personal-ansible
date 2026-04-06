@@ -17,6 +17,28 @@ http:
             - main: "*.frai.se"
 {% endfor %}
   middlewares:
+    auth-unitix:
+      forwardAuth:
+        maxBodySize: 1048576
+        maxResponseBodySize: 1048576
+        address: "https://auth.unitix.be/api/authz/forward-auth"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "Remote-User"
+          - "Remote-Groups"
+          - "Remote-Name"
+          - "Remote-Email"
+    auth-fraise:
+      forwardAuth:
+        maxBodySize: 1048576
+        maxResponseBodySize: 1048576
+        address: "https://auth.frai.se/api/authz/forward-auth"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "Remote-User"
+          - "Remote-Groups"
+          - "Remote-Name"
+          - "Remote-Email"
     corsheaders:
       headers:
         accessControlAllowMethods:

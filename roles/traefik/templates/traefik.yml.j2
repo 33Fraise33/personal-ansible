@@ -1,0 +1,58 @@
+global:
+  sendAnonymousUsage: false
+
+api:
+  dashboard: true
+  insecure: true
+ping: {}
+
+log:
+  level: INFO
+
+providers:
+  docker:
+    endpoint: "tcp://dockerproxy:2375"
+    defaultRule: "Host(`{{ traefik.rule | default('{{' + ' .Name ' + '}}.frai.se') }}`)"
+    exposedByDefault: true
+  file:
+    filename: "/etc/traefik/custom_rules.yml"
+    watch: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: web-secure
+          scheme: https
+
+  web-secure:
+    address: ":443"
+    forwardedHeaders:
+      trustedIPs:
+        - "127.0.0.1/32"
+        - "::1/128"
+        - "{{ traefik.home.ip }}"
+        - "{{ traefik.home.ipv6 }}"
+        - "{{ traefik.dco.ip }}"
+        - "{{ traefik.dco.ipv6 }}"
+        - "{{ traefik.media.ip }}"
+        - "{{ traefik.media.ipv6 }}"
+
+  traefik:
+    address: ":8080"
+
+certificatesResolvers:
+  le:
+    acme:
+      email: "{{ letsencrypt_email }}"
+      storage: "/letsencrypt/acme.json"
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "8.8.8.8:53"
+
+serversTransport:
+  insecureSkipVerify: true

@@ -1,24 +1,42 @@
 ---
 # setup traefik with a docker container
 # container from: https://docs.traefik.io/getting-started/quick-start/
+- name: Create traefik user to minimize privileges
+  ansible.builtin.user:
+    name: "traefik"
+    comment: "traefik user"
+    system: true
 
 - name: Create traefik config directory
   ansible.builtin.file:
-    path: "{{ docker.dir.config }}/traefik"
+    path: "{{ docker.dir.config }}/{{ item }}"
     state: directory
-    mode: "0600"
-    owner: root
-    group: root
+    mode: "0700"
+    owner: traefik
+    group: traefik
+  loop:
+    - traefik
+    - traefik/letsencrypt
+    - traefik/secrets
 
 - name: Copy Traefik config
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ docker.dir.config }}/traefik/{{ item }}"
-    owner: root
-    group: root
-    mode: "0755"
+    owner: traefik
+    group: traefik
+    mode: "0600"
   loop:
+    - traefik.yml
     - custom_rules.yml
+
+- name: Write Cloudflare Token to secret file
+  ansible.builtin.copy:
+    content: "{{ cloudflare_api_token }}"
+    dest: "{{ docker.dir.config }}/traefik/secrets/cf_api_token"
+    owner: traefik
+    group: traefik
+    mode: "0400"
 
 - name: Create a volume for letsencrypt
   community.docker.docker_volume:
@@ -28,10 +46,59 @@
   ansible.builtin.set_fact:
     traefik_network: "{{ traefik_network | default('services') }}"
 
+- name: Gather numeric UID and GID of the host traefik user
+  ansible.builtin.getent:
+    database: passwd
+    key: traefik
+
+- name: Gather numeric GID of the host docker group
+  ansible.builtin.getent:
+    database: group
+    key: docker
+
+- name: Create dockerproxy docker network
+  community.docker.docker_network:
+    name: dockerproxy_network
+    driver: bridge
+    internal: true
+
+- name: Setup dockerproxy docker container
+  community.docker.docker_container:
+    name: dockerproxy
+    image: ghcr.io/wollomatic/socket-proxy:1
+    networks:
+      - name: dockerproxy_network
+    dns_servers: "{{ dns.servers }}"
+    command:
+      - '-loglevel=info' # set to debug for far more logging
+      - '-allowfrom=traefik'
+      - '-listenip=0.0.0.0'
+      - '-allowGET=/v1\..{1,2}/(version|containers/.*|events.*)'
+      - '-allowHEAD=/_ping'
+      - '-shutdowngracetime=5'
+      - '-watchdoginterval=600'
+      - '-stoponwatchdog'
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opts:
+      - no-new-privileges:true
+    user: 65534:{{ getent_group['docker'][1] }}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      traefik.enable: "false"
+      wud.watch.digest: "true"
+
 - name: Setup traefik docker container
   community.docker.docker_container:
     name: traefik
     image: traefik:latest
+    user: "{{ getent_passwd['traefik'][1] }}:{{ getent_passwd['traefik'][2] }}"
     networks:
       - name: "{{ traefik_network }}"
         ipv4_address: "{{ docker.networks[traefik_network].ipam[0].subnet \
@@ -39,42 +106,37 @@
           | ansible.utils.ipaddr(docker.networks[traefik_network].hosts.traefik) \
           | ansible.utils.ipaddr('address') if docker.networks[traefik_network].hosts.traefik is defined else omit }}"
         ipv6_address: "{{ (docker.networks[traefik_network].ipam[1].subnet | ansible.utils.ipaddr('network') \
-          + docker.networks[traefik_network].hosts.traefik) if docker.ipv6|default(true)
+          + docker.networks[traefik_network].hosts.traefik | string) if docker.ipv6 | default(true)
           and docker.networks[traefik_network].hosts.traefik is defined else omit }}"
+      - name: dockerproxy_network
     dns_servers: "{{ dns.servers }}"
-    command:
-      - --global.sendAnonymousUsage=false
-      - --entryPoints.web.address=:80
-      - --entryPoints.web.http.redirections.entryPoint.to=web-secure
-      - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --entryPoints.web-secure.address=:443
-      - --entryPoints.traefik.address=:8080
-      - --api=true
-      - --api.dashboard=true
-      - --api.insecure=true
-      - --log=true
-      - --log.level=INFO
-      - --providers.docker=true
-      - --providers.docker.endpoint=unix:///var/run/docker.sock
-      - --providers.docker.defaultRule=Host(`{{ traefik.rule | default('{{' + ' .Name ' + '}}.frai.se') }}`)
-      - --providers.docker.exposedByDefault=true
-      - --providers.file.filename=/etc/traefik/custom_rules.yml
-      - --providers.file.watch=true
-      - --certificatesResolvers.le.acme.email={{ letsencrypt_email }}
-      - --certificatesResolvers.le.acme.storage=/letsencrypt/acme.json
-      - --certificatesResolvers.le.acme.dnsChallenge.provider=cloudflare
-      - --certificatesResolvers.le.acme.dnsChallenge.resolvers=molly.ns.cloudflare.com,rudy.ns.cloudflare.com
-      - --serversTransport.insecureSkipVerify=true
     volumes:
-      - "data_traefik_letsencrypt:/letsencrypt"
+      - "{{ docker.dir.config }}/traefik/letsencrypt:/letsencrypt"
+      - "{{ docker.dir.config }}/traefik/traefik.yml:/etc/traefik/traefik.yml:ro"
       - "{{ docker.dir.config }}/traefik/custom_rules.yml:/etc/traefik/custom_rules.yml:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "{{ docker.dir.config }}/traefik/secrets/cf_api_token:/run/secrets/cf_api_token:ro"
+    mounts:
+      - target: /tmp
+        type: tmpfs
     env:
       CF_API_EMAIL: "{{ cloudflare_api_email }}"
-      CF_API_KEY: "{{ cloudflare_api_token }}"
+      CF_API_KEY_FILE: "/run/secrets/cf_api_token"
+    read_only: true
+    capabilities:
+      - NET_BIND_SERVICE
+    cap_drop:
+      - ALL
+    security_opts:
+      - no-new-privileges:true
     restart: true
     restart_policy: always
-    state: started
+    state: healthy
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     pull: true
     labels:
       traefik.enable: "true"
