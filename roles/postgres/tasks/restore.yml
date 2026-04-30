@@ -1,0 +1,32 @@
+---
+- name: RESTORE - Check if backup exists
+  ansible.builtin.stat:
+    path: "{{ docker.dir.data }}/docker/volumes/data_postgres_backup/_data/backup.sql"
+  register: postgres_db_dump
+
+- name: RESTORE - Assert that backup exists
+  ansible.builtin.assert:
+    that:
+      - postgres_db_dump.stat.exists
+    fail_msg: "Backup does not exist - HALTING"
+
+- name: RESTORE - Stop & Remove postgres container
+  community.docker.docker_container:
+    state: absent
+    name: postgres
+
+- name: RESTORE - Reinstall postgres container with new version if specified
+  ansible.builtin.include_tasks:
+    file: postgres.yml
+    apply:
+      tags:
+        - never
+        - restore
+      become: true
+  tags: always
+
+- name: RESTORE - Restore database backup
+  ansible.builtin.command: >-
+    docker exec postgres
+    sh -c "psql -U {{ postgres_user }} < /backup/backup.sql"
+  changed_when: true

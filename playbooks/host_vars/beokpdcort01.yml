@@ -3,7 +3,7 @@ firewall_sets_host:
   - name: WAN
     type: ifname
     elements:
-      - ens17
+      - enp2s0
       - wgDEFRAIFG
   - name: BGP_PEERS_v4
     type: ipv4_addr
@@ -361,7 +361,7 @@ firewall_nat:
     - comment: DNAT to Plex
       statement: dnat ip to 10.10.48.150
       source:
-        interface: ens17
+        interface: enp2s0
       destination:
         port: 32400
         protocol: tcp
@@ -369,7 +369,7 @@ firewall_nat:
     - comment: DNAT to unifi - inform
       statement: dnat ip to 10.10.48.190
       source:
-        interface: ens17
+        interface: enp2s0
       destination:
         port: 8080
         protocol: tcp
@@ -377,7 +377,7 @@ firewall_nat:
     - comment: DNAT to unifi - STUN
       statement: dnat ip to 10.10.48.190
       source:
-        interface: ens17
+        interface: enp2s0
       destination:
         port: 3478
         protocol: udp

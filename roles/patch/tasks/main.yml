@@ -1,9 +1,9 @@
 ---
 - name: Update packages
   ansible.builtin.package:
-    name: '*'
     state: latest
     update_cache: true
+    upgrade: dist
   register: updates_applied
   diff: true
 

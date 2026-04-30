@@ -1,0 +1,128 @@
+# see postgres role for backup and restore
+---
+- name: Create authelia user to minimize privileges
+  ansible.builtin.user:
+    name: "authelia"
+    comment: "authelia user"
+    system: true
+
+- name: Create authelia config directory
+  ansible.builtin.file:
+    path: "{{ docker.dir.config }}/{{ item }}"
+    state: directory
+    mode: "0700"
+    owner: authelia
+    group: authelia
+  loop:
+    - "authelia"
+    - "authelia/secrets"
+
+- name: Create authelia config directory
+  ansible.builtin.template:
+    src: configuration.yml.j2
+    dest: "{{ docker.dir.config }}/authelia/configuration.yml"
+    mode: "0400"
+    owner: authelia
+    group: authelia
+
+- name: Deploy Authelia secrets
+  ansible.builtin.copy:
+    content: "{{ item.content | trim }}"
+    dest: "{{ docker.dir.config }}/authelia/secrets/{{ item.name }}"
+    owner: authelia
+    group: authelia
+    mode: "0400"
+  loop:
+    - { name: 'jwt_secret', content: '{{ authelia_secret_jwt }}' }
+    - { name: 'session_secret', content: '{{ authelia_secret_session }}' }
+    - { name: 'storage_encryption_key', content: '{{ authelia_secret_encryption_key }}' }
+    - { name: 'storage_postgres_password', content: '{{ authelia_postgres_pass }}' }
+    - { name: 'hmac_secret', content: '{{ authelia_oidc_hmac_secret }}' }
+    - { name: 'rsa.4096.key', content: '{{ authelia_oidc_jkws_rsa4096 }}' }
+  no_log: true
+
+- name: Get postgres container ip
+  community.docker.docker_container_info:
+    name: postgres
+  register: authelia_result_containerip
+
+- name: Create a new database with name "authelia"
+  community.general.postgresql_db:
+    name: authelia
+    login_host: "{{ authelia_result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+    encoding: UTF-8
+    lc_collate: C
+    lc_ctype: C
+    template: template0
+  delegate_to: localhost
+  become: false
+
+- name: Create authelia postgres user
+  community.general.postgresql_user:
+    name: "{{ authelia_postgres_user }}"
+    password: "{{ authelia_postgres_pass }}"
+    login_db: authelia
+    login_host: "{{ authelia_result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+  delegate_to: localhost
+  become: false
+
+- name: Set authelia postgres permissions
+  community.general.postgresql_privs:
+    roles: "{{ authelia_postgres_user }}"
+    privs: ALL
+    type: "{{ item.type }}"
+    login_db: authelia
+    objs: "{{ item.objs | default(omit) }}"
+    login_host: "{{ authelia_result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+  delegate_to: localhost
+  become: false
+  loop:
+    - type: database
+    - type: schema
+      objs: "public"
+
+- name: Gather numeric UID and GID of the host authelia user
+  ansible.builtin.getent:
+    database: passwd
+    key: authelia
+
+- name: Setup authelia
+  community.docker.docker_container:
+    name: authelia
+    image: ghcr.io/authelia/authelia:{{ authelia_major_version }}
+    user: "{{ getent_passwd['authelia'][1] }}:{{ getent_passwd['authelia'][2] }}"
+    networks:
+      - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+    volumes:
+      - '{{ docker.dir.config }}/authelia:/config'
+      - "{{ docker.dir.config }}/authelia/secrets:/secrets:ro"
+    restart: true
+    restart_policy: always
+    env:
+      TZ: 'Europe/Brussels'
+      X_AUTHELIA_CONFIG_FILTERS: "template"
+      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: '/secrets/jwt_secret'
+      AUTHELIA_SESSION_SECRET_FILE: '/secrets/session_secret'
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: '/secrets/storage_encryption_key'
+      AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE: '/secrets/storage_postgres_password'
+      AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: '/secrets/hmac_secret'
+    state: healthy
+    pull: true
+    labels:
+      wud.tag.include: '^{{ authelia_major_version }}$'
+      wud.watch.digest: "true"
+      traefik.http.routers.authelia.rule: 'Host(`auth.unitix.be`) || Host(`auth.frai.se`)'
+      traefik.http.routers.authelia.tls: 'true'
+      traefik.http.routers.authelia.tls.certresolver: 'le'
+      traefik.http.services.authelia.loadbalancer.server.port: "9091"

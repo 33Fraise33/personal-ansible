@@ -1,0 +1,95 @@
+# yamllint disable rule:comments-indentation
+---
+theme: 'dark'
+log:
+  level: 'info'
+
+totp:
+  issuer: 'unitix.be'
+
+webauthn:
+  enable_passkey_login: true
+
+authentication_backend:
+  file:
+    path: '/config/users_database.yml'
+
+password_policy:
+  standard:
+    enabled: true
+    min_length: 20
+    max_length: 0
+    require_uppercase: false
+    require_lowercase: false
+    require_number: false
+    require_special: false
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: '*.unitix.be'
+      policy: two_factor
+    - domain: '*.frai.se'
+      policy: two_factor
+
+session:
+  cookies:
+    - name: 'authelia_session'
+      domain: 'unitix.be'
+      authelia_url: 'https://auth.unitix.be'
+      expiration: '1 hour'
+      inactivity: '5 minutes'
+    - name: 'authelia_session'
+      domain: 'frai.se'
+      authelia_url: 'https://auth.frai.se'
+      expiration: '1 hour'
+      inactivity: '5 minutes'
+  redis:
+    host: 'valkey'
+    database_index: 1
+
+regulation:
+  max_retries: 7
+  find_time: '5 minutes'
+  ban_time: '30 minutes'
+
+storage:
+  postgres:
+    address: 'tcp://postgres:5432'
+    database: 'authelia'
+    schema: 'public'
+    username: 'authelia_user'
+
+notifier:
+  filesystem:
+    filename: '/config/notification.txt'
+
+identity_providers:
+  oidc:
+    jwks:
+      - algorithm: 'RS256'
+        key: {% raw %}{{ secret "/secrets/rsa.4096.key" | mindent 10 "|" | msquote }}{% endraw %}
+    
+    clients:
+      - client_id: "{{ authelia_oidc_clients.immich.client_id }}"
+        client_name: 'immich'
+        client_secret: '{{ authelia_oidc_clients.immich.client_secret }}'
+        public: false
+        authorization_policy: 'two_factor'
+        require_pkce: false
+        pkce_challenge_method: ''
+        redirect_uris:
+          - 'https://immich.frai.se/auth/login'
+          - 'https://immich.frai.se/user-settings'
+          - 'app.immich:///oauth-callback'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+        response_types:
+          - 'code'
+        grant_types:
+          - 'authorization_code'
+        access_token_signed_response_alg: 'none'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_post'

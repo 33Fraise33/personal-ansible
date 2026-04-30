@@ -1,4 +1,4 @@
-scrutiny_collector_version: 0.8.6
+scrutiny_collector_version: 0.9.2
 scrutiny_hub_version: v0-web
 scrutiny_influxdb_user: scrutiny
 scrutiny_influxdb_token: !vault |

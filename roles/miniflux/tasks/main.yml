@@ -47,3 +47,4 @@
       traefik.http.routers.miniflux.rule: "Host(`rss.frai.se`)"
       traefik.http.routers.miniflux.tls.certresolver: "le"
       traefik.http.services.miniflux.loadbalancer.server.port: "8080"
+      traefik.http.routers.miniflux.middlewares: 'auth-fraise@file'

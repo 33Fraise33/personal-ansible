@@ -46,12 +46,12 @@ scrape_configs:
   
   - job_name: 'general-icmp'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -128,12 +128,12 @@ scrape_configs:
 
   - job_name: 'node_exporter'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&platform=debian&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&platform=debian
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&platform=proxmox&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&platform=proxmox
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -193,7 +193,7 @@ scrape_configs:
   
   - job_name: 'docker_exporter'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=docker&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=docker
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -224,7 +224,7 @@ scrape_configs:
   - job_name: 'ipmi_exporter'
     metrics_path: /ipmi
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&role_id=7&has_oob_ip=True&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&role_id=7&has_oob_ip=True
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -297,7 +297,7 @@ scrape_configs:
 
   - job_name: 'mikrotik-snmp'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik
         refresh_interval: 5m
         authorization: 
           type: "Token"
@@ -326,12 +326,12 @@ scrape_configs:
 
   - job_name: 'generic-snmp'
     http_sd_configs:
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik
         refresh_interval: 5m
         authorization: 
           type: "Token"
           credentials: "{{ netbox_api_token }}"
-      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch&site__n=otgkit01
+      - url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch
         refresh_interval: 5m
         authorization: 
           type: "Token"

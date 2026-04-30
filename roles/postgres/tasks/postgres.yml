@@ -1,0 +1,38 @@
+---
+- name: BASE - Create a volume for postgres data
+  community.docker.docker_volume:
+    name: "{{ item }}"
+  loop:
+    - data_postgres_{{ postgres_major_version }}
+    - data_postgres_backup
+
+- name: Setup postgres
+  community.docker.docker_container:
+    name: postgres
+    image: postgres:{{ postgres_major_version }}-alpine
+    networks:
+      - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - "data_postgres_backup:/backup"
+      - "data_postgres_{{ postgres_major_version }}:/var/lib/postgresql"
+    env:
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+    restart: true
+    restart_policy: always
+    state: healthy
+    pull: true
+    labels:
+      traefik.enable: "false"
+      wud.tag.include: '^{{ postgres_major_version }}-alpine$'
+      wud.watch.digest: "true"

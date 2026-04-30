@@ -1,33 +1,24 @@
-# https://hub.docker.com/_/postgres
-# update take backup: pg_dumpall -U db_admin -W -f /var/lib/postgresql/data/backup17.sql
-# import: psql -U db_admin < /old_data/backup17.sql
 ---
-- name: Create a volume for postgres data
-  community.docker.docker_volume:
-    name: data_postgres_{{ postgres_major_version }}
+- name: Install Postgres
+  ansible.builtin.import_tasks: postgres.yml
+  become: true
 
-- name: Setup postgres
-  community.docker.docker_container:
-    name: postgres
-    image: postgres:{{ postgres_major_version }}-alpine
-    networks:
-      - name: services
-    dns_servers:
-      - "{{ dns_servers.adguard.dco.ipv6 }}"
-      - "{{ dns_servers.adguard.dco.ip }}"
-      - "{{ dns_servers.adguard.home.ipv6 }}"
-      - "{{ dns_servers.adguard.home.ip }}"
-    volumes:
-      # - "data_postgres_16:/old_data"
-      - "data_postgres_{{ postgres_major_version }}:/var/lib/postgresql/data"
-    env:
-      POSTGRES_USER: "{{ postgres_user }}"
-      POSTGRES_PASSWORD: "{{ postgres_password }}"
-    restart: true
-    restart_policy: always
-    state: started
-    pull: true
-    labels:
-      traefik.enable: "false"
-      wud.tag.include: '^{{ postgres_major_version }}-alpine$'
-      wud.watch.digest: "true"
+- name: Backup
+  ansible.builtin.include_tasks:
+    file: backup.yml
+    apply:
+      tags:
+        - never
+        - backup
+      become: true
+  tags: always
+
+- name: Restore
+  ansible.builtin.include_tasks:
+    file: restore.yml
+    apply:
+      tags:
+        - never
+        - restore
+      become: true
+  tags: always

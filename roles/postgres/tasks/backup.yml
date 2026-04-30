@@ -1,0 +1,7 @@
+---
+# postgres password is available as env in container
+- name: BACKUP - Create a database backup
+  ansible.builtin.command: >-
+    docker exec postgres
+    pg_dumpall -U {{ postgres_user }} -f /backup/backup.sql
+  changed_when: false

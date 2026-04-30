@@ -55,6 +55,7 @@
     labels:
       traefik.enable: "false"
       wud.tag.include: '^{{ immich_version }}$'
+      wud.watch.digest: "true"
 
 - name: Setup immich
   community.docker.docker_container:
@@ -81,6 +82,7 @@
     pull: true
     labels:
       wud.tag.include: '^{{ immich_version }}$'
+      wud.watch.digest: "true"
       traefik.http.routers.immich.tls: "true"
       traefik.http.routers.immich.tls.certresolver: "le"
       traefik.http.services.immich.loadbalancer.server.port: "2283"

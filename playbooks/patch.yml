@@ -10,7 +10,7 @@
   roles:
     - role: patch
 
-- name: Patch systems gradually
+- name: Patch Proxmox 1 by 1
   hosts: platform_proxmox
   gather_facts: false
   become: true
