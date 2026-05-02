@@ -49,6 +49,7 @@
     state: started
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.http.routers.wordpress.rule: "Host(`unitix.be`)"
       traefik.http.routers.wordpress.tls: "true"
       traefik.http.routers.wordpress.tls.certresolver: "le"

@@ -1,8 +1,10 @@
 ---
 portainer_labels:
   agent:
+    wud.watch.digest: "true"
     traefik.enable: 'false'
   full:
+    wud.watch.digest: "true"
     traefik.http.routers.portainer.tls: 'true'
     traefik.http.routers.portainer.tls.certresolver: 'le'
     traefik.http.services.portainer.loadbalancer.server.port: '9000'

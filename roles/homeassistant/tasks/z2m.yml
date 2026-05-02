@@ -38,6 +38,7 @@
     state: started
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.http.routers.z2m.rule: "Host(`z2m.frai.se`)"
       traefik.http.routers.z2m.tls: "true"
       traefik.http.routers.z2m.tls.certresolver: "le"

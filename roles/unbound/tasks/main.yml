@@ -58,7 +58,7 @@
       - "{{ docker.dir.config }}/unbound/unbound.conf:/usr/local/unbound/unbound.conf:ro"
     restart: true
     restart_policy: always
-    state: started
+    state: healthy
     pull: true
     healthcheck:
       test: /usr/local/unbound/sbin/healthcheck.sh
@@ -67,4 +67,5 @@
       start_period: 15s
       timeout: 30s
     labels:
+      wud.watch.digest: "true"
       traefik.enable: "false"

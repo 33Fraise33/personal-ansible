@@ -30,9 +30,9 @@
         ipv4_address: "{{ docker.networks.monitoring.ipam[0].subnet \
           | ansible.utils.ipsubnet(24, 0) \
           | ansible.utils.ipaddr(docker.networks.monitoring.hosts.loki) \
-          | ansible.utils.ipaddr('address') }}"
+          | ansible.utils.ipaddr('address') if docker.networks.monitoring.hosts.loki is defined else omit }}"
         ipv6_address: "{{ (docker.networks.monitoring.ipam[1].subnet | ansible.utils.ipaddr('network') \
-          + docker.networks.monitoring.hosts.loki) if docker.ipv6|default(true) else omit }}"
+          + (docker.networks.monitoring.hosts.loki | string)) if docker.ipv6 | default(true) and docker.networks.monitoring.hosts.loki is defined else omit }}"
     dns_servers: "{{ dns.servers }}"
     volumes:
       - "{{ docker.dir.config }}/loki:/mnt/config"
@@ -52,6 +52,7 @@
     state: started
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.http.routers.loki.tls: "true"
       traefik.http.routers.loki.tls.certresolver: "le"
       traefik.http.services.loki.loadbalancer.server.port: "3100"

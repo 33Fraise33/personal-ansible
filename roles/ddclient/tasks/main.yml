@@ -22,7 +22,7 @@
 - name: Setup ddclient docker container
   community.docker.docker_container:
     name: ddclient
-    image: linuxserver/ddclient:latest
+    image: quay.io/linuxserver.io/ddclient:latest
     networks:
       - name: services
     dns_servers:

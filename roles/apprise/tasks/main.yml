@@ -19,6 +19,7 @@
     restart_policy: always
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.http.routers.apprise.tls: "true"
       traefik.http.routers.apprise.rule: "Host(`apprise.frai.se`)"
       traefik.http.routers.apprise.tls.certresolver: "le"

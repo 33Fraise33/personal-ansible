@@ -38,10 +38,6 @@
     group: traefik
     mode: "0400"
 
-- name: Create a volume for letsencrypt
-  community.docker.docker_volume:
-    name: data_traefik_letsencrypt
-
 - name: Set network var
   ansible.builtin.set_fact:
     traefik_network: "{{ traefik_network | default('services') }}"
@@ -139,6 +135,7 @@
       start_period: 5s
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.enable: "true"
       traefik.http.routers.api.rule: Host(`traefik.frai.se`)
       traefik.http.routers.api.tls: "true"

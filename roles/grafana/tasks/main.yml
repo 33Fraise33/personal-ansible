@@ -25,6 +25,7 @@
     pull: true
     user: 0:0
     labels:
+      wud.watch.digest: "true"
       traefik.http.routers.grafana.rule: "Host(`{{ grafana_host | default('grafana.unitix.be') }}`)"
       traefik.http.routers.grafana.tls: "true"
       traefik.http.routers.grafana.tls.certresolver: "le"

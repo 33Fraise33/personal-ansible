@@ -37,6 +37,7 @@
     state: started
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.http.routers.nginx.rule: "Host(`frai.se`)"
       traefik.http.routers.nginx.tls: "true"
       traefik.http.routers.nginx.tls.certresolver: "le"

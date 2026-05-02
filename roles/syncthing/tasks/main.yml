@@ -41,6 +41,7 @@
     restart: true
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.http.routers.syncthing.tls: "true"
       traefik.http.routers.syncthing.tls.certresolver: "le"
       traefik.http.services.syncthing.loadbalancer.server.port: "8384"

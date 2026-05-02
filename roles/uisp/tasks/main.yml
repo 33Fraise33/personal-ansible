@@ -32,6 +32,7 @@
     state: started
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.http.routers.uisp.rule: "Host(`uisp.unitix.be`)"
       traefik.http.routers.uisp.tls: "true"
       traefik.http.routers.uisp.tls.certresolver: "le"

@@ -25,3 +25,4 @@
     pull: true
     labels:
       traefik.enable: "false"
+      wud.watch.digest: "true"

@@ -32,4 +32,5 @@
     state: started
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.enable: "false"

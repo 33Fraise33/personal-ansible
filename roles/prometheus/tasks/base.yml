@@ -49,7 +49,8 @@
           | ansible.utils.ipaddr(docker.networks.monitoring.hosts.prometheus) \
           | ansible.utils.ipaddr('address') if docker.networks.monitoring.hosts.prometheus is defined else omit }}"
         ipv6_address: "{{ (docker.networks.monitoring.ipam[1].subnet | ansible.utils.ipaddr('network') \
-          + docker.networks.monitoring.hosts.prometheus) if docker.ipv6|default(true) and docker.networks.monitoring.hosts.prometheus is defined else omit }}"
+          + (docker.networks.monitoring.hosts.prometheus | string)) if docker.ipv6 | default(true) and \
+          docker.networks.monitoring.hosts.prometheus is defined else omit }}"
     dns_servers: "{{ dns.servers }}"
     volumes:
       - "{{ docker.dir.config }}/prometheus:/config:ro"

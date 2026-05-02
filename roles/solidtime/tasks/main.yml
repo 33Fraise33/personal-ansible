@@ -1,0 +1,188 @@
+# see postgres role for backup and restore
+---
+- name: Create solidtime user to minimize privileges
+  ansible.builtin.user:
+    name: "solidtime"
+    comment: "solidtime user"
+    system: true
+
+- name: Create solidtime config directory
+  ansible.builtin.file:
+    path: "{{ docker.dir.config }}/{{ item }}"
+    state: directory
+    mode: "0700"
+    owner: solidtime
+    group: solidtime
+  loop:
+    - solidtime
+    - solidtime/base
+    - solidtime/app
+
+- name: Copy laravel env template
+  ansible.builtin.template:
+    src: "laravel.env.j2"
+    dest: "{{ docker.dir.config }}/solidtime/laravel.env"
+    mode: "0700"
+    owner: solidtime
+    group: solidtime
+
+- name: Get postgres container ip
+  community.docker.docker_container_info:
+    name: postgres
+  register: solidtime_result_containerip
+
+- name: Create a new database with name "solidtime"
+  community.general.postgresql_db:
+    name: solidtime
+    login_host: "{{ solidtime_result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+    encoding: UTF-8
+    lc_collate: C
+    lc_ctype: C
+    template: template0
+  delegate_to: localhost
+  become: false
+
+- name: Create solidtime postgres user
+  community.general.postgresql_user:
+    name: "{{ solidtime_postgres_user }}"
+    password: "{{ solidtime_postgres_pass }}"
+    login_db: solidtime
+    login_host: "{{ solidtime_result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+  delegate_to: localhost
+  become: false
+
+- name: Set solidtime postgres permissions
+  community.general.postgresql_privs:
+    roles: "{{ solidtime_postgres_user }}"
+    privs: ALL
+    type: "{{ item.type }}"
+    login_db: solidtime
+    objs: "{{ item.objs | default(omit) }}"
+    login_host: "{{ solidtime_result_containerip.container.NetworkSettings.Networks.services.IPAddress }}"
+    login_password: "{{ postgres_password }}"
+    login_user: "{{ postgres_user }}"
+  delegate_to: localhost
+  become: false
+  loop:
+    - type: database
+    - type: schema
+      objs: "public"
+
+- name: Gather numeric UID and GID of the host solidtime user
+  ansible.builtin.getent:
+    database: passwd
+    key: solidtime
+
+- name: Setup solidtime
+  community.docker.docker_container:
+    name: solidtime-app
+    image: solidtime/solidtime:latest
+    user: "{{ getent_passwd['solidtime'][1] }}:{{ getent_passwd['solidtime'][2] }}"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/health-check/up"]
+    networks:
+      - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+    volumes:
+      - '{{ docker.dir.config }}/solidtime/base:/var/www/html/storage'
+      - '{{ docker.dir.config }}/solidtime/app:/var/www/html/storage/app'
+    restart: true
+    restart_policy: always
+    env:
+      CONTAINER_MODE: http
+    env_file:
+      - "{{ docker.dir.config }}/solidtime/laravel.env"
+    state: healthy
+    pull: true
+    labels:
+      traefik.http.routers.solidtime.rule: 'Host(`time.unitix.be`)'
+      traefik.http.routers.solidtime.tls: 'true'
+      traefik.http.routers.solidtime.tls.certresolver: 'le'
+      traefik.http.services.solidtime.loadbalancer.server.port: "8000"
+
+- name: Setup solidtime scheduler
+  community.docker.docker_container:
+    name: solidtime-scheduler
+    image: solidtime/solidtime:latest
+    user: "{{ getent_passwd['solidtime'][1] }}:{{ getent_passwd['solidtime'][2] }}"
+    healthcheck:
+      test: ["CMD", "healthcheck"]
+    networks:
+      - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+    volumes:
+      - '{{ docker.dir.config }}/solidtime/base:/var/www/html/storage'
+      - '{{ docker.dir.config }}/solidtime/app:/var/www/html/storage/app'
+    restart: true
+    restart_policy: always
+    env:
+      CONTAINER_MODE: scheduler
+    env_file:
+      - "{{ docker.dir.config }}/solidtime/laravel.env"
+    state: healthy
+    pull: true
+    labels:
+      traefik.enable: "false"
+
+- name: Setup solidtime queue
+  community.docker.docker_container:
+    name: solidtime-queue
+    image: solidtime/solidtime:latest
+    user: "{{ getent_passwd['solidtime'][1] }}:{{ getent_passwd['solidtime'][2] }}"
+    healthcheck:
+      test: ["CMD", "healthcheck"]
+    networks:
+      - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+    volumes:
+      - '{{ docker.dir.config }}/solidtime/base:/var/www/html/storage'
+      - '{{ docker.dir.config }}/solidtime/app:/var/www/html/storage/app'
+    restart: true
+    restart_policy: always
+    env:
+      CONTAINER_MODE: worker
+      WORKER_COMMAND: "php /var/www/html/artisan queue:work"
+    env_file:
+      - "{{ docker.dir.config }}/solidtime/laravel.env"
+    state: healthy
+    pull: true
+    labels:
+      traefik.enable: "false"
+
+- name: Setup gotenberg
+  community.docker.docker_container:
+    name: gotenberg
+    image: gotenberg/gotenberg:{{ solidtime_gotenberg_version }}
+    healthcheck:
+      test: ["CMD", "curl", "--silent", "--fail", "http://localhost:3000/health"]
+    networks:
+      - name: services
+    dns_servers:
+      - "{{ dns_servers.adguard.dco.ipv6 }}"
+      - "{{ dns_servers.adguard.dco.ip }}"
+      - "{{ dns_servers.adguard.home.ipv6 }}"
+      - "{{ dns_servers.adguard.home.ip }}"
+    restart: true
+    restart_policy: always
+    state: healthy
+    pull: true
+    labels:
+      traefik.enable: "false"
+      wud.tag.include: '^{{ solidtime_gotenberg_version }}$'
+      wud.watch.digest: "true"

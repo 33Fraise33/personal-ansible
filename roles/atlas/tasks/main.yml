@@ -10,7 +10,7 @@
 - name: Setup Ripe Atlas
   community.docker.docker_container:
     name: ripe-atlas
-    image: docker.io/jamesits/ripe-atlas:latest
+    image: ghcr.io/jamesits/ripe-atlas:latest
     networks:
       - name: host
     dns_servers:

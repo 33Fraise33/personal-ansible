@@ -41,6 +41,7 @@
     restart_policy: always
     state: started
     labels:
+      wud.watch.digest: "true"
       traefik.http.routers.adguard.rule: "Host(`{{ adguard_hostname }}`)"
       traefik.http.routers.adguard.tls: "true"
       traefik.http.routers.adguard.tls.certresolver: "le"
