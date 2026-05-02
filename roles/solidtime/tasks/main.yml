@@ -11,20 +11,26 @@
     path: "{{ docker.dir.config }}/{{ item }}"
     state: directory
     mode: "0700"
-    owner: solidtime
-    group: solidtime
+    owner: 1000
+    group: 1000
   loop:
     - solidtime
-    - solidtime/base
-    - solidtime/app
+    - solidtime/storage
+    - solidtime/storage/logs
+    - solidtime/storage/app
+    - solidtime/storage/framework
+    - solidtime/storage/framework/cache
+    - solidtime/storage/framework/sessions
+    - solidtime/storage/framework/views
+    - solidtime/logs
 
 - name: Copy laravel env template
   ansible.builtin.template:
     src: "laravel.env.j2"
     dest: "{{ docker.dir.config }}/solidtime/laravel.env"
     mode: "0700"
-    owner: solidtime
-    group: solidtime
+    owner: 1000
+    group: 1000
 
 - name: Get postgres container ip
   community.docker.docker_container_info:
@@ -72,16 +78,17 @@
     - type: schema
       objs: "public"
 
-- name: Gather numeric UID and GID of the host solidtime user
-  ansible.builtin.getent:
-    database: passwd
-    key: solidtime
+# - name: Gather numeric UID and GID of the host solidtime user
+#   ansible.builtin.getent:
+#     database: passwd
+#     key: solidtime
 
 - name: Setup solidtime
   community.docker.docker_container:
     name: solidtime-app
     image: solidtime/solidtime:latest
-    user: "{{ getent_passwd['solidtime'][1] }}:{{ getent_passwd['solidtime'][2] }}"
+    # user: "{{ getent_passwd['solidtime'][1] }}:{{ getent_passwd['solidtime'][2] }}"
+    user: 1000:1000
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8000/health-check/up"]
     networks:
@@ -92,17 +99,17 @@
       - "{{ dns_servers.adguard.home.ipv6 }}"
       - "{{ dns_servers.adguard.home.ip }}"
     volumes:
-      - '{{ docker.dir.config }}/solidtime/base:/var/www/html/storage'
-      - '{{ docker.dir.config }}/solidtime/app:/var/www/html/storage/app'
+      - '{{ docker.dir.config }}/solidtime/storage:/var/www/html/storage'
     restart: true
     restart_policy: always
     env:
       CONTAINER_MODE: http
-    env_file:
-      - "{{ docker.dir.config }}/solidtime/laravel.env"
+      AUTO_DB_MIGRATE: "true"
+    env_file: "{{ docker.dir.config }}/solidtime/laravel.env"
     state: healthy
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.http.routers.solidtime.rule: 'Host(`time.unitix.be`)'
       traefik.http.routers.solidtime.tls: 'true'
       traefik.http.routers.solidtime.tls.certresolver: 'le'
@@ -112,7 +119,7 @@
   community.docker.docker_container:
     name: solidtime-scheduler
     image: solidtime/solidtime:latest
-    user: "{{ getent_passwd['solidtime'][1] }}:{{ getent_passwd['solidtime'][2] }}"
+    user: 1000:1000
     healthcheck:
       test: ["CMD", "healthcheck"]
     networks:
@@ -123,24 +130,23 @@
       - "{{ dns_servers.adguard.home.ipv6 }}"
       - "{{ dns_servers.adguard.home.ip }}"
     volumes:
-      - '{{ docker.dir.config }}/solidtime/base:/var/www/html/storage'
-      - '{{ docker.dir.config }}/solidtime/app:/var/www/html/storage/app'
+      - '{{ docker.dir.config }}/solidtime/storage:/var/www/html/storage'
     restart: true
     restart_policy: always
     env:
       CONTAINER_MODE: scheduler
-    env_file:
-      - "{{ docker.dir.config }}/solidtime/laravel.env"
+    env_file: "{{ docker.dir.config }}/solidtime/laravel.env"
     state: healthy
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.enable: "false"
 
 - name: Setup solidtime queue
   community.docker.docker_container:
     name: solidtime-queue
     image: solidtime/solidtime:latest
-    user: "{{ getent_passwd['solidtime'][1] }}:{{ getent_passwd['solidtime'][2] }}"
+    user: 1000:1000
     healthcheck:
       test: ["CMD", "healthcheck"]
     networks:
@@ -151,18 +157,17 @@
       - "{{ dns_servers.adguard.home.ipv6 }}"
       - "{{ dns_servers.adguard.home.ip }}"
     volumes:
-      - '{{ docker.dir.config }}/solidtime/base:/var/www/html/storage'
-      - '{{ docker.dir.config }}/solidtime/app:/var/www/html/storage/app'
+      - '{{ docker.dir.config }}/solidtime/storage:/var/www/html/storage'
     restart: true
     restart_policy: always
     env:
       CONTAINER_MODE: worker
       WORKER_COMMAND: "php /var/www/html/artisan queue:work"
-    env_file:
-      - "{{ docker.dir.config }}/solidtime/laravel.env"
+    env_file: "{{ docker.dir.config }}/solidtime/laravel.env"
     state: healthy
     pull: true
     labels:
+      wud.watch.digest: "true"
       traefik.enable: "false"
 
 - name: Setup gotenberg

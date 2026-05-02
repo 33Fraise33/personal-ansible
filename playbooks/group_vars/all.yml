@@ -178,6 +178,10 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: unifi.unitix.be
       answer: "{{ traefik.dco.ip }}"
+    - domain: time.unitix.be
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: time.unitix.be
+      answer: "{{ traefik.dco.ip }}"
     # MEDIA
     - domain: "autobrr.frai.se"
       answer: "{{ traefik.media.ip }}"
