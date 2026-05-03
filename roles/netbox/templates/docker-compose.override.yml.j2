@@ -9,10 +9,20 @@ services:
     restart: always
     dns: {{ dns.servers }}
     labels:
+      # AUTHELIA
       traefik.http.routers.netbox.rule: "Host(`netbox.unitix.be`)"
       traefik.http.routers.netbox.tls: "true"
       traefik.http.routers.netbox.tls.certresolver: "le"
-      traefik.http.services.netbox.loadbalancer.server.port: "8080"
+      traefik.http.routers.netbox.service: "netbox-service"
+      traefik.http.routers.netbox.middlewares: 'auth-unitix@file'
+      # BYPASS FOR PROMETHEUS
+      traefik.http.routers.netbox-bypass.rule: "Host(`netbox.unitix.be`) && Header(`X-Authelia-Bypass`, `{{ authelia_bypass_header }}`)"
+      traefik.http.routers.netbox-bypass.tls: "true"
+      traefik.http.routers.netbox-bypass.tls.certresolver: "le"
+      traefik.http.routers.netbox-bypass.service: "netbox-service"
+      traefik.http.routers.netbox-bypass.priority: "100"
+      # SHARED
+      traefik.http.services.netbox-service.loadbalancer.server.port: "8080"
   netbox-worker:
     image: netbox:latest-plugins
     build:

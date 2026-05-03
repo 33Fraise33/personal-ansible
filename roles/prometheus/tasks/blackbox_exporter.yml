@@ -8,8 +8,8 @@
     group: "{{ nobody.group }}"
 
 - name: Copy blackbox config
-  ansible.builtin.copy:
-    src: blackbox.yml
+  ansible.builtin.template:
+    src: blackbox.yml.j2
     dest: "{{ docker.dir.config }}/prometheus_blackbox/blackbox.yml"
     owner: "{{ nobody.user }}"
     group: "{{ nobody.group }}"

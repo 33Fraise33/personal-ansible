@@ -4,6 +4,8 @@ modules:
     prober: http
     http:
       preferred_ip_protocol: ip4
+      headers:
+        X-Authelia-Bypass: "{{ authelia_bypass_header }}"
   http_post_2xx:
     prober: http
     http:

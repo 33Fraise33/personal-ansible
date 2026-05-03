@@ -38,6 +38,8 @@
       BASE_URL: "https://rss.frai.se"
       POLLING_PARSING_ERROR_LIMIT: "0"
       WEBAUTHN: "on"
+      AUTH_PROXY_HEADER: "Remote-User"
+      TRUSTED_REVERSE_PROXY_NETWORKS: "{{ traefik.dco.ipv6 }}/128,{{ traefik.dco.ip }}/32"
     state: started
     restart: true
     restart_policy: always

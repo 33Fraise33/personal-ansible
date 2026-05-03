@@ -19,6 +19,11 @@
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
       GF_LOG_LEVEL: error
       GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_AUTH_PROXY_ENABLED: "true"
+      GF_AUTH_PROXY_HEADER_NAME: "Remote-User"
+      GF_AUTH_PROXY_AUTO_SIGN_UP: "false"
+      GF_AUTH_PROXY_WHITELIST: "{{ traefik.dco.ipv6 }},{{ traefik.dco.ip }}"
+      GF_AUTH_PROXY_HEADERS: "Email:Remote-Email"
     restart: true
     state: started
     restart_policy: always
@@ -26,7 +31,18 @@
     user: 0:0
     labels:
       wud.watch.digest: "true"
+      # AUTHELIA
       traefik.http.routers.grafana.rule: "Host(`{{ grafana_host | default('grafana.unitix.be') }}`)"
       traefik.http.routers.grafana.tls: "true"
       traefik.http.routers.grafana.tls.certresolver: "le"
-      traefik.http.services.grafana.loadbalancer.server.port: "3000"
+      traefik.http.routers.grafana.service: "grafana-service"
+      traefik.http.routers.grafana.middlewares: 'auth-unitix@file'
+      # BYPASS FOR PROMETHEUS
+      traefik.http.routers.grafana-bypass.rule: "Host(`{{ grafana_host | default('grafana.unitix.be') }}`) \
+        && Header(`X-Authelia-Bypass`, `{{ authelia_bypass_header }}`)"
+      traefik.http.routers.grafana-bypass.tls: "true"
+      traefik.http.routers.grafana-bypass.tls.certresolver: "le"
+      traefik.http.routers.grafana-bypass.service: "netbox-service"
+      traefik.http.routers.grafana-bypass.priority: "100"
+      # SHARED
+      traefik.http.services.grafana-service.loadbalancer.server.port: "3000"

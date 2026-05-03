@@ -2,11 +2,16 @@ http:
   pprof:
     port: 6060
     enabled: false
+  doh:
+    routes:
+      - GET /dns-query
+      - POST /dns-query
+      - GET /dns-query/{ClientID}
+      - POST /dns-query/{ClientID}
+    insecure_enabled: true
   address: 0.0.0.0:80
   session_ttl: 720h
-users:
-  - name: fraise
-    password: {{ adguard_password | password_hash(hashtype='bcrypt') }}
+users: []
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
@@ -85,7 +90,6 @@ tls:
   port_dns_over_quic: 784
   port_dnscrypt: 0
   dnscrypt_config_file: ""
-  allow_unencrypted_doh: true
   certificate_chain: ""
   private_key: ""
   certificate_path: ""
@@ -97,12 +101,14 @@ querylog:
   interval: 24h
   size_memory: 1000
   enabled: true
+  ignored_enabled: false
   file_enabled: true
 statistics:
   dir_path: ""
   ignored: []
   interval: 720h
   enabled: true
+  ignored_enabled: false
 filters:
   - enabled: true
     url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_27.txt
@@ -211,4 +217,4 @@ os:
   group: ""
   user: ""
   rlimit_nofile: 0
-schema_version: 32
+schema_version: 34
