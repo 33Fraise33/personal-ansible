@@ -227,9 +227,9 @@ domain:
       answer: "{{ traefik.media.ipv6 }}"
     - domain: bazarr.frai.se
       answer: "{{ traefik.media.ip }}"
-    - domain: overseerr.frai.se
+    - domain: seerr.frai.se
       answer: "{{ traefik.media.ipv6 }}"
-    - domain: overseerr.frai.se
+    - domain: seerr.frai.se
       answer: "{{ traefik.media.ip }}"
     - domain: sabnzbd.frai.se
       answer: "{{ traefik.media.ipv6 }}"
