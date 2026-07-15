@@ -25,4 +25,3 @@
     labels:
       traefik.enable: "false"
       wud.tag.include: '^{{ mongo_major_version }}$'
-      wud.watch.digest: "true"

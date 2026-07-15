@@ -109,7 +109,6 @@
     state: healthy
     pull: true
     labels:
-      wud.watch.digest: "true"
       traefik.http.routers.solidtime.rule: 'Host(`time.unitix.be`)'
       traefik.http.routers.solidtime.tls: 'true'
       traefik.http.routers.solidtime.tls.certresolver: 'le'
@@ -139,7 +138,6 @@
     state: healthy
     pull: true
     labels:
-      wud.watch.digest: "true"
       traefik.enable: "false"
 
 - name: Setup solidtime queue
@@ -167,7 +165,6 @@
     state: healthy
     pull: true
     labels:
-      wud.watch.digest: "true"
       traefik.enable: "false"
 
 - name: Setup gotenberg
@@ -190,4 +187,3 @@
     labels:
       traefik.enable: "false"
       wud.tag.include: '^{{ solidtime_gotenberg_version }}$'
-      wud.watch.digest: "true"

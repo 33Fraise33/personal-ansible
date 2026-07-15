@@ -35,4 +35,3 @@
     labels:
       traefik.enable: "false"
       wud.tag.include: '^{{ postgres_major_version }}-alpine$'
-      wud.watch.digest: "true"

@@ -121,7 +121,6 @@
     pull: true
     labels:
       wud.tag.include: '^{{ authelia_major_version }}$'
-      wud.watch.digest: "true"
       traefik.http.routers.authelia.rule: 'Host(`auth.unitix.be`) || Host(`auth.frai.se`)'
       traefik.http.routers.authelia.tls: 'true'
       traefik.http.routers.authelia.tls.certresolver: 'le'

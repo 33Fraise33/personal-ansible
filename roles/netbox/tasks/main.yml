@@ -92,8 +92,6 @@
       line: "SECRET_KEY='{{ netbox.secret_key }}'"
     - regexp: "^CHANGELOG_RETENTION="
       line: "CHANGELOG_RETENTION=0"
-    # - regexp: "^LOGIN_REQUIRED="  # default changed to true
-    #   line: "LOGIN_REQUIRED=true"
     - regexp: "^EMAIL_FROM="
       line: "EMAIL_FROM=netbox@frai.se"
     - regexp: "^EMAIL_USERNAME="
