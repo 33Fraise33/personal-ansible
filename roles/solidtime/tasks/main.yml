@@ -83,10 +83,16 @@
 #     database: passwd
 #     key: solidtime
 
+- name: Log into private registry
+  community.docker.docker_login:
+    registry_url: registry.on-premise.solidtime.io
+    username: op-72971212
+    password: "{{ solidtime_registry_pass }}"
+
 - name: Setup solidtime
   community.docker.docker_container:
     name: solidtime-app
-    image: solidtime/solidtime:latest
+    image: registry.on-premise.solidtime.io/solidtime/solidtime:latest
     # user: "{{ getent_passwd['solidtime'][1] }}:{{ getent_passwd['solidtime'][2] }}"
     user: 1000:1000
     healthcheck:
@@ -117,7 +123,7 @@
 - name: Setup solidtime scheduler
   community.docker.docker_container:
     name: solidtime-scheduler
-    image: solidtime/solidtime:latest
+    image: registry.on-premise.solidtime.io/solidtime/solidtime:latest
     user: 1000:1000
     healthcheck:
       test: ["CMD", "healthcheck"]
@@ -143,7 +149,7 @@
 - name: Setup solidtime queue
   community.docker.docker_container:
     name: solidtime-queue
-    image: solidtime/solidtime:latest
+    image: registry.on-premise.solidtime.io/solidtime/solidtime:latest
     user: 1000:1000
     healthcheck:
       test: ["CMD", "healthcheck"]

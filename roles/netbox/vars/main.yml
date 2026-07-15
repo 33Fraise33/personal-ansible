@@ -1,7 +1,7 @@
 ---
 netbox:
-  docker_version: 4.0.2  # netbox docker release
-  version: v4.5.9  # netbox release vx.x.x. or latest
+  docker_version: 5.0.1  # netbox docker release
+  version: v4.6  # netbox release vx.x.x. or latest
   secret_key: !vault |
     $ANSIBLE_VAULT;1.1;AES256
     31643035343133383233623633653462656266303139393836373532643161643932393832366632

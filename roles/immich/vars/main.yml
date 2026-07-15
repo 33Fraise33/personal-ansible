@@ -9,4 +9,4 @@ immich_postgres_password: !vault |
   39613330663532313135653230376465353462313430636438336133326433646665
 immich_postgres_major_version: 14
 immich_postgres_specific_tag: vectorchord0.4.3-pgvectors0.2.0
-immich_version: v2
+immich_version: v3

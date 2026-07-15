@@ -303,7 +303,7 @@ scrape_configs:
       - <<: *netbox_auth
         url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&manufacturer=mikrotik
       - <<: *netbox_auth
-        url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch
+        url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&role=router&role=switch&tag__n=no_snmp
     metrics_path: /snmp
     params:
       module:
