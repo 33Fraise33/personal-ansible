@@ -22,13 +22,27 @@ frontend:
 
 {% raw %}
 template:
+  - trigger:
+      - platform: state
+        entity_id: event.switch_poort_scene_001
+        not_to:
+          - unknown
+          - unavailable
+    binary_sensor:
+      - name: "Garage Door Switch State"
+        device_class: opening
+        # Evaluates directly to True ('on') or False ('off').
+        # Since this is trigger-based, HA automatically restores/remembers its state across reboots!
+        state: >
+          {{ trigger.to_state.attributes.event_type == 'KeyReleased' }}
   - cover:
-    - device_class: garage
+    - name: "Garage Door"
+      device_class: garage
       default_entity_id: cover.garage_door
       open_cover:
         - condition: state
           entity_id:
-            - binary_sensor.fibaro_door_window_sensor_2_window_door_is_open
+            - binary_sensor.garage_door_switch_state
           state: 'off'
           match: all
         - target:
@@ -45,9 +59,8 @@ template:
             entity_id:
               - switch.node_31
           action: switch.toggle
-      name: Garage Door
-      state: "{% if is_state('binary_sensor.fibaro_door_window_sensor_2_window_door_is_open',
-        'on') %}\n  open\n{% else %}\n  closed\n{% endif %}"
+      state: >
+        {{ 'open' if is_state('binary_sensor.garage_door_switch_state', 'on') else 'closed' }}
   - alarm_control_panel:
     - code_format: no_code
       name: ultrasync_alarm

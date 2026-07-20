@@ -1,0 +1,8 @@
+---
+netbox_interface: true
+docker:
+  users:
+    - fraise
+  dir:
+    config: /data/docker-config
+    data: /data/docker

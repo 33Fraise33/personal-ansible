@@ -23,3 +23,12 @@ new_script:
       entity_id: media_player.shield_android_tv
   alias: 'Script: Start Plex & AVR'
   description: ''
+aircogianni:
+  sequence:
+  - action: climate.toggle
+    metadata: {}
+    target:
+      entity_id: climate.bureau_garage_room_temperature
+    data: {}
+  alias: AircoGianni
+  description: ''

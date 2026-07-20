@@ -54,9 +54,6 @@ docker:
         adguard: 124
         traefik: 125
 
-portainer:
-  type: agent
-
 adguard_hostname: dns2.frai.se
 
 lancache:
