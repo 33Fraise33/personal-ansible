@@ -1,0 +1,35 @@
+---
+driver:
+  name: docker
+
+scenario:
+  test_sequence:
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - verify
+    - cleanup
+    - destroy
+
+platforms:
+  - name: dawarich-instance
+    image: geerlingguy/docker-debian12-ansible:latest
+    pre_build_image: true
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: prepare.yml
+  inventory:
+    host_vars:
+      dawarich-instance:
+        ansible_python_interpreter: /usr/bin/python3
+
+verifier:
+  name: ansible

@@ -1,0 +1,10 @@
+---
+- name: Setup shared Valkey and Dawarich
+  hosts: BEOKPDCOVM01
+  connection: ssh
+  become: true
+  roles:
+    - role: valkey
+      tags: valkey
+    - role: dawarich
+      tags: dawarich

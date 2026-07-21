@@ -1,3 +1,5 @@
 *.pem
 .venv/
 .ansible
+__pycache__/
+*.py[cod]

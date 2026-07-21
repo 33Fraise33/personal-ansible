@@ -93,3 +93,25 @@ identity_providers:
         access_token_signed_response_alg: 'none'
         userinfo_signed_response_alg: 'none'
         token_endpoint_auth_method: 'client_secret_post'
+{% if authelia_oidc_clients.dawarich is defined %}
+      - client_id: "{{ authelia_oidc_clients.dawarich.client_id }}"
+        client_name: 'dawarich'
+        client_secret: '{{ authelia_oidc_clients.dawarich.client_secret | authelia_client_secret_hash(authelia_oidc_client_secret_salt) }}'
+        public: false
+        authorization_policy: 'two_factor'
+        require_pkce: false
+        pkce_challenge_method: ''
+        redirect_uris:
+          - 'https://location.frai.se/users/auth/openid_connect/callback'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+        response_types:
+          - 'code'
+        grant_types:
+          - 'authorization_code'
+        access_token_signed_response_alg: 'none'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_basic'
+{% endif %}

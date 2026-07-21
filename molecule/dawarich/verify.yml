@@ -1,0 +1,33 @@
+---
+- name: Verify Dawarich deployment
+  hosts: all
+  gather_facts: false
+  vars:
+    dawarich_container_state: "{{ lookup('env', 'DAWARICH_CONTAINER_STATE') | default('healthy', true) }}"
+  tasks:
+    - name: Inspect Dawarich containers
+      community.docker.docker_container_info:
+        name: "{{ item }}"
+      loop:
+        - dawarich_db
+        - dawarich_app
+        - dawarich_sidekiq
+      register: dawarich_containers
+
+    - name: Assert Dawarich containers are running
+      ansible.builtin.assert:
+        that:
+          - item.container.State.Status == 'running'
+          - >-
+            dawarich_container_state == 'started' or
+            item.container.State.Health.Status == 'healthy'
+      loop: "{{ dawarich_containers.results }}"
+
+    - name: Inspect shared Valkey
+      community.docker.docker_container_info:
+        name: valkey
+      register: valkey_container
+
+    - name: Assert shared Valkey is running
+      ansible.builtin.assert:
+        that: valkey_container.container.State.Status == 'running'
