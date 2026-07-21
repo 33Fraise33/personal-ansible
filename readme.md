@@ -22,11 +22,17 @@ As a network engineer I prefer to segregate my network a bit more than normally 
 ### Running a playbook
 ``eval `ssh-agent` ``   
 `ssh-add <ssh-key here>`      
-`ansible-playbook -i ../netbox-ansible/netbox.yml playbooks/<playbook>.yml --tags <tags> --diff <--check>` (vault pass is handled by 1password cli)
+`ansible-playbook -i ../netbox-ansible/netbox.yml playbooks/<playbook>.yml --tags <tags> --diff --vault-password-file ./vault_pass.sh [--check]` (vault pass is handled by the 1Password CLI)
 
 ### Encrypting passwords
-`ansible-vault encrypt_string`
+`ansible-vault encrypt_string --vault-password-file ./vault_pass.sh`
 Next enter your variable to encrypt and press ctrl+d twice.
+
+### Validating GitHub Actions workflows
+GitHub Actions workflow files use the GitHub workflow schema in VS Code and are checked by a dedicated actionlint workflow. Install the repository hook once with `pre-commit install`, then run all local checks with `pre-commit run --all-files`. Actionlint can also run directly with `docker run --rm --volume "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.10`.
+
+### GitHub Actions Vault validation
+Create a GitHub environment named `ansible-validation`, restrict its deployment branches to `main`, and add an environment secret named `ANSIBLE_VAULT_PASSWORD` containing only the raw Ansible Vault password. Do not add an approval rule if validation must remain non-interactive. Trusted pushes to `main` run `python scripts/validate_vault.py` after lint, syntax, and Molecule checks succeed. Pull requests never receive the Vault password.
 
 ## Servicer Specific Info
 
@@ -41,5 +47,3 @@ DNS is running in multiple stages.
 ### Matrix Setup
 - nginx serves frai.se => /.well-known/matrix/server redirects to https://matrix.frai.se:443
 - matrix.frai.se directs directly towards the matrix server
-
-

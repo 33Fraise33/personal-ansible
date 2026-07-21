@@ -2,6 +2,11 @@
 driver:
   name: docker
 
+ansible:
+  cfg:
+    defaults:
+      roles_path: ${MOLECULE_PROJECT_DIRECTORY}/roles
+
 scenario:
   test_sequence:
     - destroy
