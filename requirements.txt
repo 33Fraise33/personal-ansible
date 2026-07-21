@@ -9,3 +9,5 @@ netaddr  # needed for ansible.utils.ipaddr
 bcrypt  # needed for adguard password hash
 proxmoxer  # needed for proxmox modules
 jmespath  # json_query
+molecule
+molecule-docker

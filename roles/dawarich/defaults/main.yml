@@ -1,0 +1,5 @@
+---
+dawarich_postgres_version: "17-3.5-alpine"
+dawarich_hostname: location.frai.se
+dawarich_image: freikin/dawarich
+dawarich_postgres_image: postgis/postgis

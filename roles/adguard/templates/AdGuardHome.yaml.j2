@@ -10,7 +10,7 @@ http:
       - POST /dns-query/{ClientID}
     insecure_enabled: true
   address: 0.0.0.0:80
-  session_ttl: 720h
+  session_ttl: 30d
 users: []
 auth_attempts: 5
 block_auth_min: 15
@@ -98,7 +98,7 @@ tls:
 querylog:
   dir_path: ""
   ignored: []
-  interval: 24h
+  interval: 1d
   size_memory: 1000
   enabled: true
   ignored_enabled: false
@@ -106,7 +106,7 @@ querylog:
 statistics:
   dir_path: ""
   ignored: []
-  interval: 720h
+  interval: 30d
   enabled: true
   ignored_enabled: false
 filters:
@@ -185,6 +185,7 @@ filtering:
 {% endfor %}
   safe_fs_patterns:
     - /opt/adguardhome/work/data/userfilters/*
+  max_http_size: 256MB
   safebrowsing_cache_size: 1048576
   safesearch_cache_size: 1048576
   parental_cache_size: 1048576

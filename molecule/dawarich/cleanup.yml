@@ -1,0 +1,30 @@
+---
+- name: Cleanup Dawarich test dependencies
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Remove Dawarich test containers
+      community.docker.docker_container:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - dawarich_app
+        - dawarich_db
+        - dawarich_sidekiq
+        - valkey
+
+    - name: Remove Dawarich test network
+      community.docker.docker_network:
+        name: molecule-services
+        state: absent
+
+    - name: Remove Dawarich test volumes
+      community.docker.docker_volume:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - data_dawarich_db
+        - data_dawarich_shared
+        - data_dawarich_public
+        - data_dawarich_watched
+        - data_dawarich_storage

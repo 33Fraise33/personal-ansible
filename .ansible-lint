@@ -1,0 +1,13 @@
+---
+profile: production
+skip_list:
+  - fqcn[action-core]
+  - jinja[spacing]
+  - name[missing]
+  - no-handler
+  - package-latest
+  - var-naming[no-role-prefix]
+  - yaml
+exclude_paths:
+  - .ansible/
+  - .venv/

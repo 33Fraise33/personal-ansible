@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: dawarich
+  author: 33Fraise33
+  description: Deploy Dawarich with shared Valkey and Traefik.
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+dependencies: []

@@ -17,6 +17,13 @@
     - "authelia"
     - "authelia/secrets"
 
+- name: Validate Dawarich OIDC client secret salt
+  ansible.builtin.assert:
+    that:
+      - authelia_oidc_client_secret_salt | default('') | length > 0
+    fail_msg: authelia_oidc_client_secret_salt must be supplied through Vault when the Dawarich OIDC client is enabled.
+  when: authelia_oidc_clients.dawarich is defined
+
 - name: Create authelia config directory
   ansible.builtin.template:
     src: configuration.yml.j2

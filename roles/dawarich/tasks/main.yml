@@ -1,0 +1,187 @@
+---
+- name: Resolve Dawarich OIDC client details
+  ansible.builtin.set_fact:
+    dawarich_oidc_id: >-
+      {{ (authelia_oidc_clients | default({})).get('dawarich', {}).get('client_id', 'dawarich') }}
+    dawarich_oidc_secret: >-
+      {{ (authelia_oidc_clients | default({})).get('dawarich', {}).get('client_secret', '') }}
+  no_log: true
+
+- name: Validate required Dawarich secrets
+  ansible.builtin.assert:
+    that:
+      - dawarich_database_password | default('') | length > 0
+      - dawarich_secret_key_base | default('') | length > 0
+      - dawarich_oidc_secret | length > 0
+    fail_msg: Dawarich secrets must be supplied through Vault or CI variables.
+
+- name: Create Dawarich private network
+  community.docker.docker_network:
+    name: "{{ dawarich_network | default('dawarich') }}"
+    driver: bridge
+
+- name: Create Dawarich data volumes
+  community.docker.docker_volume:
+    name: "{{ item }}"
+  loop: >-
+    {{ dawarich_data_volumes | default([
+      'data_dawarich_shared',
+      'data_dawarich_public',
+      'data_dawarich_watched',
+      'data_dawarich_storage'
+    ]) }}
+
+- name: Create Dawarich database volume
+  community.docker.docker_volume:
+    name: data_dawarich_db
+
+- name: Start Dawarich database
+  community.docker.docker_container:
+    name: dawarich_db
+    image: "{{ dawarich_postgres_image }}:{{ dawarich_postgres_version }}"
+    networks:
+      - name: "{{ dawarich_network | default('dawarich') }}"
+    volumes:
+      - data_dawarich_db:/var/lib/postgresql/data
+      - data_dawarich_shared:/var/shared
+    env:
+      POSTGRES_USER: "{{ dawarich_database_user | default('dawarich') }}"
+      POSTGRES_PASSWORD: "{{ dawarich_database_password }}"
+      POSTGRES_DB: "{{ dawarich_database_name | default('dawarich') }}"
+    shm_size: 1G
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "pg_isready -U {{ dawarich_database_user | default('dawarich') }} -d {{ dawarich_database_name | default('dawarich') }}"
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    restart_policy: always
+    state: "{{ dawarich_container_state | default('healthy') }}"
+    pull: true
+    labels:
+      traefik.enable: "false"
+      wud.tag.include: '^{{ dawarich_postgres_version }}$'
+
+- name: Start Dawarich web application
+  community.docker.docker_container:
+    name: dawarich_app
+    image: "freikin/dawarich:{{ dawarich_version | default('latest') }}"
+    entrypoint: web-entrypoint.sh
+    command:
+      - bin/rails
+      - server
+      - -p
+      - "3000"
+      - -b
+      - "::"
+    networks:
+      - name: "{{ dawarich_network | default('dawarich') }}"
+      - name: "{{ dawarich_services_network | default('services') }}"
+    dns_servers: "{{ dawarich_dns_servers | default(dns.servers) }}"
+    volumes:
+      - data_dawarich_public:/var/app/public
+      - data_dawarich_watched:/var/app/tmp/imports/watched
+      - data_dawarich_storage:/var/app/storage
+    env:
+      RAILS_ENV: production
+      REDIS_URL: "{{ dawarich_redis_url | default('redis://valkey:6379') }}"
+      RAILS_CACHE_DB: "{{ dawarich_cache_db | default('3') }}"
+      RAILS_JOB_QUEUE_DB: "{{ dawarich_job_queue_db | default('4') }}"
+      RAILS_WS_DB: "{{ dawarich_websocket_db | default('5') }}"
+      DATABASE_HOST: dawarich_db
+      DATABASE_PORT: "5432"
+      DATABASE_USERNAME: "{{ dawarich_database_user | default('dawarich') }}"
+      DATABASE_PASSWORD: "{{ dawarich_database_password }}"
+      DATABASE_NAME: "{{ dawarich_database_name | default('dawarich') }}"
+      APPLICATION_HOSTS: "{{ dawarich_application_hosts | default(dawarich_hostname ~ ',localhost,127.0.0.1,::1') }}"
+      APPLICATION_PROTOCOL: http
+      DOMAIN: "{{ dawarich_domain | default(dawarich_hostname) }}"
+      TIME_ZONE: "{{ dawarich_timezone | default('Europe/Brussels') }}"
+      SECRET_KEY_BASE: "{{ dawarich_secret_key_base }}"
+      SELF_HOSTED: "true"
+      STORE_GEODATA: "true"
+      WEB_CONCURRENCY: "{{ dawarich_web_concurrency | default('1') }}"
+      BACKGROUND_PROCESSING_CONCURRENCY: "{{ dawarich_background_processing_concurrency | default('3') }}"
+      OIDC_CLIENT_ID: "{{ dawarich_oidc_id }}"
+      OIDC_CLIENT_SECRET: "{{ dawarich_oidc_secret }}"
+      OIDC_ISSUER: "{{ dawarich_oidc_issuer | default('https://auth.frai.se') }}"
+      OIDC_REDIRECT_URI: "https://{{ dawarich_hostname }}/users/auth/openid_connect/callback"
+      OIDC_PROVIDER_NAME: Authelia
+      OIDC_AUTO_REGISTER: "true"
+      ALLOW_EMAIL_PASSWORD_REGISTRATION: "false"
+      ALLOW_EMAIL_PASSWORD_LOGIN: "false"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qO - http://127.0.0.1:3000/api/v1/health | grep -q '"status"'
+      interval: 10s
+      retries: 30
+      start_period: 30s
+      timeout: 10s
+    restart_policy: always
+    state: "{{ dawarich_container_state | default('healthy') }}"
+    pull: true
+    labels:
+      traefik.docker.network: "{{ dawarich_services_network | default('services') }}"
+      traefik.http.routers.dawarich.rule: "Host(`{{ dawarich_hostname }}`)"
+      traefik.http.routers.dawarich.tls: "true"
+      traefik.http.routers.dawarich.tls.certresolver: le
+      traefik.http.services.dawarich.loadbalancer.server.port: "3000"
+      traefik.enable: "true"
+
+- name: Start Dawarich Sidekiq worker
+  community.docker.docker_container:
+    name: dawarich_sidekiq
+    image: "freikin/dawarich:{{ dawarich_version | default('latest') }}"
+    entrypoint: sidekiq-entrypoint.sh
+    command:
+      - sidekiq
+    networks:
+      - name: "{{ dawarich_network | default('dawarich') }}"
+      - name: "{{ dawarich_services_network | default('services') }}"
+    volumes:
+      - data_dawarich_public:/var/app/public
+      - data_dawarich_watched:/var/app/tmp/imports/watched
+      - data_dawarich_storage:/var/app/storage
+    env:
+      RAILS_ENV: production
+      REDIS_URL: "{{ dawarich_redis_url | default('redis://valkey:6379') }}"
+      RAILS_CACHE_DB: "{{ dawarich_cache_db | default('3') }}"
+      RAILS_JOB_QUEUE_DB: "{{ dawarich_job_queue_db | default('4') }}"
+      RAILS_WS_DB: "{{ dawarich_websocket_db | default('5') }}"
+      DATABASE_HOST: dawarich_db
+      DATABASE_PORT: "5432"
+      DATABASE_USERNAME: "{{ dawarich_database_user | default('dawarich') }}"
+      DATABASE_PASSWORD: "{{ dawarich_database_password }}"
+      DATABASE_NAME: "{{ dawarich_database_name | default('dawarich') }}"
+      APPLICATION_HOSTS: "{{ dawarich_application_hosts | default(dawarich_hostname ~ ',localhost,127.0.0.1,::1') }}"
+      APPLICATION_PROTOCOL: http
+      DOMAIN: "{{ dawarich_domain | default(dawarich_hostname) }}"
+      TIME_ZONE: "{{ dawarich_timezone | default('Europe/Brussels') }}"
+      SECRET_KEY_BASE: "{{ dawarich_secret_key_base }}"
+      SELF_HOSTED: "true"
+      STORE_GEODATA: "true"
+      BACKGROUND_PROCESSING_CONCURRENCY: "{{ dawarich_background_processing_concurrency | default('3') }}"
+      OIDC_CLIENT_ID: "{{ dawarich_oidc_id }}"
+      OIDC_CLIENT_SECRET: "{{ dawarich_oidc_secret }}"
+      OIDC_ISSUER: "{{ dawarich_oidc_issuer | default('https://auth.frai.se') }}"
+      OIDC_REDIRECT_URI: "https://{{ dawarich_hostname }}/users/auth/openid_connect/callback"
+      OIDC_PROVIDER_NAME: Authelia
+      OIDC_AUTO_REGISTER: "true"
+      ALLOW_EMAIL_PASSWORD_REGISTRATION: "false"
+      ALLOW_EMAIL_PASSWORD_LOGIN: "false"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pgrep -f sidekiq
+      interval: 10s
+      retries: 30
+      start_period: 30s
+      timeout: 10s
+    restart_policy: always
+    state: "{{ dawarich_container_state | default('healthy') }}"
+    pull: true
+    labels:
+      traefik.enable: "false"

@@ -1,0 +1,16 @@
+---
+extends: relaxed
+rules:
+  comments:
+    min-spaces-from-content: 1
+  empty-lines:
+    level: warning
+  line-length: disable
+  new-line-at-end-of-file:
+    level: warning
+  new-lines: disable
+  octal-values:
+    forbid-explicit-octal: true
+    forbid-implicit-octal: true
+  trailing-spaces:
+    level: warning

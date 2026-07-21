@@ -1,0 +1,27 @@
+---
+- name: Prepare Dawarich dependencies
+  hosts: all
+  gather_facts: false
+  become: true
+  vars:
+    molecule_services_network: molecule-services
+  tasks:
+    - name: Install Docker SDK dependencies
+      ansible.builtin.apt:
+        name:
+          - python3-docker
+          - python3-requests
+        state: present
+        update_cache: true
+
+    - name: Create shared services network
+      community.docker.docker_network:
+        name: "{{ molecule_services_network }}"
+
+    - name: Start shared Valkey
+      community.docker.docker_container:
+        name: valkey
+        image: ghcr.io/valkey-io/valkey:alpine
+        networks:
+          - name: "{{ molecule_services_network }}"
+        state: started

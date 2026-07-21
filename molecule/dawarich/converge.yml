@@ -1,0 +1,17 @@
+---
+- name: Converge Dawarich role
+  hosts: all
+  gather_facts: false
+  vars:
+    dawarich_database_password: molecule-dawarich-password
+    dawarich_secret_key_base: molecule-dawarich-secret-key
+    authelia_oidc_clients:
+      dawarich:
+        client_id: dawarich
+        client_secret: molecule-dawarich-client-secret
+    dawarich_container_state: "{{ lookup('env', 'DAWARICH_CONTAINER_STATE') | default('healthy', true) }}"
+    dawarich_postgres_image: imresamu/postgis
+    dawarich_services_network: molecule-services
+    dawarich_dns_servers: []
+  roles:
+    - role: dawarich
