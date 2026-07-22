@@ -3,23 +3,68 @@
 name: GitHub workflow validation
 
 on:
-  pull_request:
-    paths:
-      - .github/workflows/**
+  pull_request: {}
   push:
     branches:
       - main
-    paths:
-      - .github/workflows/**
 
 permissions:
   contents: read
 
 jobs:
   actionlint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: Test OpenCode scripts
+        run: node --test .github/scripts/*.test.mjs
+      - name: Install pinned OpenCode for policy smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/opencode-linux-x64.tar.gz"
+          install_dir="$RUNNER_TEMP/opencode"
+          mkdir -p "$install_dir"
+          curl --fail --location --proto '=https' --tlsv1.2 \
+            --output "$archive" \
+            https://github.com/anomalyco/opencode/releases/download/v1.18.4/opencode-linux-x64.tar.gz
+          printf '%s  %s\n' \
+            bab463c3fb3224d388bb7cfad63f38703df9cf0be2cfd2ce8cb49d886b53a174 \
+            "$archive" | sha256sum --check --strict
+          tar -xzf "$archive" -C "$install_dir"
+          printf '%s\n' "$install_dir" >> "$GITHUB_PATH"
+      - name: Smoke test GitHub OpenCode policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          config="$RUNNER_TEMP/opencode-github-config.json"
+          GITHUB_ACTIONS=true \
+            OPENCODE_CONFIG_CONTENT='{"share":"disabled","default_agent":"github-build","small_model":"openai/gpt-5.6-luna","enabled_providers":["openai"],"provider":{"openai":{"whitelist":["gpt-5.6-sol","gpt-5.6-terra","gpt-5.6-luna"]}},"formatter":false,"lsp":false}' \
+            opencode debug config > "$config"
+          CONFIG="$config" node --input-type=module <<'NODE'
+          import assert from "node:assert/strict"
+          import { readFileSync } from "node:fs"
+
+          const config = JSON.parse(readFileSync(process.env.CONFIG, "utf8"))
+          assert.equal(config.default_agent, "github-build")
+          assert.equal(config.share, "disabled")
+          assert.deepEqual(config.enabled_providers, ["openai"])
+          assert.deepEqual(config.provider.openai.whitelist, ["gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"])
+          assert.equal(config.agent["github-build"].permission.edit["*"], "allow")
+          assert.equal(config.agent["github-build"].permission.edit[".github/**"], "deny")
+          NODE
+      - name: Verify plan token separation
+        shell: bash
+        run: |
+          set -euo pipefail
+          plan_job="$(awk '/^  plan:/{inside=1} /^  build:/{inside=0} inside' .github/workflows/opencode.yml)"
+          if grep -q 'id-token: write' <<<"$plan_job"; then
+            exit 1
+          fi
+          grep -q "USE_GITHUB_TOKEN: 'true'" .github/workflows/opencode.yml
+          grep -q 'Reauthorize commenter after approval' .github/workflows/opencode.yml
       - name: Validate GitHub Actions workflows
         uses: docker://rhysd/actionlint@sha256:ef8299f97635c4c30e2298f48f30763ab782a4ad2c95b744649439a039421e36
         with:
