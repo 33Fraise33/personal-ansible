@@ -60,7 +60,9 @@ jobs:
         run: |
           set -euo pipefail
           plan_job="$(awk '/^  plan:/{inside=1} /^  build:/{inside=0} inside' .github/workflows/opencode.yml)"
-          ! grep -q 'id-token: write' <<<"$plan_job"
+          if grep -q 'id-token: write' <<<"$plan_job"; then
+            exit 1
+          fi
           grep -q "USE_GITHUB_TOKEN: 'true'" .github/workflows/opencode.yml
           grep -q 'Reauthorize commenter after approval' .github/workflows/opencode.yml
       - name: Validate GitHub Actions workflows
