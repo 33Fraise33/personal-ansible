@@ -19,7 +19,7 @@
 - Tags are the intended way to select roles and role components. `common.yml` requires `--ask-become-pass --ask-pass` for an initial host run.
 - `patch.yml` deliberately rolls Debian hosts out at 30%, 60%, then 100%, and Proxmox one host at a time; preserve that rollout behavior.
 - Firewall changes are high impact: the role validates `/etc/nftables.conf` with `nft --check` before applying it only when templates changed.
-- GitHub Actions runs secret-free lint, syntax, and Molecule validation for pull requests. The `ansible-validation` environment must restrict deployments to `main` and supply `ANSIBLE_VAULT_PASSWORD` only to trusted pushes for decryption validation. It must not require approval because CI is non-interactive.
+- GitHub Actions runs secret-free lint, syntax, and Molecule validation. Vault decryption remains a local operator responsibility and is not performed in CI.
 
 ## Roles And Containers
 

@@ -29,10 +29,7 @@ As a network engineer I prefer to segregate my network a bit more than normally 
 Next enter your variable to encrypt and press ctrl+d twice.
 
 ### Validating GitHub Actions workflows
-GitHub Actions workflow files use the GitHub workflow schema in VS Code and are checked by a dedicated actionlint workflow. Install the repository hook once with `pre-commit install`, then run all local checks with `pre-commit run --all-files`. Actionlint can also run directly with `docker run --rm --volume "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.10`.
-
-### GitHub Actions Vault validation
-Create a GitHub environment named `ansible-validation`, restrict its deployment branches to `main`, and add an environment secret named `ANSIBLE_VAULT_PASSWORD` containing only the raw Ansible Vault password. Do not add an approval rule if validation must remain non-interactive. Trusted pushes to `main` run `python scripts/validate_vault.py` after lint, syntax, and Molecule checks succeed. Pull requests never receive the Vault password.
+GitHub Actions workflow files use the GitHub workflow schema in VS Code and are checked by a dedicated actionlint workflow. Install the repository hook once with `pre-commit install`, then run the hook with `pre-commit run --all-files`. OpenCode workflow scripts additionally require `node --test .github/scripts/*.test.mjs`. Actionlint can also run directly with `docker run --rm --volume "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.10`.
 
 ## Servicer Specific Info
 
