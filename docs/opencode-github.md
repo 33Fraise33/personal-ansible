@@ -6,7 +6,7 @@ OpenCode responds to explicit commands in GitHub issue comments, pull request co
 
 - Only the repository owner can invoke unapproved plan runs. Build requests require repository write/admin permission and the build-environment approval.
 - Commands must start at the first character of a comment and use an allowlisted mode and model. Requests are limited to 8,000 characters; CRLF is normalized, and unsupported control characters are rejected.
-- Plan runs use the scoped `GITHUB_TOKEN` with read-only contents permission plus issue and pull-request comment/reaction write access. Build runs alone exchange OIDC for the OpenCode App token.
+- Both plan and build runs exchange GitHub OIDC for the installed OpenCode App token, so visible reactions, comments, branches, commits, and pull requests are authored by `opencode-agent[bot]`. The authorization and post-approval verification steps alone use scoped `GITHUB_TOKEN` credentials for invisible read-only checks.
 - Build runs require approval through the `opencode-build` environment. Fork PRs, non-open PRs, and PRs whose head is the default branch are rejected.
 - The build agent statically denies edits. A trusted startup plugin enables edits only for ordinary repository files and retains canonical and symlink path checks. If the plugin or config hook fails, editing stays denied.
 - The build agent has no shell, network, subagent, external-directory, or merge access. It cannot edit `.github/`, `.opencode/`, `.git/`, `opencode.json`, `AGENTS.md`, `vault_pass.sh`, `.env`, or `.env.*` files.
@@ -34,7 +34,7 @@ Create two GitHub environments:
 - `opencode-plan` has no required reviewer and contains only its copy of the four OAuth component secrets.
 - `opencode-build` has a required reviewer, prevents self-review, disables administrator bypass, and contains a separate copy of the four OAuth component secrets.
 
-The installed OpenCode GitHub App must be installed only for this repository, have the minimum contents, issues, and pull-request permissions needed to create branches, comments, and pull requests, and have no branch/ruleset bypass. Build mode uses the App through OIDC so App-created changes trigger normal pull-request validation workflows; plan mode instead uses its scoped `GITHUB_TOKEN`.
+The installed OpenCode GitHub App must be installed only for this repository and have no branch/ruleset bypass. Both modes use the App through OIDC so App-created changes trigger normal pull-request validation workflows. The official App's installation token has App-defined permissions that cannot be reduced by per-job GitHub Actions permissions; owner-only plans remain read-only through the pinned OpenCode binary and the `github-plan` tool policy.
 
 Create a ruleset or branch protection rule for `main` with:
 

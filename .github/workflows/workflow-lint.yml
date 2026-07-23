@@ -55,15 +55,18 @@ jobs:
           assert.equal(config.agent["github-build"].permission.edit["*"], "allow")
           assert.equal(config.agent["github-build"].permission.edit[".github/**"], "deny")
           NODE
-      - name: Verify plan token separation
+      - name: Verify native OpenCode App identity
         shell: bash
         run: |
           set -euo pipefail
           plan_job="$(awk '/^  plan:/{inside=1} /^  build:/{inside=0} inside' .github/workflows/opencode.yml)"
-          if grep -q 'id-token: write' <<<"$plan_job"; then
+          grep -q 'id-token: write' <<<"$plan_job"
+          if grep -qE 'GITHUB_TOKEN:|USE_GITHUB_TOKEN' <<<"$plan_job"; then
             exit 1
           fi
-          grep -q "USE_GITHUB_TOKEN: 'true'" .github/workflows/opencode.yml
+          if grep -qE 'Configure OpenCode commit identity|github-actions\[bot\]' .github/workflows/opencode.yml; then
+            exit 1
+          fi
           grep -q 'Reauthorize commenter after approval' .github/workflows/opencode.yml
       - name: Validate GitHub Actions workflows
         uses: docker://rhysd/actionlint@sha256:ef8299f97635c4c30e2298f48f30763ab782a4ad2c95b744649439a039421e36
