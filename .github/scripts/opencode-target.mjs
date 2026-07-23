@@ -120,7 +120,6 @@ export async function inspectTarget(event, mode, options) {
       head_ref: "",
       head_sha: "",
       head_repo: "",
-      same_repo: "true",
     }
   }
 
@@ -136,7 +135,6 @@ export async function inspectTarget(event, mode, options) {
     head_ref: pull.head?.ref,
     head_sha: pull.head?.sha,
     head_repo: pull.head?.repo?.full_name,
-    same_repo: String(sameRepo),
   }
   if (Object.values(result).some((value) => typeof value !== "string")) {
     throw new Error("GitHub returned incomplete pull request metadata.")

@@ -41,7 +41,6 @@ jobs:
       head_ref: ${{ steps.target.outputs.head_ref }}
       head_sha: ${{ steps.target.outputs.head_sha }}
       head_repo: ${{ steps.target.outputs.head_repo }}
-      same_repo: ${{ steps.target.outputs.same_repo }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
@@ -118,9 +117,9 @@ jobs:
     timeout-minutes: 45
     environment: opencode-build
     permissions:
-      contents: write
-      issues: write
-      pull-requests: write
+      contents: read
+      issues: read
+      pull-requests: read
       id-token: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
