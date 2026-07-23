@@ -31,3 +31,19 @@
     - name: Assert shared Valkey is running
       ansible.builtin.assert:
         that: valkey_container.container.State.Status == 'running'
+
+    - name: Inspect Dawarich containers using Photon
+      community.docker.docker_container_info:
+        name: "{{ item }}"
+      loop:
+        - dawarich_app
+        - dawarich_sidekiq
+      register: dawarich_photon_containers
+
+    - name: Assert Dawarich Photon configuration
+      ansible.builtin.assert:
+        that:
+          - item.container.Config.Env is contains('PHOTON_API_HOST=molecule-photon')
+          - item.container.Config.Env is contains('PHOTON_API_PORT=2322')
+          - item.container.Config.Env is contains('PHOTON_API_USE_HTTPS=false')
+      loop: "{{ dawarich_photon_containers.results }}"

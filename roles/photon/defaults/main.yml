@@ -1,0 +1,7 @@
+---
+photon_image: rtuszik/photon-docker
+photon_version: latest
+photon_database_path: /var/lib/photon
+photon_port: 2322
+photon_update_strategy: CONTINUOUS
+photon_update_interval: 3600

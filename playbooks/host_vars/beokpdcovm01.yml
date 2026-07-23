@@ -1,4 +1,8 @@
 ---
+dawarich_photon_api_host: 10.10.48.35
+dawarich_photon_api_port: "2322"
+dawarich_photon_api_use_https: "false"
+
 cloudflared:
   docker_network: services
   service_token: !vault |

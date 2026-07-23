@@ -1,8 +1,17 @@
 ---
+photon_database_path: /media/photon
+
 firewall_filter_input_host:
   - comment: "Allow portainer_agent"
     destination:
       port: 9001
+      protocol: tcp
+    counter: true
+  - comment: "Allow Photon from VM01"
+    source:
+      ip: "@VM01"
+    destination:
+      port: 2322
       protocol: tcp
     counter: true
 

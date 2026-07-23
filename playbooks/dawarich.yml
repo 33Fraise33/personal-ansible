@@ -1,4 +1,12 @@
 ---
+- name: Setup Photon reverse geocoding service
+  hosts: BEOKPDCOVM02
+  connection: ssh
+  become: true
+  roles:
+    - role: photon
+      tags: photon
+
 - name: Setup shared Valkey and Dawarich
   hosts: BEOKPDCOVM01
   connection: ssh

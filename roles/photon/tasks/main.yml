@@ -1,0 +1,27 @@
+---
+- name: Create Photon database directory
+  ansible.builtin.file:
+    path: "{{ photon_database_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Start Photon reverse geocoding service
+  community.docker.docker_container:
+    name: photon
+    image: "{{ photon_image }}:{{ photon_version }}"
+    command: >-
+      {{ photon_command if photon_command | default([]) | length > 0 else omit }}
+    env:
+      PHOTON_UPDATE_STRATEGY: "{{ photon_update_strategy }}"
+      PHOTON_UPDATE_INTERVAL: "{{ photon_update_interval | string }}"
+    volumes:
+      - "{{ photon_database_path }}:/photon/photon_data"
+    ports:
+      - "{{ photon_port }}:2322"
+    restart_policy: always
+    state: "{{ photon_container_state | default('started') }}"
+    pull: true
+    labels:
+      traefik.enable: "false"

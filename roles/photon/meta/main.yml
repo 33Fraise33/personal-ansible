@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: photon
+  author: 33Fraise33
+  description: Deploy the Photon reverse geocoding service.
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+dependencies: []
