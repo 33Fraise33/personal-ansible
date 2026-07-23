@@ -60,8 +60,18 @@ jobs:
         run: |
           set -euo pipefail
           plan_job="$(awk '/^  plan:/{inside=1} /^  build:/{inside=0} inside' .github/workflows/opencode.yml)"
+          build_job="$(awk '/^  build:/{inside=1} inside' .github/workflows/opencode.yml)"
           grep -q 'id-token: write' <<<"$plan_job"
-          if grep -qE 'GITHUB_TOKEN:|USE_GITHUB_TOKEN' <<<"$plan_job"; then
+          grep -q 'id-token: write' <<<"$build_job"
+          grep -q 'contents: read' <<<"$build_job"
+          grep -q 'issues: read' <<<"$build_job"
+          grep -q 'pull-requests: read' <<<"$build_job"
+          if grep -qE '(contents|issues|pull-requests): write' <<<"$build_job"; then
+            exit 1
+          fi
+          plan_run="$(awk '/^      - name: Run read-only OpenCode plan/{inside=1} inside {print} /run: opencode github run/{if (inside) exit}' .github/workflows/opencode.yml)"
+          build_run="$(awk '/^      - name: Run constrained OpenCode build/{inside=1} inside {print} /run: opencode github run/{if (inside) exit}' .github/workflows/opencode.yml)"
+          if grep -qE 'GITHUB_TOKEN:|USE_GITHUB_TOKEN|github\.token' <<<"$plan_run$build_run"; then
             exit 1
           fi
           if grep -qE 'Configure OpenCode commit identity|github-actions\[bot\]' .github/workflows/opencode.yml; then

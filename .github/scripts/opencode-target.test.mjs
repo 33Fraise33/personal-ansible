@@ -41,7 +41,7 @@ test("classifies issues, PR conversations, and PR review comments", () => {
   assert.deepEqual(classifyTarget({ pull_request: { number: 3 } }), { type: "pull_request", number: 3 })
 })
 
-test("issues do not call the API", async () => {
+test("captures current issue metadata", async () => {
   const result = await inspectTarget({ issue: { number: 4 } }, "build", { ...options, fetchImpl: response() })
   assert.equal(result.target_type, "issue")
   assert.equal(result.target_number, "4")
@@ -59,7 +59,6 @@ test("captures current pull request metadata", async () => {
     head_ref: "feature",
     head_sha: "abc123",
     head_repo: repository,
-    same_repo: "true",
   })
 })
 
@@ -90,7 +89,7 @@ test("plan permits fork pull requests", async () => {
     ...options,
     fetchImpl: response({ pullValue: { ...pull, head: { ...pull.head, repo: { full_name: "fork/repo" } } } }),
   })
-  assert.equal(result.same_repo, "false")
+  assert.equal(result.head_repo, "fork/repo")
 })
 
 test("rejects oversized thread context before model access", async () => {

@@ -11,7 +11,7 @@ OpenCode responds to explicit commands in GitHub issue comments, pull request co
 - The build agent statically denies edits. A trusted startup plugin enables edits only for ordinary repository files and retains canonical and symlink path checks. If the plugin or config hook fails, editing stays denied.
 - The build agent has no shell, network, subagent, external-directory, or merge access. It cannot edit `.github/`, `.opencode/`, `.git/`, `opencode.json`, `AGENTS.md`, `vault_pass.sh`, `.env`, or `.env.*` files.
 - Comment workflows start from the trusted default branch before OpenCode processes PR content.
-- Authorization caps all context sent by OpenCode at ten issue/review/review-thread comments, 100 changed files, and 60,000 characters before OAuth is exposed. GitHub attachment URLs are rejected rather than downloaded. It captures current target state, `updated_at`, PR base branch, head branch, head SHA, and head repository. After environment approval, build mode rechecks the commenter's permission and fetches the target again immediately before OpenCode, rejecting any relevant change.
+- Authorization bounds the repository-collected issue and pull-request context to ten issue/review/review-thread comments, 100 changed files, and 60,000 characters before OAuth is exposed. Native OpenCode may independently fetch additional GitHub context. GitHub attachment URLs are rejected rather than downloaded. Authorization captures current target state, `updated_at`, PR base branch, head branch, head SHA, and head repository. After environment approval, build mode rechecks the commenter's permission and fetches the target again immediately before OpenCode, rejecting any relevant change.
 - Builds may update any same-repository, non-default-branch PR head. A residual race remains: OpenCode v1.18.4 ultimately fetches and pushes by mutable branch name, so a branch can theoretically move after verification and before fetch or push. Execution is not immutable by SHA unless upstream changes this behavior; all such branches need equivalent protection where appropriate, and final human diff review remains mandatory.
 - OpenCode sessions are never shared. The workflow downloads OpenCode v1.18.4 and verifies its pinned SHA-256 digest.
 - OpenCode can create or update a branch and pull request but has no merge operation in its configured toolset. Protected branch rules provide the final merge boundary.
@@ -32,22 +32,21 @@ Do not use build mode until all settings in this section are active.
 Create two GitHub environments:
 
 - `opencode-plan` has no required reviewer and contains only its copy of the four OAuth component secrets.
-- `opencode-build` has a required reviewer, prevents self-review, disables administrator bypass, and contains a separate copy of the four OAuth component secrets.
+- `opencode-build` has a required reviewer, disables administrator bypass, and contains a separate copy of the four OAuth component secrets.
 
 The installed OpenCode GitHub App must be installed only for this repository and have no branch/ruleset bypass. Both modes use the App through OIDC so App-created changes trigger normal pull-request validation workflows. The official App's installation token has App-defined permissions that cannot be reduced by per-job GitHub Actions permissions; owner-only plans remain read-only through the pinned OpenCode binary and the `github-plan` tool policy.
 
 Create a ruleset or branch protection rule for `main` with:
 
 - Pull requests required before merging.
-- At least one human approving review and code owner review required.
+- Code owner review enabled. The current zero-approval policy permits the repository owner to merge their own pull requests after required checks pass.
 - Stale approvals dismissed when new commits are pushed.
-- Approval required for the latest reviewable push.
 - All conversations resolved before merging.
-- `Ansible validation / validate` and `GitHub workflow validation / actionlint` required.
+- `validate` and `actionlint` from GitHub Actions required.
 - Force pushes and branch deletion blocked.
 - Rule bypass disabled, including for administrators.
 
-Do not enable the repository-wide "Allow GitHub Actions to create and approve pull requests" setting for OpenCode. The installed App creates pull requests instead. Required human approval, stale-review dismissal, latest-push approval, required checks, code ownership, and no bypass remain mandatory. Confirm neither workflows nor the App can satisfy required human review.
+Do not enable the repository-wide "Allow GitHub Actions to create and approve pull requests" setting for OpenCode. The installed App creates pull requests instead. Required checks, code-owner settings, and no bypass remain mandatory. Confirm neither workflows nor the App can satisfy required human review when approvals are required.
 
 Issues must be enabled and limited to collaborators. After every environment, secret, Actions, and branch/ruleset control is verified, create the Actions repository variable `OPENCODE_BUILD_ENABLED` with value `true` as the final activation step. Build remains skipped while this variable is absent or has any other value.
 
