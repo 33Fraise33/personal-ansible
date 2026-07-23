@@ -21,6 +21,8 @@ Role vars, host vars, group vars, encrypted Vault ciphertext, and repository top
 
 ## Local OpenCode
 
+Build smoke test.
+
 The repository `opencode.json` only disables session sharing. Local OpenCode sessions otherwise retain the user's normal providers, models, built-in build agent, tools, formatter, and LSP behavior, allowing broader local changes when the operator chooses.
 
 The `github-plan` and `github-build` agents remain available locally but are not selected by default. The GitHub workflow injects the complete restrictive policy through `OPENCODE_CONFIG_CONTENT`. The auto-discovered guard plugin returns no hooks unless `GITHUB_ACTIONS` is exactly `true`, so it does not constrain local tools or paths.
