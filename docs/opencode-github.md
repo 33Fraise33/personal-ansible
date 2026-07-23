@@ -6,8 +6,9 @@ OpenCode responds to explicit commands in GitHub issue comments, pull request co
 
 - Only the repository owner can invoke unapproved plan runs. Build requests require repository write/admin permission and the build-environment approval.
 - Commands must start at the first character of a comment and use an allowlisted mode and model. Requests are limited to 8,000 characters; CRLF is normalized, and unsupported control characters are rejected.
-- Both plan and build runs exchange GitHub OIDC for the installed OpenCode App token, so visible reactions, comments, branches, commits, and pull requests are authored by `opencode-agent[bot]`. The authorization and post-approval verification steps alone use scoped `GITHUB_TOKEN` credentials for invisible read-only checks.
+- Both plan and build runs exchange GitHub OIDC for the installed OpenCode App token, so visible reactions, comments, branches, commits, and pull requests are authored by `opencode-agent[bot]`. The authorization and post-approval verification steps use scoped `GITHUB_TOKEN` credentials for invisible read-only checks; an accepted build also uses a narrowly scoped notification job to add or update its approval comment.
 - Build runs require approval through the `opencode-build` environment. Fork PRs, non-open PRs, and PRs whose head is the default branch are rejected.
+- An accepted build request adds an idempotent issue or PR comment linking to the pending workflow. The `opencode-build` deployment approval links back to the authorized source issue or PR, so reviewers can identify the affected request from either location.
 - The build agent statically denies edits. A trusted startup plugin enables edits only for ordinary repository files and retains canonical and symlink path checks. If the plugin or config hook fails, editing stays denied.
 - The build agent has no shell, network, subagent, external-directory, or merge access. It cannot edit `.github/`, `.opencode/`, `.git/`, `opencode.json`, `AGENTS.md`, `vault_pass.sh`, `.env`, or `.env.*` files.
 - Comment workflows start from the trusted default branch before OpenCode processes PR content.
@@ -88,6 +89,8 @@ The accepted syntax is:
 Model names map to `openai/gpt-5.6-sol`, `openai/gpt-5.6-terra`, and `openai/gpt-5.6-luna`; arbitrary providers and model names are rejected in GitHub Actions. Plans are owner-only and may analyze fork PRs. Builds may operate only on issues and same-repository PRs that pass authorization and post-approval verification.
 
 Use `plan` first for non-trivial work. Review the result in the GitHub thread, then issue a separate `build` command. Inspect the complete generated PR diff and wait for required CI before human approval.
+
+When an authorized `/oc build` request is awaiting `opencode-build` approval, OpenCode adds or updates a comment on its source issue or pull request with a link to that workflow run. The deployment approval page also links back to the same authorized issue or pull request.
 
 ## Updating OpenCode
 
