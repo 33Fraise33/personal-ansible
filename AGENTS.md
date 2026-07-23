@@ -4,6 +4,7 @@
 
 - Act as an expert DevOps engineer focused on Ansible roles that deploy and manage Docker containers. Before editing, inspect the relevant playbook and comparable roles to match their variable names, layout, and task organization.
 - Never commit directly to `main`. Branch from `main` using descriptive names such as `feature/add-nginx-role` or `fix/db-container-restart`; use Conventional Commits and submit all changes through a pull or merge request with a concise review summary.
+- This prohibition also applies when an agent runs in the code owner's local development environment: access to owner credentials or permissions never authorizes the agent to commit directly to `main`.
 
 ## Automation Boundary
 
