@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { MAX_PULL_REQUEST_FILES, MAX_THREAD_COMMENTS, classifyTarget, inspectTarget } from "./opencode-target.mjs"
+import { MAX_PULL_REQUEST_FILES, MAX_THREAD_ITEMS, classifyTarget, inspectTarget } from "./opencode-target.mjs"
 
 const repository = "owner/repo"
 const pull = {
@@ -92,26 +92,31 @@ test("plan permits fork pull requests", async () => {
   assert.equal(result.head_repo, "fork/repo")
 })
 
+test("accepts a thread at the item limit", async () => {
+  const comments = Array.from({ length: MAX_THREAD_ITEMS }, () => ({ body: "comment" }))
+  await assert.doesNotReject(() => inspectTarget({ issue: { number: 8 } }, "plan", { ...options, fetchImpl: response({ issueComments: comments }) }))
+})
+
 test("rejects oversized thread context before model access", async () => {
-  const comments = Array.from({ length: MAX_THREAD_COMMENTS + 1 }, () => ({ body: "comment" }))
+  const comments = Array.from({ length: MAX_THREAD_ITEMS + 1 }, () => ({ body: "comment" }))
   await assert.rejects(
     () => inspectTarget({ issue: { number: 8 } }, "plan", { ...options, fetchImpl: response({ issueComments: comments }) }),
-    /limits issue and pull request threads/,
+    /limits issue and pull request threads to 50 items/,
   )
 })
 
 test("counts PR reviews and nested review comments in the context limit", async () => {
-  const reviews = Array.from({ length: MAX_THREAD_COMMENTS + 1 }, (_, id) => ({ id, body: "review" }))
+  const reviews = Array.from({ length: MAX_THREAD_ITEMS + 1 }, (_, id) => ({ id, body: "review" }))
   await assert.rejects(
     () => inspectTarget({ pull_request: { number: 9 } }, "plan", { ...options, fetchImpl: response({ reviews }) }),
-    /limits issue and pull request threads/,
+    /limits issue and pull request threads to 50 items/,
   )
   await assert.rejects(
     () => inspectTarget({ pull_request: { number: 9 } }, "plan", {
       ...options,
-      fetchImpl: response({ reviews: [{ id: 1, body: "review" }], reviewComments: Array.from({ length: MAX_THREAD_COMMENTS }, () => ({ body: "comment" })) }),
+      fetchImpl: response({ reviews: [{ id: 1, body: "review" }], reviewComments: Array.from({ length: MAX_THREAD_ITEMS }, () => ({ body: "comment" })) }),
     }),
-    /limits issue and pull request threads/,
+    /limits issue and pull request threads to 50 items/,
   )
 })
 
