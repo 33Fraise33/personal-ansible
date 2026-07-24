@@ -4,6 +4,7 @@
   gather_facts: false
   vars:
     photon_database_path: /tmp/molecule-photon-data
+    photon_network: molecule-traefik
   tasks:
     - name: Inspect Photon container
       community.docker.docker_container_info:
@@ -14,11 +15,13 @@
       ansible.builtin.assert:
         that:
           - photon_container.container.State.Status == 'running'
+          - photon_container.container.State.Health.Status == 'healthy'
           - photon_container.container.Config.Image == 'python:3.13-alpine'
           - photon_container.container.HostConfig.RestartPolicy.Name == 'always'
           - >-
-            photon_container.container.HostConfig.PortBindings['2322/tcp'][0].HostPort
-            == '12322'
+            photon_container.container.HostConfig.PortBindings is none or
+            photon_container.container.HostConfig.PortBindings | length == 0
+          - photon_network in photon_container.container.NetworkSettings.Networks
           - >-
             photon_container.container.Mounts | selectattr('Destination', 'equalto',
             '/photon/photon_data') | list | length == 1
@@ -28,6 +31,12 @@
             map(attribute='Source') | first) == photon_database_path
           - photon_container.container.Config.Env is contains('PHOTON_UPDATE_STRATEGY=CONTINUOUS')
           - photon_container.container.Config.Env is contains('PHOTON_UPDATE_INTERVAL=3600')
+          - photon_container.container.Config.Labels['traefik.enable'] == 'true'
+          - photon_container.container.Config.Labels['traefik.docker.network'] == photon_network
+          - photon_container.container.Config.Labels['traefik.http.routers.photon.rule'] == 'Host(`photon.test`)'
+          - photon_container.container.Config.Labels['traefik.http.routers.photon.tls'] == 'true'
+          - photon_container.container.Config.Labels['traefik.http.routers.photon.tls.certresolver'] == 'le'
+          - photon_container.container.Config.Labels['traefik.http.services.photon.loadbalancer.server.port'] == '2322'
 
     - name: Check Photon API endpoint from the container
       community.docker.docker_container_exec:

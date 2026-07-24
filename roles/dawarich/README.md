@@ -11,6 +11,8 @@ Supply `dawarich_database_password` and `dawarich_secret_key_base` through Ansib
 Reverse geocoding defaults to the public Photon service. Set
 `dawarich_photon_api_host`, `dawarich_photon_api_port`, and
 `dawarich_photon_api_use_https` to use a self-hosted Photon instance.
+In production Photon is exposed by media Traefik at `photon.frai.se:443` over
+HTTPS; Photon itself is managed separately on the media host.
 
 Before deployment, define these variables in the target host or CI secret injection. Do not commit plaintext values:
 

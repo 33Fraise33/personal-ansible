@@ -18,10 +18,16 @@
       PHOTON_UPDATE_INTERVAL: "{{ photon_update_interval | string }}"
     volumes:
       - "{{ photon_database_path }}:/photon/photon_data"
-    ports:
-      - "{{ photon_port }}:2322"
+    networks:
+      - name: "{{ photon_network }}"
+    healthcheck: "{{ photon_healthcheck }}"
     restart_policy: always
-    state: "{{ photon_container_state | default('started') }}"
+    state: "{{ photon_container_state }}"
     pull: true
     labels:
-      traefik.enable: "false"
+      traefik.enable: "true"
+      traefik.docker.network: "{{ photon_network }}"
+      traefik.http.routers.photon.rule: "Host(`{{ photon_hostname }}`)"
+      traefik.http.routers.photon.tls: "true"
+      traefik.http.routers.photon.tls.certresolver: le
+      traefik.http.services.photon.loadbalancer.server.port: "{{ photon_service_port }}"

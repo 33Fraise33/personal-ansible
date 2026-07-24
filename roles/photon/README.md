@@ -3,6 +3,11 @@
 Deploys [Photon](https://photon.komoot.io/) as a reverse-geocoding service for
 Dawarich.
 
+Photon joins the media host's existing Traefik Docker network, configured by
+`photon_network` (the media network on VM02). It has no host-port publication
+and does not depend on the services VLAN. Traefik exposes the API as HTTPS at
+`photon_hostname` (`photon.frai.se`) and forwards requests to port 2322.
+
 `photon_database_path` controls the host directory mounted at
 `/photon/photon_data`. Photon downloads and stores a large OpenStreetMap
 database there on its first start. Place this directory on storage that is not
@@ -11,5 +16,5 @@ disk space while applying updates.
 
 The container uses Photon’s recommended continuous update configuration:
 `PHOTON_UPDATE_STRATEGY=CONTINUOUS` and a `PHOTON_UPDATE_INTERVAL` of 3600
-seconds. Its API is published on `photon_port` (2322 by default); restrict
-network access with the host firewall.
+seconds. The pre-existing Traefik network must be available before deploying
+this role.

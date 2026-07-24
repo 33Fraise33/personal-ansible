@@ -43,7 +43,7 @@
     - name: Assert Dawarich Photon configuration
       ansible.builtin.assert:
         that:
-          - item.container.Config.Env is contains('PHOTON_API_HOST=molecule-photon')
-          - item.container.Config.Env is contains('PHOTON_API_PORT=2322')
-          - item.container.Config.Env is contains('PHOTON_API_USE_HTTPS=false')
+          - item.container.Config.Env is contains('PHOTON_API_HOST=photon.frai.se')
+          - item.container.Config.Env is contains('PHOTON_API_PORT=443')
+          - item.container.Config.Env is contains('PHOTON_API_USE_HTTPS=true')
       loop: "{{ dawarich_photon_containers.results }}"

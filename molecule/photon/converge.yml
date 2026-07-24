@@ -11,7 +11,23 @@
       - http.server
       - "2322"
     photon_database_path: /tmp/molecule-photon-data
-    photon_port: 12322
+    photon_hostname: photon.test
+    photon_network: molecule-traefik
+    photon_healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          python -c "from urllib.request import urlopen;
+          assert urlopen('http://127.0.0.1:2322/').status == 200"
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 1s
+  pre_tasks:
+    - name: Create shared Traefik test network
+      community.docker.docker_network:
+        name: molecule-traefik
+        driver: bridge
   roles:
     - role: photon
   tasks:

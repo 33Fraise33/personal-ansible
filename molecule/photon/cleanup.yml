@@ -12,3 +12,8 @@
       ansible.builtin.file:
         path: /tmp/molecule-photon-data
         state: absent
+
+    - name: Remove shared Traefik test network
+      community.docker.docker_network:
+        name: molecule-traefik
+        state: absent
