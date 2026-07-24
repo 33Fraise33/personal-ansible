@@ -1,0 +1,19 @@
+---
+- name: Cleanup Photon test dependencies
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Remove Photon test container
+      community.docker.docker_container:
+        name: photon
+        state: absent
+
+    - name: Remove Photon test database directory
+      ansible.builtin.file:
+        path: /tmp/molecule-photon-data
+        state: absent
+
+    - name: Remove shared Traefik test network
+      community.docker.docker_network:
+        name: molecule-traefik
+        state: absent

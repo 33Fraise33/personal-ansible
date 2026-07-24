@@ -31,3 +31,25 @@
     - name: Assert shared Valkey is running
       ansible.builtin.assert:
         that: valkey_container.container.State.Status == 'running'
+
+    - name: Inspect Dawarich Sidekiq worker
+      community.docker.docker_container_info:
+        name: dawarich_sidekiq
+      register: dawarich_sidekiq
+
+    - name: Assert Sidekiq Photon configuration
+      ansible.builtin.assert:
+        that:
+          - dawarich_sidekiq.container.Config.Env is contains('PHOTON_API_HOST=photon.frai.se')
+          - dawarich_sidekiq.container.Config.Env is contains('PHOTON_API_PORT=443')
+          - dawarich_sidekiq.container.Config.Env is contains('PHOTON_API_USE_HTTPS=true')
+
+    - name: Inspect Dawarich web application
+      community.docker.docker_container_info:
+        name: dawarich_app
+      register: dawarich_app
+
+    - name: Assert web application has no Photon configuration
+      ansible.builtin.assert:
+        that:
+          - dawarich_app.container.Config.Env | select('match', '^PHOTON_API_') | list | length == 0

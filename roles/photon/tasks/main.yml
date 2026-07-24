@@ -1,0 +1,42 @@
+---
+- name: Create Photon database directory
+  ansible.builtin.file:
+    path: "{{ photon_database_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Start Photon reverse geocoding service
+  vars:
+    photon_default_healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsS 'http://127.0.0.1:2322/api/?q=Berlin' > /dev/null"
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 5m
+  community.docker.docker_container:
+    name: photon
+    image: "{{ photon_image }}:{{ photon_version }}"
+    command: >-
+      {{ photon_command if photon_command | default([]) | length > 0 else omit }}
+    env:
+      PHOTON_UPDATE_STRATEGY: "{{ photon_update_strategy }}"
+      PHOTON_UPDATE_INTERVAL: "{{ photon_update_interval | string }}"
+    volumes:
+      - "{{ photon_database_path }}:/photon/photon_data"
+    networks:
+      - name: "{{ photon_network }}"
+    healthcheck: "{{ photon_healthcheck | default(photon_default_healthcheck) }}"
+    restart_policy: always
+    state: "{{ photon_container_state }}"
+    pull: true
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "{{ photon_network }}"
+      traefik.http.routers.photon.rule: "Host(`{{ photon_hostname }}`)"
+      traefik.http.routers.photon.tls: "true"
+      traefik.http.routers.photon.tls.certresolver: le
+      traefik.http.services.photon.loadbalancer.server.port: "{{ photon_service_port }}"
