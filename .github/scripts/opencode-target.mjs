@@ -2,7 +2,7 @@ import { appendFileSync, readFileSync } from "node:fs"
 import { randomUUID } from "node:crypto"
 import { pathToFileURL } from "node:url"
 
-export const MAX_THREAD_COMMENTS = 10
+export const MAX_THREAD_ITEMS = 50
 export const MAX_THREAD_CONTEXT_CHARACTERS = 60_000
 export const MAX_PULL_REQUEST_FILES = 100
 const CONTEXT_FORMAT_OVERHEAD = 10_000
@@ -56,7 +56,7 @@ async function fetchTargetData({ apiUrl, repository, endpoint, token, fetchImpl 
 async function assertBoundedThread(target, options) {
   const issueComments = await fetchTargetData({
     ...options,
-    endpoint: `issues/${target.number}/comments?per_page=${MAX_THREAD_COMMENTS + 1}`,
+    endpoint: `issues/${target.number}/comments?per_page=${MAX_THREAD_ITEMS + 1}`,
   })
   const context = [
     options.subject.title,
@@ -70,7 +70,7 @@ async function assertBoundedThread(target, options) {
   if (target.type === "pull_request") {
     const reviews = await fetchTargetData({
       ...options,
-      endpoint: `pulls/${target.number}/reviews?per_page=${MAX_THREAD_COMMENTS + 1}`,
+      endpoint: `pulls/${target.number}/reviews?per_page=${MAX_THREAD_ITEMS + 1}`,
     })
     itemCount += reviews.value.length
     context.push(...reviews.value.flatMap((review) => [review.user?.login, review.submitted_at, review.state, review.body]))
@@ -78,7 +78,7 @@ async function assertBoundedThread(target, options) {
       reviews.value.map((review) =>
         fetchTargetData({
           ...options,
-          endpoint: `pulls/${target.number}/reviews/${review.id}/comments?per_page=${MAX_THREAD_COMMENTS + 1}`,
+          endpoint: `pulls/${target.number}/reviews/${review.id}/comments?per_page=${MAX_THREAD_ITEMS + 1}`,
         }),
       ),
     )
@@ -93,10 +93,10 @@ async function assertBoundedThread(target, options) {
       throw new Error(`OpenCode limits pull requests to ${MAX_PULL_REQUEST_FILES} changed files.`)
     }
     context.push(...files.value.flatMap((file) => [file.filename, file.status, file.additions, file.deletions]))
-    if (reviews.hasNextPage || reviewComments.some((result) => result.hasNextPage)) itemCount = MAX_THREAD_COMMENTS + 1
+    if (reviews.hasNextPage || reviewComments.some((result) => result.hasNextPage)) itemCount = MAX_THREAD_ITEMS + 1
   }
-  if (itemCount > MAX_THREAD_COMMENTS || issueComments.hasNextPage) {
-    throw new Error(`OpenCode limits issue and pull request threads to ${MAX_THREAD_COMMENTS} comments.`)
+  if (itemCount > MAX_THREAD_ITEMS || issueComments.hasNextPage) {
+    throw new Error(`OpenCode limits issue and pull request threads to ${MAX_THREAD_ITEMS} items.`)
   }
 
   const text = context.filter((value) => typeof value === "string" || typeof value === "number")
