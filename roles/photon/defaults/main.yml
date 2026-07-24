@@ -8,11 +8,3 @@ photon_service_port: 2322
 photon_update_strategy: CONTINUOUS
 photon_update_interval: 3600
 photon_container_state: healthy
-photon_healthcheck:
-  test:
-    - CMD-SHELL
-    - "curl -fsS 'http://127.0.0.1:2322/api/?q=Berlin' > /dev/null"
-  interval: 30s
-  timeout: 10s
-  retries: 10
-  start_period: 5m

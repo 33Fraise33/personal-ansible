@@ -32,18 +32,24 @@
       ansible.builtin.assert:
         that: valkey_container.container.State.Status == 'running'
 
-    - name: Inspect Dawarich containers using Photon
+    - name: Inspect Dawarich Sidekiq worker
       community.docker.docker_container_info:
-        name: "{{ item }}"
-      loop:
-        - dawarich_app
-        - dawarich_sidekiq
-      register: dawarich_photon_containers
+        name: dawarich_sidekiq
+      register: dawarich_sidekiq
 
-    - name: Assert Dawarich Photon configuration
+    - name: Assert Sidekiq Photon configuration
       ansible.builtin.assert:
         that:
-          - item.container.Config.Env is contains('PHOTON_API_HOST=photon.frai.se')
-          - item.container.Config.Env is contains('PHOTON_API_PORT=443')
-          - item.container.Config.Env is contains('PHOTON_API_USE_HTTPS=true')
-      loop: "{{ dawarich_photon_containers.results }}"
+          - dawarich_sidekiq.container.Config.Env is contains('PHOTON_API_HOST=photon.frai.se')
+          - dawarich_sidekiq.container.Config.Env is contains('PHOTON_API_PORT=443')
+          - dawarich_sidekiq.container.Config.Env is contains('PHOTON_API_USE_HTTPS=true')
+
+    - name: Inspect Dawarich web application
+      community.docker.docker_container_info:
+        name: dawarich_app
+      register: dawarich_app
+
+    - name: Assert web application has no Photon configuration
+      ansible.builtin.assert:
+        that:
+          - dawarich_app.container.Config.Env | select('match', '^PHOTON_API_') | list | length == 0

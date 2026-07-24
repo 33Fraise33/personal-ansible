@@ -8,6 +8,15 @@
     mode: "0755"
 
 - name: Start Photon reverse geocoding service
+  vars:
+    photon_default_healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsS 'http://127.0.0.1:2322/api/?q=Berlin' > /dev/null"
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 5m
   community.docker.docker_container:
     name: photon
     image: "{{ photon_image }}:{{ photon_version }}"
@@ -20,7 +29,7 @@
       - "{{ photon_database_path }}:/photon/photon_data"
     networks:
       - name: "{{ photon_network }}"
-    healthcheck: "{{ photon_healthcheck }}"
+    healthcheck: "{{ photon_healthcheck | default(photon_default_healthcheck) }}"
     restart_policy: always
     state: "{{ photon_container_state }}"
     pull: true
