@@ -1,42 +1,55 @@
 ---
+- name: Create photon user to minimize privileges
+  ansible.builtin.user:
+    name: photon
+    comment: Photon service user
+    system: true
+    create_home: false
+
 - name: Create Photon database directory
   ansible.builtin.file:
     path: "{{ photon_database_path }}"
     state: directory
-    owner: root
-    group: root
+    owner: photon
+    group: photon
     mode: "0755"
+
+- name: Gather numeric UID and GID of the host photon user
+  ansible.builtin.getent:
+    database: passwd
+    key: photon
 
 - name: Start Photon reverse geocoding service
   vars:
     photon_default_healthcheck:
       test:
         - CMD-SHELL
-        - "curl -fsS 'http://127.0.0.1:2322/api/?q=Berlin' > /dev/null"
+        - "curl -fsS 'http://127.0.0.1:2322/status' > /dev/null"
       interval: 30s
       timeout: 10s
       retries: 10
-      start_period: 5m
+      start_period: 6h
   community.docker.docker_container:
     name: photon
-    image: "{{ photon_image }}:{{ photon_version }}"
+    image: "{{ photon_image | default('rtuszik/photon-docker:latest') }}"
     command: >-
       {{ photon_command if photon_command | default([]) | length > 0 else omit }}
     env:
-      PHOTON_UPDATE_STRATEGY: "{{ photon_update_strategy }}"
-      PHOTON_UPDATE_INTERVAL: "{{ photon_update_interval | string }}"
+      PUID: "{{ ansible_facts.getent_passwd['photon'][1] }}"
+      PGID: "{{ ansible_facts.getent_passwd['photon'][2] }}"
+      UPDATE_STRATEGY: SEQUENTIAL
+      UPDATE_INTERVAL: 30d
     volumes:
-      - "{{ photon_database_path }}:/photon/photon_data"
+      - "{{ photon_database_path }}:/photon/data"
     networks:
       - name: "{{ photon_network }}"
     healthcheck: "{{ photon_healthcheck | default(photon_default_healthcheck) }}"
     restart_policy: always
-    state: "{{ photon_container_state }}"
+    state: started
     pull: true
     labels:
       traefik.enable: "true"
-      traefik.docker.network: "{{ photon_network }}"
       traefik.http.routers.photon.rule: "Host(`{{ photon_hostname }}`)"
       traefik.http.routers.photon.tls: "true"
       traefik.http.routers.photon.tls.certresolver: le
-      traefik.http.services.photon.loadbalancer.server.port: "{{ photon_service_port }}"
+      traefik.http.services.photon.loadbalancer.server.port: "2322"

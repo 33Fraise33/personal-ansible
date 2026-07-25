@@ -3,10 +3,9 @@
   hosts: all
   gather_facts: false
   vars:
-    photon_image: python
-    photon_version: 3.13-alpine
+    photon_image: rtuszik/photon-docker:latest
     photon_command:
-      - python
+      - python3
       - -m
       - http.server
       - "2322"
@@ -17,8 +16,7 @@
       test:
         - CMD-SHELL
         - >-
-          python -c "from urllib.request import urlopen;
-          assert urlopen('http://127.0.0.1:2322/').status == 200"
+          curl -fsS http://127.0.0.1:2322/ > /dev/null
       interval: 5s
       timeout: 5s
       retries: 3
@@ -31,6 +29,12 @@
   roles:
     - role: photon
   tasks:
+    - name: Wait for Photon test container health check
+      community.docker.docker_container:
+        name: photon
+        state: healthy
+        healthy_wait_timeout: 30
+
     - name: Pause for Photon runtime inspection
       ansible.builtin.pause:
         seconds: 5

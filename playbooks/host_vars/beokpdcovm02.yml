@@ -1,5 +1,5 @@
 ---
-photon_database_path: /media/photon
+photon_database_path: /data/media/photon
 photon_network: media
 
 firewall_filter_input_host:

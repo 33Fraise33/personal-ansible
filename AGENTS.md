@@ -24,10 +24,11 @@
 
 ## Roles And Containers
 
-- New roles use the Galaxy layout: `defaults/main.yml`, `tasks/main.yml`, `handlers/main.yml`, `templates/`, `meta/main.yml`, and `README.md`. Put configurable image tags and ports in `defaults`; use `tasks/main.yml` to compose task files.
+- New roles use the Galaxy layout: `defaults/main.yml`, `tasks/main.yml`, `handlers/main.yml`, `templates/`, `meta/main.yml`, and `README.md`; use `tasks/main.yml` to compose task files.
 - Use `community.docker` modules for Docker containers, networks, and volumes instead of raw Docker shell commands. Make tasks idempotent and declare container state, restart policy, and other intended configuration explicitly.
 - Keep secrets, passwords, and API keys in variables for Vault or CI injection, never literals. Generate container config with `.j2` templates and bind-mount it into the container.
-- Prefer sane non-critical defaults with Jinja's `default` modifier instead of populating `defaults/main.yml` broadly. Only define critical variables in `defaults/main.yml`; values such as a database name or role-specific username may safely default to the role name, but passwords and other secrets must always be provided explicitly.
+- This is personal infrastructure, not a public role collection. Hardcode stable, role-specific settings in tasks. Add a variable only for a secret, an inventory-specific setting, a deliberate override, or a value likely to change frequently. Keep defaults limited to required host-specific values and test overrides.
+- For a role with writable persisted data, create a dedicated system user and own its persisted host directories and files with that user. Run the container as that numeric UID:GID when the image supports it. If an image requires a root entrypoint, use its supported UID/GID mechanism and verify that its long-running application process drops privileges; document the exception.
 - Prefer application image versions in this order: first, use a major version tag such as `v3` where possible and configure WUD to update within that major version, preventing beta or other incompatible releases; second, use the `latest` tag without setting WUD configuration on the container; third, use a fixed image version tag only when explicitly requested by the owner.
 
 ## Testing And CI
