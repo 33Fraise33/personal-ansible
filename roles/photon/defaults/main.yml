@@ -1,0 +1,4 @@
+---
+photon_database_path: /var/lib/photon
+photon_hostname: photon.frai.se
+photon_network: media

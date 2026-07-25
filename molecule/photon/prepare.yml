@@ -1,0 +1,13 @@
+---
+- name: Prepare Photon dependencies
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Install Docker SDK dependencies
+      ansible.builtin.apt:
+        name:
+          - python3-docker
+          - python3-requests
+        state: present
+        update_cache: true

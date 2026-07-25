@@ -13,5 +13,8 @@
     dawarich_postgres_image: imresamu/postgis
     dawarich_services_network: molecule-services
     dawarich_dns_servers: []
+    dawarich_photon_api_host: photon.frai.se
+    dawarich_photon_api_port: "443"
+    dawarich_photon_api_use_https: "true"
   roles:
     - role: dawarich

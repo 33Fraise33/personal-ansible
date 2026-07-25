@@ -1,4 +1,8 @@
 ---
+dawarich_photon_api_host: photon.frai.se
+dawarich_photon_api_port: "443"
+dawarich_photon_api_use_https: "true"
+
 cloudflared:
   docker_network: services
   service_token: !vault |

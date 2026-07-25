@@ -1,0 +1,40 @@
+---
+- name: Converge Photon role
+  hosts: all
+  gather_facts: false
+  vars:
+    photon_image: rtuszik/photon-docker:latest
+    photon_command:
+      - python3
+      - -m
+      - http.server
+      - "2322"
+    photon_database_path: /tmp/molecule-photon-data
+    photon_hostname: photon.test
+    photon_network: molecule-traefik
+    photon_healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          curl -fsS http://127.0.0.1:2322/ > /dev/null
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 1s
+  pre_tasks:
+    - name: Create shared Traefik test network
+      community.docker.docker_network:
+        name: molecule-traefik
+        driver: bridge
+  roles:
+    - role: photon
+  tasks:
+    - name: Wait for Photon test container health check
+      community.docker.docker_container:
+        name: photon
+        state: healthy
+        healthy_wait_timeout: 30
+
+    - name: Pause for Photon runtime inspection
+      ansible.builtin.pause:
+        seconds: 5

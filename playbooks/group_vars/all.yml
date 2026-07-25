@@ -187,6 +187,10 @@ domain:
     - domain: time.unitix.be
       answer: "{{ traefik.dco.ip }}"
     # MEDIA
+    - domain: photon.frai.se
+      answer: "{{ traefik.media.ipv6 }}"
+    - domain: photon.frai.se
+      answer: "{{ traefik.media.ip }}"
     - domain: "autobrr.frai.se"
       answer: "{{ traefik.media.ip }}"
     - domain: "autobrr.frai.se"
