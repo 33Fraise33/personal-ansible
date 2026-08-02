@@ -8,3 +8,5 @@
       tags: valkey
     - role: netbox
       tags: netbox
+    - role: netbox_dns
+      tags: netbox_dns

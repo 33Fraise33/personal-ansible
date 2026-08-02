@@ -1,0 +1,7 @@
+---
+- name: Synchronize NetBox DNS records now
+  community.docker.docker_container_exec:
+    container: "{{ netbox_dns_container_name }}"
+    command: sync --once
+  changed_when: false
+  no_log: true

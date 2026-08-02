@@ -1,0 +1,14 @@
+---
+- name: Configure NetBox DNS webhook and event rules
+  community.docker.docker_container:
+    name: "{{ netbox_dns_container_name }}-configure-events"
+    image: "{{ netbox_dns_image }}"
+    command: configure-netbox-events
+    cleanup: true
+    detach: false
+    network_mode: "{{ netbox_dns_docker_network }}"
+    volumes:
+      - "{{ netbox_dns_config_directory }}/config.yml:/etc/netbox-dns/config.yml:ro"
+    env:
+      NETBOX_DNS_MAINTAINER_TOKEN: "{{ netbox_dns_maintainer_api_token }}"
+  no_log: true

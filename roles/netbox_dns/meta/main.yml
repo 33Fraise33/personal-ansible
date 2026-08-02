@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: netbox_dns
+  author: 33Fraise33
+  description: Synchronize NetBox primary addresses to Cloudflare DNS.
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+dependencies: []
