@@ -1,26 +1,66 @@
 ---
-- name: Validate PBS exporter credentials
+- name: Validate PBS exporter instances list
   ansible.builtin.assert:
     that:
-      - pbs_exporter_api_token_id is defined
-      - pbs_exporter_api_token_id | length > 0
-      - pbs_exporter_api_token_secret is defined
-      - pbs_exporter_api_token_secret | length > 0
+      - pbs_exporter_instances is defined
+      - pbs_exporter_instances is sequence
+      - pbs_exporter_instances is not string
+      - pbs_exporter_instances | length > 0
     fail_msg: >-
-      pbs_exporter_api_token_id and pbs_exporter_api_token_secret must be
-      supplied as inventory variables.
+      pbs_exporter_instances must be a non-empty inventory list.
   no_log: true
 
-- name: Setup Prometheus PBS exporter
+- name: Validate PBS exporter instances
+  ansible.builtin.assert:
+    that:
+      - item.name is defined
+      - item.name is string
+      - item.name is match('^[a-z0-9][a-z0-9-]*$')
+      - item.netbox_name is defined
+      - item.netbox_name is string
+      - item.netbox_name | length > 0
+      - item.api_token_id is defined
+      - item.api_token_id is string
+      - item.api_token_id | length > 0
+      - item.api_token_secret is defined
+      - item.api_token_secret is string
+      - item.api_token_secret | length > 0
+    fail_msg: >-
+      Every PBS exporter instance must define a lowercase name, netbox_name,
+      api_token_id, and api_token_secret.
+  loop: "{{ pbs_exporter_instances }}"
+  loop_control:
+    label: hidden
+  no_log: true
+
+- name: Validate unique PBS exporter instance selectors
+  ansible.builtin.assert:
+    that:
+      - >-
+        pbs_exporter_instances | map(attribute='name') | unique | list | length
+        == pbs_exporter_instances | length
+      - >-
+        pbs_exporter_instances | map(attribute='netbox_name') | unique | list | length
+        == pbs_exporter_instances | length
+    fail_msg: PBS exporter instance names and NetBox names must be unique.
+  no_log: true
+
+- name: Remove legacy Prometheus PBS exporter
   community.docker.docker_container:
     name: prometheus-pbs_exporter
+    state: absent
+  no_log: true
+
+- name: Setup Prometheus PBS exporters
+  community.docker.docker_container:
+    name: "prometheus-pbs-exporter-{{ item.name }}"
     image: "{{ pbs_exporter_image | default('natrontech/pbs-exporter:latest') }}"
     networks:
       - name: monitoring
     dns_servers: "{{ dns.servers }}"
     env:
-      PBS_TOKEN_ID: "{{ pbs_exporter_api_token_id }}"
-      PBS_TOKEN_SECRET: "{{ pbs_exporter_api_token_secret }}"
+      PBS_TOKEN_ID: "{{ item.api_token_id }}"
+      PBS_TOKEN_SECRET: "{{ item.api_token_secret }}"
       PBS_TLS_INSECURE: "true"
     restart: true
     restart_policy: always
@@ -28,4 +68,8 @@
     pull: true
     labels:
       traefik.enable: "false"
+      com.unitix.prometheus.pbs-exporter: "true"
+  loop: "{{ pbs_exporter_instances }}"
+  loop_control:
+    label: hidden
   no_log: true

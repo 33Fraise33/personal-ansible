@@ -262,12 +262,17 @@ scrape_configs:
       - targets:
           - "prometheus-adguard_exporter:9618"
 
-  - job_name: 'pbs_exporter'
+{% if prometheus.features.pbs_exporter | default(false) %}
+{% for pbs_instance in pbs_exporter_instances | default([]) %}
+  - job_name: 'pbs_exporter_{{ pbs_instance.name }}'
     metrics_path: /probe
     http_sd_configs:
       - <<: *netbox_auth
         url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=pbs
     relabel_configs:
+      - source_labels: [__meta_netbox_name]
+        regex: '^{{ pbs_instance.netbox_name | regex_escape }}$'
+        action: keep
       - source_labels: [__meta_netbox_primary_ip]
         target_label: __param_target
       - source_labels: [__param_target]
@@ -281,7 +286,10 @@ scrape_configs:
       - source_labels: [__meta_netbox_role_slug]
         target_label: device_role
       - target_label: __address__
-        replacement: "prometheus-pbs_exporter:9569"
+        replacement: "prometheus-pbs-exporter-{{ pbs_instance.name }}:9569"
+
+{% endfor %}
+{% endif %}
 
   - job_name: "hass"
     metrics_path: /api/prometheus
