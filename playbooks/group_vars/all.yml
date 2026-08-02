@@ -95,6 +95,8 @@ domain:
     #   answer: 2a12:4946:4001:35::1
     # - domain: wireguard.frai.se
     #   answer: 31.24.249.70
+    - domain: unifi
+      answer: 10.10.48.190
     - domain: inform.unitix.be
       answer: 10.10.48.190
     - domain: sync.frai.se
