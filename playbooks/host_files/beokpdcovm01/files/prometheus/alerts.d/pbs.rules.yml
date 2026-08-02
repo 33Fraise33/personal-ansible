@@ -2,29 +2,77 @@
 groups:
   - name: pbs.rules
     rules:
-      - alert: PBS - Backup Failed
-        expr: pbs_task_status{task_type="backup",status=~"(?i:failed|error)"} == 1
+      - alert: PBS - Down
+        expr: pbs_up == 0
         for: 10m
         labels:
           severity: critical
         annotations:
-          summary: "PBS backup failed on {{ $labels.node_name }}"
-          description: "Backup {{ $labels.task }} for datastore {{ $labels.datastore }} failed."
+          summary: "PBS Offline"
+          description: "PBS job is not returning a healthy state."
 
-      - alert: PBS - Verification Failed
-        expr: pbs_task_status{task_type="verify",status=~"(?i:failed|error)"} == 1
+      - alert: PBS - Verification Not Successful
+        expr: pbs_snapshot_vm_last_verify == 0
         for: 10m
         labels:
           severity: critical
         annotations:
-          summary: "PBS verification failed on {{ $labels.node_name }}"
-          description: "Verification {{ $labels.task }} for datastore {{ $labels.datastore }} failed."
+          summary: "PBS snapshot for {{ $labels.vm_name }} is not verified successfully"
+          description: >-
+            The latest snapshot for {{ $labels.vm_name }} on
+            {{ $labels.node_name }} is not verified successfully.
 
-      - alert: PBS - Sync Failed
-        expr: pbs_task_status{task_type="sync",status=~"(?i:failed|error)"} == 1
+      - alert: PBS - Local Backup Stale
+        expr: >-
+          (time() - pbs_snapshot_vm_last_timestamp > 172800)
+          and on (site_slug, namespace)
+          label_replace(
+            count by (site_slug) (pbs_snapshot_vm_last_timestamp),
+            "namespace", "$1", "site_slug", "(.+)"
+          )
         for: 10m
         labels:
           severity: critical
         annotations:
-          summary: "PBS sync failed on {{ $labels.node_name }}"
-          description: "Sync {{ $labels.task }} for datastore {{ $labels.datastore }} failed."
+          summary: "PBS backup for {{ $labels.vm_name }} is older than two days"
+          description: >-
+            The latest local snapshot for {{ $labels.vm_name }} on
+            {{ $labels.node_name }} is older than two days.
+
+      - alert: PBS - Sync Backup Stale
+        expr: >-
+          (time() - pbs_snapshot_vm_last_timestamp > 172800)
+          unless on (site_slug, namespace)
+          label_replace(
+            count by (site_slug) (pbs_snapshot_vm_last_timestamp),
+            "namespace", "$1", "site_slug", "(.+)"
+          )
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PBS sync for {{ $labels.vm_name }} is older than two days"
+          description: >-
+            The latest remote snapshot for {{ $labels.vm_name }} on
+            {{ $labels.node_name }} is older than two days.
+
+      - alert: PBS - Sync Missing
+        expr: >-
+          count by (site_slug, node_name, instance) (pbs_snapshot_vm_last_timestamp)
+          unless on (site_slug, node_name, instance)
+          count by (site_slug, node_name, instance) (
+            pbs_snapshot_vm_last_timestamp
+            unless on (site_slug, namespace)
+            label_replace(
+              count by (site_slug) (pbs_snapshot_vm_last_timestamp),
+              "namespace", "$1", "site_slug", "(.+)"
+            )
+          )
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PBS has no remote snapshots"
+          description: >-
+            PBS {{ $labels.node_name }} has local snapshots but no snapshots in
+            a remote namespace.

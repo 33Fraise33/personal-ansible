@@ -3,18 +3,86 @@ dawarich_photon_api_host: photon.frai.se
 dawarich_photon_api_port: "443"
 dawarich_photon_api_use_https: "true"
 
+adguard_hostname: dns1.frai.se
+
+docker:
+  dir:
+    config: /data/docker-config
+    data: /data/docker
+  networks:
+    monitoring:
+      driver_options:
+        parent: ens19.1001
+      hosts:
+        loki: 94
+      ipam:
+        - gateway: 10.10.48.65
+          subnet: 10.10.48.64/27
+        - gateway: 2001:678:1080:1001::1
+          subnet: 2001:678:1080:1001::/64
+      ipv6: true
+      type: ipvlan
+    networking:
+      driver_options:
+        parent: ens19.1004
+      hosts:
+        uisp: 189
+        unifi: 190
+      ipam:
+        - gateway: 10.10.48.161
+          subnet: 10.10.48.160/27
+        - gateway: 2001:678:1080:1004::1
+          subnet: 2001:678:1080:1004::/64
+      ipv6: true
+      type: ipvlan
+    services:
+      driver_options:
+        parent: ens19.1002
+      hosts:
+        adguard: 124
+        traefik: 125
+        unbound: 123
+      ipam:
+        - gateway: 10.10.48.97
+          subnet: 10.10.48.96/27
+        - gateway: 2001:678:1080:1102::1
+          subnet: 2001:678:1080:1102::/64
+      ipv6: true
+      type: ipvlan
+  users:
+    - fraise
+
+mounts:
+  - fs: ext4
+    mountpoint: /data/
+    source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2
+
+netbox_interface: true
+
+portainer:
+  network: services
+  type: portainer-ce
+
 prometheus:
   features:
+    adguard: true
+    alertmanager: true
+    blackbox: true
+    graphite: true
+    ipmi: true
+    snmp: true
+    speedtest: true
     pbs_exporter: true
 
-# Each target is keyed by the PBS VM's NetBox name. The target must be the
-# endpoint accepted by the PBS exporter; token secrets belong in Vault.
-# pbs_exporter_targets:
-#   - netbox_name: pbs.example
-#     target: https://pbs.example:8007
-#     api_token_id: prometheus@pbs!exporter
-#     api_token_secret: !vault |
-#       $ANSIBLE_VAULT;1.1;AES256
+# Shared secret for the prometheus@pbs!exporter token configured on every PBS.
+pbs_exporter_api_token: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  66653733653366643937326266313733396333356535656563306634613739333964316434303736
+  3530373137643934333034373738366631353838666663660a326662613839346663383832626538
+  39613466356665323864376164323835396661666137313039396436373736386331306362363137
+  3233313231613636330a613430353262356234386366346534386462376362636136316130306238
+  31386434316431383361613835323464626661313530383834306231623764393032313932343938
+  3934663937333435663532346261663261643038343063303030
 
 cloudflared:
   docker_network: services

@@ -1,91 +1,29 @@
 ---
-- name: Validate PBS exporter targets list
+- name: Validate PBS exporter API token
   ansible.builtin.assert:
     that:
-      - pbs_exporter_targets is defined
-      - pbs_exporter_targets is sequence
-      - pbs_exporter_targets is not string
-      - pbs_exporter_targets | length > 0
-    fail_msg: pbs_exporter_targets must be a non-empty inventory list.
-  no_log: true
-
-- name: Validate PBS exporter targets
-  ansible.builtin.assert:
-    that:
-      - item.netbox_name is defined
-      - item.netbox_name is string
-      - item.netbox_name | length > 0
-      - item.target is defined
-      - item.target is string
-      - item.target | length > 0
-      - item.api_token_id is defined
-      - item.api_token_id is string
-      - item.api_token_id | length > 0
-      - item.api_token_secret is defined
-      - item.api_token_secret is string
-      - item.api_token_secret | length > 0
-    fail_msg: >-
-      Every PBS exporter target must define netbox_name, target, api_token_id,
-      and api_token_secret.
-  loop: "{{ pbs_exporter_targets }}"
-  loop_control:
-    label: hidden
-  no_log: true
-
-- name: Validate unique PBS exporter target selectors
-  ansible.builtin.assert:
-    that:
-      - >-
-        pbs_exporter_targets | map(attribute='netbox_name') | unique | list | length
-        == pbs_exporter_targets | length
-      - >-
-        pbs_exporter_targets | map(attribute='target') | unique | list | length
-        == pbs_exporter_targets | length
-    fail_msg: PBS exporter NetBox names and targets must be unique.
-  no_log: true
-
-- name: Create PBS exporter config directory
-  ansible.builtin.file:
-    path: "{{ docker.dir.config }}/prometheus_pbs_exporter"
-    state: directory
-    owner: root
-    group: root
-    mode: "0700"
-  no_log: true
-
-- name: Render PBS exporter targets
-  ansible.builtin.template:
-    src: pbs_targets.yml.j2
-    dest: "{{ docker.dir.config }}/prometheus_pbs_exporter/targets.yml"
-    owner: root
-    group: root
-    mode: "0600"
-  no_log: true
-
-- name: Remove legacy per-target PBS exporters
-  community.docker.docker_container:
-    name: "prometheus-pbs-exporter-{{ item.name }}"
-    state: absent
-  loop: "{{ pbs_exporter_instances | default([]) }}"
-  loop_control:
-    label: hidden
+      - pbs_exporter_api_token is defined
+      - pbs_exporter_api_token is string
+      - pbs_exporter_api_token | length > 0
+    fail_msg: pbs_exporter_api_token must be supplied as an inventory variable.
   no_log: true
 
 - name: Setup Prometheus PBS exporter
   community.docker.docker_container:
     name: prometheus-pbs_exporter
-    image: "{{ pbs_exporter_image | default('natrontech/pbs-exporter:latest') }}"
+    image: ghcr.io/natrontech/pbs-exporter:latest
+    user: "65534:65534"
     networks:
       - name: monitoring
     dns_servers: "{{ dns.servers }}"
-    volumes:
-      - "{{ docker.dir.config }}/prometheus_pbs_exporter/targets.yml:/config/targets.yml:ro"
-    command: "--config.file=/config/targets.yml"
+    env:
+      PBS_USERNAME: pbs_exporter@pbs
+      PBS_API_TOKEN_NAME: pbs_exporter_token
+      PBS_API_TOKEN: "{{ pbs_exporter_api_token }}"
+      PBS_INSECURE: "true"
     restart: true
     restart_policy: always
     state: started
     pull: true
     labels:
       traefik.enable: "false"
-      com.unitix.prometheus.pbs-exporter: "true"
-  no_log: true
