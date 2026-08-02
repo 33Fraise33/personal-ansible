@@ -1,0 +1,30 @@
+---
+groups:
+  - name: pbs.rules
+    rules:
+      - alert: PBS backup failed
+        expr: pbs_task_status{task_type="backup",status=~"(?i:failed|error)"} == 1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PBS backup failed on {{ $labels.node_name }}"
+          description: "Backup {{ $labels.task }} for datastore {{ $labels.datastore }} failed."
+
+      - alert: PBS verification failed
+        expr: pbs_task_status{task_type="verify",status=~"(?i:failed|error)"} == 1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PBS verification failed on {{ $labels.node_name }}"
+          description: "Verification {{ $labels.task }} for datastore {{ $labels.datastore }} failed."
+
+      - alert: PBS sync failed
+        expr: pbs_task_status{task_type="sync",status=~"(?i:failed|error)"} == 1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PBS sync failed on {{ $labels.node_name }}"
+          description: "Sync {{ $labels.task }} for datastore {{ $labels.datastore }} failed."
