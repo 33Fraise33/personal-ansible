@@ -1,0 +1,29 @@
+---
+- name: Validate PBS exporter API token
+  ansible.builtin.assert:
+    that:
+      - pbs_exporter_api_token is defined
+      - pbs_exporter_api_token is string
+      - pbs_exporter_api_token | length > 0
+    fail_msg: pbs_exporter_api_token must be supplied as an inventory variable.
+  no_log: true
+
+- name: Setup Prometheus PBS exporter
+  community.docker.docker_container:
+    name: prometheus-pbs_exporter
+    image: ghcr.io/natrontech/pbs-exporter:latest
+    user: "65534:65534"
+    networks:
+      - name: monitoring
+    dns_servers: "{{ dns.servers }}"
+    env:
+      PBS_USERNAME: pbs_exporter@pbs
+      PBS_API_TOKEN_NAME: pbs_exporter_token
+      PBS_API_TOKEN: "{{ pbs_exporter_api_token }}"
+      PBS_INSECURE: "true"
+    restart: true
+    restart_policy: always
+    state: started
+    pull: true
+    labels:
+      traefik.enable: "false"

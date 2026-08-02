@@ -106,7 +106,7 @@ firewall:
           ip: "@MONITORING"
         destination:
           protocol: tcp
-          port: "{ 80,443,9090,9100,9323,9342 }"  # http,https,federate,node_exporter,docker_exporter,frr_exporter
+          port: "{ 80,443,8007,9090,9100,9323,9342 }"  # http,https,pbs,federate,node_exporter,docker_exporter,frr_exporter
         counter: true
       - comment: "Allow from MONITORING"
         type: ip6
@@ -114,7 +114,7 @@ firewall:
           ip: "@v6_MONITORING"
         destination:
           protocol: tcp
-          port: "{ 80,443,9090,9100,9323,9342 }"  # http,https,node_exporter,docker_exporter,frr_exporter
+          port: "{ 80,443,8007,9090,9100,9323,9342 }"  # http,https,pbs,node_exporter,docker_exporter,frr_exporter
         counter: true
       # DNS
       - comment: "Allow Adguard to Recursive"

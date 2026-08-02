@@ -27,6 +27,11 @@
   tags: adguard, adguard_exporter
   when: prometheus.features.adguard | default (false)
 
+- name: Setup PBS exporter
+  ansible.builtin.import_tasks: pbs_exporter.yml
+  tags: pbs, pbs_exporter, pbs-exporter
+  when: prometheus.features.pbs_exporter | default(false)
+
 - name: Setup alertmanager
   ansible.builtin.import_tasks: alertmanager.yml
   tags: alertmanager, alerts, alert
