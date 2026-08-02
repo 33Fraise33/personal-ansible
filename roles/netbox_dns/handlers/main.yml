@@ -1,0 +1,6 @@
+---
+- name: Restart NetBox DNS synchronizer
+  community.docker.docker_container:
+    name: "{{ netbox_dns_container_name }}"
+    state: started
+    restart: true

@@ -1,0 +1,62 @@
+---
+- name: Validate NetBox DNS credentials
+  ansible.builtin.assert:
+    that:
+      - netbox_dns_netbox_api_token is defined
+      - netbox_dns_netbox_webhook_secret is defined
+      - netbox_dns_cloudflare_api_token is defined
+    fail_msg: Dedicated NetBox runtime token, webhook secret, and Cloudflare token are required.
+  no_log: true
+
+- name: Create NetBox DNS service user
+  ansible.builtin.user:
+    name: "{{ netbox_dns_user }}"
+    comment: NetBox Cloudflare DNS synchronizer
+    system: true
+    create_home: false
+
+- name: Get NetBox DNS service user identity
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ netbox_dns_user }}"
+
+- name: Create NetBox DNS configuration directory
+  ansible.builtin.file:
+    path: "{{ netbox_dns_config_directory }}"
+    state: directory
+    owner: root
+    group: "{{ netbox_dns_user }}"
+    mode: "0750"
+
+- name: Render NetBox DNS configuration
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: "{{ netbox_dns_config_directory }}/config.yml"
+    owner: root
+    group: "{{ netbox_dns_user }}"
+    mode: "0640"
+  no_log: true
+  notify: Restart NetBox DNS synchronizer
+
+- name: Deploy NetBox DNS synchronizer
+  community.docker.docker_container:
+    name: "{{ netbox_dns_container_name }}"
+    image: "{{ netbox_dns_image }}"
+    command: serve
+    user: "{{ ansible_facts.getent_passwd[netbox_dns_user][1] }}:{{ ansible_facts.getent_passwd[netbox_dns_user][2] }}"
+    volumes:
+      - "{{ netbox_dns_config_directory }}/config.yml:/etc/netbox-dns/config.yml:ro"
+    networks:
+      - name: "{{ netbox_dns_docker_network }}"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart_policy: unless-stopped
+    state: healthy
+    pull: true
+    labels:
+      wud.watch: "true"
+      wud.tag.include: ^v1(?:$|\\.)

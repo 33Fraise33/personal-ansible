@@ -1,0 +1,10 @@
+{
+  "netbox_url": {{ netbox_dns_netbox_url | to_json }},
+  "netbox_token": {{ netbox_dns_netbox_api_token | to_json }},
+  "cloudflare_token": {{ netbox_dns_cloudflare_api_token | to_json }},
+  "webhook_secret": {{ netbox_dns_netbox_webhook_secret | to_json }},
+  "zone": {{ netbox_dns_zone | to_json }},
+  "ttl": {{ netbox_dns_record_ttl }},
+  "interval": {{ netbox_dns_reconciliation_interval }},
+  "excluded_statuses": {{ netbox_dns_excluded_statuses | to_json }}
+}

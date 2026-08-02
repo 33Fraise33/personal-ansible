@@ -3,6 +3,15 @@ dawarich_photon_api_host: photon.frai.se
 dawarich_photon_api_port: "443"
 dawarich_photon_api_use_https: "true"
 
+netbox_dns_zone: unitix.it
+netbox_dns_netbox_url: http://netbox:8080
+netbox_dns_docker_network: services
+netbox_dns_reconciliation_interval: 900
+netbox_dns_record_ttl: 300
+netbox_dns_excluded_statuses:
+  - decommissioning
+  - decommissioned
+
 cloudflared:
   docker_network: services
   service_token: !vault |

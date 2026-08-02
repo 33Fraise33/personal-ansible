@@ -1,0 +1,13 @@
+---
+- name: Deploy NetBox DNS synchronizer
+  ansible.builtin.import_tasks: deploy.yml
+
+- name: Configure NetBox DNS webhook events
+  ansible.builtin.import_tasks: configure_events.yml
+  when: netbox_dns_configure_events | bool
+
+- name: Run a manual NetBox DNS synchronization
+  ansible.builtin.import_tasks: sync.yml
+  tags:
+    - never
+    - netbox_dns_sync

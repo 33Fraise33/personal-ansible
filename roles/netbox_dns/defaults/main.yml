@@ -1,0 +1,14 @@
+---
+netbox_dns_image: ghcr.io/33fraise33/netbox-cloudflare-dns:v1
+netbox_dns_container_name: netbox-dns
+netbox_dns_user: netbox-dns
+netbox_dns_config_directory: /etc/netbox-dns
+netbox_dns_zone: unitix.it
+netbox_dns_netbox_url: http://netbox:8080
+netbox_dns_docker_network: services
+netbox_dns_reconciliation_interval: 900
+netbox_dns_record_ttl: 300
+netbox_dns_excluded_statuses:
+  - decommissioning
+  - decommissioned
+netbox_dns_configure_events: false
