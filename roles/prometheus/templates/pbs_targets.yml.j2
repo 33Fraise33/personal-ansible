@@ -1,0 +1,9 @@
+---
+targets:
+{% for pbs_target in pbs_exporter_targets %}
+  - name: "{{ pbs_target.netbox_name }}"
+    target: "{{ pbs_target.target }}"
+    token_id: "{{ pbs_target.api_token_id }}"
+    token_secret: "{{ pbs_target.api_token_secret }}"
+    tls_insecure: true
+{% endfor %}

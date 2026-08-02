@@ -7,6 +7,15 @@ prometheus:
   features:
     pbs_exporter: true
 
+# Each target is keyed by the PBS VM's NetBox name. The target must be the
+# endpoint accepted by the PBS exporter; token secrets belong in Vault.
+# pbs_exporter_targets:
+#   - netbox_name: pbs.example
+#     target: https://pbs.example:8007
+#     api_token_id: prometheus@pbs!exporter
+#     api_token_secret: !vault |
+#       $ANSIBLE_VAULT;1.1;AES256
+
 cloudflared:
   docker_network: services
   service_token: !vault |
