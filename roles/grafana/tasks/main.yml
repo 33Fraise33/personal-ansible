@@ -41,7 +41,7 @@
         && Header(`X-Authelia-Bypass`, `{{ authelia_bypass_header }}`)"
       traefik.http.routers.grafana-bypass.tls: "true"
       traefik.http.routers.grafana-bypass.tls.certresolver: "le"
-      traefik.http.routers.grafana-bypass.service: "netbox-service"
+      traefik.http.routers.grafana-bypass.service: "grafana-service"
       traefik.http.routers.grafana-bypass.priority: "100"
       # SHARED
       traefik.http.services.grafana-service.loadbalancer.server.port: "3000"
