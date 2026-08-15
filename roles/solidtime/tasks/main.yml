@@ -111,6 +111,7 @@
     env:
       CONTAINER_MODE: http
       AUTO_DB_MIGRATE: "true"
+      APP_URL: https://time.unitix.be
     env_file: "{{ docker.dir.config }}/solidtime/laravel.env"
     state: healthy
     pull: true

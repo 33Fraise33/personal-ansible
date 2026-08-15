@@ -12,15 +12,17 @@ groups:
           description: "PBS job is not returning a healthy state."
 
       - alert: PBS - Verification Not Successful
-        expr: pbs_snapshot_vm_last_verify == 0
+        expr: >-
+          (max_over_time(pbs_snapshot_vm_last_verify[2d]) == 0)
+          and (pbs_snapshot_vm_count > 1)
         for: 10m
         labels:
           severity: critical
         annotations:
-          summary: "PBS snapshot for {{ $labels.vm_name }} is not verified successfully"
+          summary: "No successfully verified PBS snapshot for {{ $labels.vm_name }} in the last two days"
           description: >-
-            The latest snapshot for {{ $labels.vm_name }} on
-            {{ $labels.node_name }} is not verified successfully.
+            No successfully verified snapshot for {{ $labels.vm_name }} on
+            {{ $labels.node_name }} has been observed in the last two days.
 
       - alert: PBS - Local Backup Stale
         expr: >-

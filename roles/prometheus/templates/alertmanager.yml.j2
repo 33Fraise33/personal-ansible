@@ -6,6 +6,23 @@ route:
   group_by: ['site']
   repeat_interval: 10000h
 
+inhibit_rules:
+  - source_matchers:
+      - alertname = "Device offline"
+    target_matchers:
+      - alertname = "Probe Failed"
+    equal: ['node_name']
+  - source_matchers:
+      - alertname = "Probe Failed"
+    target_matchers:
+      - alertname = "High packet loss"
+    equal: ['node_name']
+  - source_matchers:
+      - alertname = "Probe Failed"
+    target_matchers:
+      - alertname = "High latency"
+    equal: ['node_name']
+
 receivers:
   - name: default
     # N8N to matrix
