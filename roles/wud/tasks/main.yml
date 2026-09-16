@@ -1,13 +1,53 @@
 ---
+- name: Create WUD user to minimize privileges
+  ansible.builtin.user:
+    name: wud
+    comment: WUD user
+    system: true
+
+- name: Create WUD data volume
+  community.docker.docker_volume:
+    name: data_wud
+
+- name: Gather numeric UID and GID of the host WUD user
+  ansible.builtin.getent:
+    database: passwd
+    key: wud
+
+- name: Gather numeric GID of the host Docker group
+  ansible.builtin.getent:
+    database: group
+    key: docker
+
+- name: Set WUD data volume ownership
+  ansible.builtin.file:
+    path: "{{ docker.dir.data }}/docker/volumes/data_wud/_data"
+    state: directory
+    owner: wud
+    group: wud
+    mode: "0700"
+
+- name: Validate WUD OIDC client secret
+  ansible.builtin.assert:
+    that:
+      - authelia_oidc_clients.wud is defined
+      - authelia_oidc_clients.wud.client_id | length > 0
+      - authelia_oidc_clients.wud.client_secret | length > 0
+    fail_msg: authelia_oidc_clients.wud credentials must be supplied through Vault.
+
 - name: WUD - Set up container
   community.docker.docker_container:
     name: wud
-    image: ghcr.io/getwud/wud:latest
+    image: ghcr.io/getwud/wud:9
+    user: "{{ getent_passwd['wud'][1] }}:{{ getent_passwd['wud'][2] }}"
+    groups:
+      - "{{ getent_group['docker'][1] }}"
     networks:
       - name: host
     dns_servers: "{{ dns.servers }}"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "data_wud:/store"
     healthcheck:
       test: curl --fail http://localhost:${WUD_SERVER_PORT:-3000}/health || exit 1
       interval: 10s
@@ -21,9 +61,18 @@
     pull: true
     labels:
       traefik.enable: "false"
+      wud.tag.include: '^9$'
+  no_log: true
   vars:
     static_dict:
       WUD_SERVER_PORT: "9103"
+      WUD_PUBLIC_URL: "https://wud-{{ inventory_hostname | lower }}.frai.se"
+      WUD_AUTH_OIDC_AUTHELIA_CLIENTID: "{{ authelia_oidc_clients.wud.client_id }}"
+      WUD_AUTH_OIDC_AUTHELIA_CLIENTSECRET: "{{ authelia_oidc_clients.wud.client_secret }}"
+      WUD_AUTH_OIDC_AUTHELIA_DISCOVERY: "https://auth.frai.se/.well-known/openid-configuration"
+      WUD_AUTH_OIDC_AUTHELIA_ADMINGROUP: "wud_admins"
+      WUD_AUTH_OIDC_AUTHELIA_DEFAULTROLE: "none"
+      WUD_AUTH_OIDC_AUTHELIA_GROUPSCLAIM: "groups"
       WUD_WATCHER_LOCAL_CRON: "33 4 * * *"
       WUD_REGISTRY_HUB_PUBLIC_WATCHDIGEST: "true"
       WUD_REGISTRY_HUB_PUBLIC_SUPPRESSDIGESTWATCHWARNING: "true"

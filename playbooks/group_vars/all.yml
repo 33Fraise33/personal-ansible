@@ -77,6 +77,14 @@ traefik_custom_rules:
     target: https://172.16.33.3:8006/
   - name: accweb
     target: http://172.16.33.6
+  - name: wud-bejbegiavm01
+    target: "http://[2001:678:1080:4033::5]:9103"
+  - name: wud-beokpdcovm01
+    target: "http://[2001:678:1080:2202::2]:9103"
+  - name: wud-beokpdcovm02
+    target: "http://[2001:678:1080:2202::3]:9103"
+  - name: wud-beokpdcovm04
+    target: "http://[2001:678:1080:2202::5]:9103"
 
 traefik:
   home:
@@ -188,6 +196,14 @@ domain:
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: time.unitix.be
       answer: "{{ traefik.dco.ip }}"
+    - domain: wud-beokpdcovm01.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: wud-beokpdcovm01.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: wud-beokpdcovm04.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
+    - domain: wud-beokpdcovm04.frai.se
+      answer: "{{ traefik.dco.ip }}"
     # MEDIA
     - domain: photon.frai.se
       answer: "{{ traefik.media.ipv6 }}"
@@ -249,6 +265,10 @@ domain:
       answer: "{{ traefik.media.ipv6 }}"
     - domain: tdarr.frai.se
       answer: "{{ traefik.media.ip }}"
+    - domain: wud-beokpdcovm02.frai.se
+      answer: "{{ traefik.media.ipv6 }}"
+    - domain: wud-beokpdcovm02.frai.se
+      answer: "{{ traefik.media.ip }}"
     # HOME
     - domain: "ha.frai.se"
       answer: "{{ traefik.home.ip }}"
@@ -290,6 +310,10 @@ domain:
       answer: "{{ traefik.home.ip }}"
     - domain: "accweb.frai.se"
       answer: "{{ traefik.home.ipv6 }}"
+    - domain: wud-bejbegiavm01.frai.se
+      answer: "{{ traefik.home.ipv6 }}"
+    - domain: wud-bejbegiavm01.frai.se
+      answer: "{{ traefik.home.ip }}"
   external:  # specific ipv4 at the front, no ipv4 = ddclient
     # UNITIX.BE
     # - name: beokpdcort01
@@ -476,9 +500,10 @@ firewall_filter_input_all:
       port: 1830
       protocol: tcp
     counter: true
-  - comment: "Allow WUD from MGMT"
+  - comment: "Allow WUD from TRAEFIK over IPv6"
+    type: ip6
     source:
-      ip: "@MGMT"
+      ip: "@TRAEFIK_v6"
     destination:
       port: 9103
       protocol: tcp
@@ -572,3 +597,21 @@ authelia_oidc_clients:
       33656462653730306433623231646663353136363534313365353236623636643335323761666632
       61663765396237356639333531353239316538383531356562643733346134316638366164326132
       61393833386366363732
+  wud:
+    client_id: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      62653133333237623837663139633832313939643164323930386635306337376339303665653731
+      6366316534376164303665383165633963346332323966380a333636633164656139616334353534
+      36386234663439326530373031336532306135346536396362363139303364616132353663326663
+      3237363665633835340a303864323962336637653230346533643463653563333662343066353963
+      32316339343266656664306635653937333336663633656438656261663738363339663533323932
+      3331323733306361343830623232633135363866363431656137
+    client_secret: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      32643639363963356537613631316137393034656362303464343933656664303635633433633162
+      3863346264643038393636336461386566656333343762610a366366643834303735326535386461
+      66626433393864646563316532646238316366333330616530306562653031386231393933653538
+      3766653038396135640a373439386538313832613239646435363632323833636135396264313964
+      63316562633531633335643536333736613135386138363236306634383062643262303537336366
+      36373532383233306535386532613534366464383464646335633762313462663438333231656632
+      393338356663363537616664653030656430
