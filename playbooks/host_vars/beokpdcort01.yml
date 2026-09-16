@@ -18,6 +18,13 @@ firewall_sets_host:
     type: ipv6_addr
     elements:
       - 2a02:578:856d:1e00::/56  # EDPNET
+  - name: WUD_v6
+    type: ipv6_addr
+    elements:
+      - 2001:678:1080:4033::5/128
+      - 2001:678:1080:2202::2/128
+      - 2001:678:1080:2202::3/128
+      - 2001:678:1080:2202::5/128
 
 firewall_filter_input_host:
   - comment: "Allow BGP from PEERS_v4"
@@ -220,6 +227,15 @@ firewall:
           ip: "@Proxmox"
           protocol: tcp
           port: 8006
+        counter: true
+      - comment: "Allow from TRAEFIK to WUD"
+        type: ip6
+        source:
+          ip: "@TRAEFIK_v6"
+        destination:
+          ip: "@WUD_v6"
+          protocol: tcp
+          port: 9103
         counter: true
       # MEDIA
       - comment: "To Plex Allow"
