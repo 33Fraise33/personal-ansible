@@ -1,0 +1,32 @@
+---
+- name: Converge Immich role
+  hosts: all
+  gather_facts: false
+  vars:
+    docker:
+      dir:
+        config: /tmp/molecule-immich-config
+    dns_servers:
+      adguard:
+        home:
+          ip: 127.0.0.1
+          ipv6: ::1
+        dco:
+          ip: 127.0.0.1
+          ipv6: ::1
+    immich_hardware_acceleration: false
+    immich_library_path: /tmp/molecule-immich-library
+    immich_network: molecule-services
+    immich_postgres_password: molecule-immich-password
+  pre_tasks:
+    - name: Create Immich test library
+      ansible.builtin.file:
+        path: /tmp/molecule-immich-library
+        state: directory
+        mode: "0755"
+  roles:
+    - role: immich
+  tasks:
+    - name: Pause for Immich runtime inspection
+      ansible.builtin.pause:
+        seconds: 5
