@@ -1,0 +1,35 @@
+---
+- name: Cleanup Immich test dependencies
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Remove Immich test containers
+      community.docker.docker_container:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - immich
+        - immich_machine_learning
+        - immich_postgres
+        - valkey
+
+    - name: Remove Immich test volumes
+      community.docker.docker_volume:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - data_immich_postgres14
+        - data_immich_model_cache
+
+    - name: Remove Immich test network
+      community.docker.docker_network:
+        name: molecule-services
+        state: absent
+
+    - name: Remove Immich test files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/molecule-immich-config
+        - /tmp/molecule-immich-library

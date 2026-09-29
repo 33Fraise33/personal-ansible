@@ -1,0 +1,5 @@
+---
+immich_hardware_acceleration: false
+immich_library_path: /media/photos
+immich_network: services
+immich_state_directory: "{{ docker.dir.config }}/immich"

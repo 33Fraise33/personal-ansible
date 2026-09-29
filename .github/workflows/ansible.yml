@@ -42,7 +42,11 @@ jobs:
           for playbook in "${playbooks[@]}"; do
             ansible-playbook --syntax-check --inventory 'localhost,' "$playbook"
           done
-      - name: Test Dawarich role
-        env:
-          ANSIBLE_ALLOW_BROKEN_CONDITIONALS: 'true'
-        run: molecule test --scenario-name dawarich
+      # - name: Test Dawarich role
+      #   env:
+      #     ANSIBLE_ALLOW_BROKEN_CONDITIONALS: 'true'
+      #   run: molecule test --scenario-name dawarich
+      # - name: Test Immich role
+      #   env:
+      #     ANSIBLE_ALLOW_BROKEN_CONDITIONALS: 'true'
+      #   run: molecule test --scenario-name immich

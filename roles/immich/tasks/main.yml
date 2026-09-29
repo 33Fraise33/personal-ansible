@@ -1,46 +1,126 @@
 # see postgres role for backup and restore
 ---
+- name: Create Immich user to minimize privileges
+  ansible.builtin.user:
+    name: immich
+    comment: Immich service user
+    system: true
+    create_home: false
+
+- name: Gather numeric UID and GID of the host Immich user
+  ansible.builtin.getent:
+    database: passwd
+    key: immich
+
+- name: Set Immich service account IDs
+  ansible.builtin.set_fact:
+    immich_service_uid: "{{ ansible_facts.getent_passwd['immich'][1] }}"
+    immich_service_gid: "{{ ansible_facts.getent_passwd['immich'][2] }}"
+
+- name: Install Intel graphics firmware
+  ansible.builtin.apt:
+    name: firmware-intel-graphics
+    state: present
+    update_cache: true
+  when: immich_hardware_acceleration
+
+- name: Inspect Intel GPU render node
+  ansible.builtin.stat:
+    path: /dev/dri/renderD128
+  register: immich_render_node
+  when: immich_hardware_acceleration
+
+- name: Validate Intel GPU render node
+  ansible.builtin.assert:
+    that:
+      - immich_render_node.stat.exists
+      - immich_render_node.stat.ischr
+    fail_msg: >-
+      Intel acceleration requires /dev/dri/renderD128. Confirm that the GPU is passed
+      through to this VM and that the i915 driver is bound before running this role.
+  when: immich_hardware_acceleration
+
+- name: Gather numeric GPU group IDs
+  ansible.builtin.getent:
+    database: group
+  when: immich_hardware_acceleration
+
 - name: Create a volume for immich_postgres data
   community.docker.docker_volume:
     name: data_immich_postgres{{ immich_postgres_major_version }}
+
+- name: Create a volume for model cache
+  community.docker.docker_volume:
+    name: data_immich_model_cache
+
+- name: Inspect Immich model cache volume
+  community.docker.docker_volume_info:
+    name: data_immich_model_cache
+  register: immich_model_cache_volume
+
+- name: Set Immich model cache ownership
+  ansible.builtin.file:
+    path: "{{ immich_model_cache_volume.volume.Mountpoint }}"
+    state: directory
+    owner: immich
+    group: immich
+    recurse: true
+
+- name: Set Immich library ownership
+  ansible.builtin.file:
+    path: "{{ immich_library_path }}"
+    state: directory
+    owner: immich
+    group: immich
+    recurse: true
 
 - name: Setup immich postgres
   community.docker.docker_container:
     name: immich_postgres
     image: ghcr.io/immich-app/postgres:{{ immich_postgres_major_version }}-{{ immich_postgres_specific_tag }}
     networks:
-      - name: services
+      - name: "{{ immich_network }}"
     dns_servers:
       - "{{ dns_servers.adguard.home.ipv6 }}"
       - "{{ dns_servers.adguard.home.ip }}"
       - "{{ dns_servers.adguard.dco.ipv6 }}"
       - "{{ dns_servers.adguard.dco.ip }}"
     volumes:
-      # - "data_postgres_16:/old_data"
       - "data_immich_postgres{{ immich_postgres_major_version }}:/var/lib/postgresql/data"
     env:
       POSTGRES_USER: "{{ immich_postgres_user }}"
       POSTGRES_PASSWORD: "{{ immich_postgres_password }}"
       POSTGRES_DB: immich
       POSTGRES_INITDB_ARGS: '--data-checksums'
-    restart: true
+      DB_STORAGE_TYPE: SSD
     restart_policy: always
+    shm_size: 128M
     state: healthy
     pull: true
+    cap_drop:
+      - NET_RAW
+    security_opts:
+      - no-new-privileges:true
     labels:
       traefik.enable: "false"
       wud.trigger.exclude: "docker.upgradeany"
 
-- name: Create a volume for model cache
-  community.docker.docker_volume:
-    name: data_immich_model_cache
-
 - name: Setup immich machine learning
   community.docker.docker_container:
     name: immich_machine_learning
-    image: ghcr.io/immich-app/immich-machine-learning:{{ immich_version }}
+    image: >-
+      ghcr.io/immich-app/immich-machine-learning:{{ immich_version }}{{ '-openvino'
+      if immich_hardware_acceleration else '' }}
+    user: >-
+      {{ ansible_facts.getent_passwd['immich'][1] }}:{{
+      ansible_facts.getent_passwd['immich'][2] }}
+    groups: >-
+      {{ [ansible_facts.getent_group['video'][1], ansible_facts.getent_group['render'][1]]
+      if immich_hardware_acceleration else omit }}
+    devices: "{{ ['/dev/dri:/dev/dri'] if immich_hardware_acceleration else omit }}"
+    device_cgroup_rules: "{{ ['c 189:* rmw'] if immich_hardware_acceleration else omit }}"
     networks:
-      - name: services
+      - name: "{{ immich_network }}"
     dns_servers:
       - "{{ dns_servers.adguard.home.ipv6 }}"
       - "{{ dns_servers.adguard.home.ip }}"
@@ -48,37 +128,51 @@
       - "{{ dns_servers.adguard.dco.ip }}"
     volumes:
       - "data_immich_model_cache:/cache"
-    restart: true
     restart_policy: always
     state: healthy
     pull: true
+    cap_drop:
+      - NET_RAW
+    security_opts:
+      - no-new-privileges:true
     labels:
       traefik.enable: "false"
-      wud.tag.include: '^{{ immich_version }}$'
+      wud.tag.include: '^{{ immich_version }}{{ "-openvino" if immich_hardware_acceleration else "" }}$'
 
 - name: Setup immich
   community.docker.docker_container:
     name: immich
     image: ghcr.io/immich-app/immich-server:{{ immich_version }}
+    user: >-
+      {{ ansible_facts.getent_passwd['immich'][1] }}:{{
+      ansible_facts.getent_passwd['immich'][2] }}
+    groups: >-
+      {{ [ansible_facts.getent_group['video'][1], ansible_facts.getent_group['render'][1]]
+      if immich_hardware_acceleration else omit }}
+    devices: "{{ ['/dev/dri:/dev/dri'] if immich_hardware_acceleration else omit }}"
     networks:
-      - name: services
+      - name: "{{ immich_network }}"
     dns_servers:
       - "{{ dns_servers.adguard.home.ipv6 }}"
       - "{{ dns_servers.adguard.home.ip }}"
       - "{{ dns_servers.adguard.dco.ipv6 }}"
       - "{{ dns_servers.adguard.dco.ip }}"
     volumes:
-      - "/media/photos:/data"
+      - "{{ immich_library_path }}:/data"
       - /etc/localtime:/etc/localtime:ro
     env:
+      TZ: Europe/Brussels
       REDIS_HOSTNAME: valkey
       DB_HOSTNAME: immich_postgres
       DB_USERNAME: "{{ immich_postgres_user }}"
       DB_PASSWORD: "{{ immich_postgres_password }}"
-    restart: true
     restart_policy: always
     state: healthy
     pull: true
+    cap_drop:
+      - NET_RAW
+    security_opts:
+      - no-new-privileges:true
     labels:
       wud.tag.include: '^{{ immich_version }}$'
       traefik.http.routers.immich.tls: "true"

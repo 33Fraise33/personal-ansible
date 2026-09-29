@@ -1,3 +1,7 @@
 [Service]
+{% if docker.startup_device_paths | default([]) | length > 0 %}
+# Continue starting Docker when an optional device does not appear before the timeout.
+ExecStartPre=-/usr/bin/udevadm wait --timeout=60 {{ docker.startup_device_paths | join(' ') }}
+{% endif %}
 ExecStart=
 ExecStart=/usr/bin/dockerd --data-root {{ docker.dir.data }}/docker

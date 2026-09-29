@@ -1,0 +1,81 @@
+---
+- name: Verify Immich deployment
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Gather numeric UID and GID of the host Immich user
+      ansible.builtin.getent:
+        database: passwd
+        key: immich
+
+    - name: Inspect Immich containers
+      community.docker.docker_container_info:
+        name: "{{ item }}"
+      loop:
+        - immich_postgres
+        - immich_machine_learning
+        - immich
+      register: immich_containers
+
+    - name: Assert Immich containers are healthy and hardened
+      ansible.builtin.assert:
+        that:
+          - item.container.State.Status == 'running'
+          - item.container.State.Health.Status == 'healthy'
+          - item.container.HostConfig.CapDrop is contains('NET_RAW')
+          - item.container.HostConfig.SecurityOpt is contains('no-new-privileges:true')
+          - item.container.HostConfig.RestartPolicy.Name == 'always'
+      loop: "{{ immich_containers.results }}"
+
+    - name: Assert Immich application containers use the dedicated service user
+      ansible.builtin.assert:
+        that: >-
+          item.container.Config.User == ansible_facts.getent_passwd['immich'][1] ~
+          ':' ~ ansible_facts.getent_passwd['immich'][2]
+      loop: "{{ immich_containers.results | rejectattr('item', 'equalto', 'immich_postgres') }}"
+
+    - name: Inspect Immich PostgreSQL container
+      community.docker.docker_container_info:
+        name: immich_postgres
+      register: immich_postgres
+
+    - name: Assert PostgreSQL shared memory configuration
+      ansible.builtin.assert:
+        that:
+          - immich_postgres.container.Config.User == ''
+          - immich_postgres.container.HostConfig.ShmSize == 134217728
+
+    - name: Inspect PostgreSQL main process user
+      community.docker.docker_container_exec:
+        container: immich_postgres
+        command: "sh -c 'grep ^Uid: /proc/1/status'"
+      register: immich_postgres_process
+      changed_when: false
+
+    - name: Assert PostgreSQL entrypoint dropped root privileges
+      ansible.builtin.assert:
+        that: immich_postgres_process.stdout is not regex('^Uid:\\s+0\\s')
+
+    - name: Inspect Immich machine-learning container
+      community.docker.docker_container_info:
+        name: immich_machine_learning
+      register: immich_machine_learning
+
+    - name: Assert CPU machine-learning configuration
+      ansible.builtin.assert:
+        that:
+          - immich_machine_learning.container.Config.Image == 'ghcr.io/immich-app/immich-machine-learning:v3'
+          - >-
+            immich_machine_learning.container.HostConfig.Devices is none or
+            immich_machine_learning.container.HostConfig.Devices | length == 0
+
+    - name: Check Immich server health endpoint
+      community.docker.docker_container_exec:
+        container: immich
+        command: immich-healthcheck
+      register: immich_healthcheck
+      changed_when: false
+
+    - name: Assert Immich server health endpoint succeeded
+      ansible.builtin.assert:
+        that: immich_healthcheck.rc == 0
