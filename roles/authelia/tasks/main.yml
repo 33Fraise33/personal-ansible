@@ -103,7 +103,7 @@
   community.docker.docker_container:
     name: authelia
     image: ghcr.io/authelia/authelia:{{ authelia_major_version }}
-    user: "{{ getent_passwd['authelia'][1] }}:{{ getent_passwd['authelia'][2] }}"
+    user: "{{ ansible_facts['getent_passwd']['authelia'][1] }}:{{ ansible_facts['getent_passwd']['authelia'][2] }}"
     networks:
       - name: services
     dns_servers:

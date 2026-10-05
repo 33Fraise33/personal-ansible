@@ -6,7 +6,7 @@ Wants=scrutiny.timer
 Type=oneshot
 User=root
 Group=root
-ExecStart=/usr/local/bin/scrutiny-collector run --api-endpoint "https://scrutiny.frai.se" --host-id {{ ansible_hostname }}
+ExecStart=/usr/local/bin/scrutiny-collector run --api-endpoint "https://scrutiny.frai.se" --host-id {{ ansible_facts['hostname'] }}
 SyslogIdentifier=scrutiny-collector
 
 [Install]

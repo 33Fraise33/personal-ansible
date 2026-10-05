@@ -83,7 +83,7 @@
       - ALL
     security_opts:
       - no-new-privileges:true
-    user: 65534:{{ getent_group['docker'][1] }}
+    user: 65534:{{ ansible_facts['getent_group']['docker'][1] }}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
@@ -93,7 +93,7 @@
   community.docker.docker_container:
     name: traefik
     image: traefik:latest
-    user: "{{ getent_passwd['traefik'][1] }}:{{ getent_passwd['traefik'][2] }}"
+    user: "{{ ansible_facts['getent_passwd']['traefik'][1] }}:{{ ansible_facts['getent_passwd']['traefik'][2] }}"
     networks:
       - name: "{{ traefik_network }}"
         ipv4_address: "{{ docker.networks[traefik_network].ipam[0].subnet \
