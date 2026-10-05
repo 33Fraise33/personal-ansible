@@ -93,7 +93,7 @@
   community.docker.docker_container:
     name: solidtime-app
     image: registry.on-premise.solidtime.io/solidtime/solidtime:latest
-    # user: "{{ getent_passwd['solidtime'][1] }}:{{ getent_passwd['solidtime'][2] }}"
+    # user: "{{ ansible_facts['getent_passwd']['solidtime'][1] }}:{{ ansible_facts['getent_passwd']['solidtime'][2] }}"
     user: 1000:1000
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8000/health-check/up"]

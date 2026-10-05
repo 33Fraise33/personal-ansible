@@ -39,9 +39,9 @@
   community.docker.docker_container:
     name: wud
     image: ghcr.io/getwud/wud:9
-    user: "{{ getent_passwd['wud'][1] }}:{{ getent_passwd['wud'][2] }}"
+    user: "{{ ansible_facts['getent_passwd']['wud'][1] }}:{{ ansible_facts['getent_passwd']['wud'][2] }}"
     groups:
-      - "{{ getent_group['docker'][1] }}"
+      - "{{ ansible_facts['getent_group']['docker'][1] }}"
     networks:
       - name: host
     dns_servers: "{{ dns.servers }}"
