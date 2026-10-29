@@ -76,7 +76,7 @@
 
 - name: Set permissions to data volume for synapse
   ansible.builtin.file:
-    path: "{{ docker.dir.data }}/docker/volumes/data_synapse_media/_data"
+    path: "{{ docker.dir.data }}/volumes/data_synapse_media/_data"
     state: directory
     mode: "0755"
     owner: "991"

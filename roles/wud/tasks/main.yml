@@ -21,7 +21,7 @@
 
 - name: Set WUD data volume ownership
   ansible.builtin.file:
-    path: "{{ docker.dir.data }}/docker/volumes/data_wud/_data"
+    path: "{{ docker.dir.data }}/volumes/data_wud/_data"
     state: directory
     owner: wud
     group: wud

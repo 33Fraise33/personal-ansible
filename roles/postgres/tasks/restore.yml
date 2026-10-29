@@ -1,7 +1,7 @@
 ---
 - name: RESTORE - Check if backup exists
   ansible.builtin.stat:
-    path: "{{ docker.dir.data }}/docker/volumes/data_postgres_backup/_data/backup.sql"
+    path: "{{ docker.dir.data }}/volumes/data_postgres_backup/_data/backup.sql"
   register: postgres_db_dump
 
 - name: RESTORE - Assert that backup exists

@@ -11,7 +11,7 @@
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
-      - "{{ docker.dir.data }}/docker/:{{ docker.dir.data }}/docker/:ro"
+      - "{{ docker.dir.data }}/:{{ docker.dir.data }}/:ro"
       - /dev/disk/:/dev/disk:ro
     command:
       - "--port=9338"

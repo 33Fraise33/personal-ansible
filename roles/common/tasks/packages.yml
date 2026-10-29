@@ -1,6 +1,6 @@
 ---
 - name: PACKAGES - Make sure debian repositories exist
-  when: ansible_facts["os_family"] == "Debian"
+  when: ansible_facts["os_family"] == "Debian" and ansible_facts['architecture'] == "x86_64"
   ansible.builtin.deb822_repository:
     name: debian
     types: deb
@@ -16,7 +16,7 @@
     signed_by: /usr/share/keyrings/debian-archive-keyring.gpg
 
 - name: PACKAGES - Make sure debian-security repositories exist
-  when: ansible_facts["os_family"] == "Debian"
+  when: ansible_facts["os_family"] == "Debian" and ansible_facts['architecture'] == "x86_64"
   ansible.builtin.deb822_repository:
     name: debian-security
     types: deb
@@ -69,7 +69,7 @@
           - net-tools
           - nfs-common
           - nmap
-          - mtr
+          - mtr-tiny
           - parted
           - python3-pip
           - qemu-guest-agent

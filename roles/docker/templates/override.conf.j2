@@ -4,4 +4,4 @@
 ExecStartPre=-/usr/bin/udevadm wait --timeout=60 {{ docker.startup_device_paths | join(' ') }}
 {% endif %}
 ExecStart=
-ExecStart=/usr/bin/dockerd --data-root {{ docker.dir.data }}/docker
+ExecStart=/usr/bin/dockerd --data-root {{ docker.dir.data }}
