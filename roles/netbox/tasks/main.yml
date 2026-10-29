@@ -111,6 +111,8 @@
       line: "REMOTE_AUTH_ENABLED=True"
     - regexp: "^REMOTE_AUTH_USER_EMAIL="
       line: "REMOTE_AUTH_USER_EMAIL=HTTP_REMOTE_EMAIL"
+    - regexp: "^DB_CONN_MAX_AGE="
+      line: "DB_CONN_MAX_AGE=0"
 
 - name: Copy docker-compose.override template
   ansible.builtin.template:
@@ -123,8 +125,20 @@
     - docker-compose.override.yml
     - Dockerfile-Plugins
 
+- name: Build netbox image with plugins
+  community.docker.docker_image_build:
+    name: netbox:latest-plugins
+    path: "{{ docker.dir.config }}/netbox"
+    dockerfile: Dockerfile-Plugins
+    network: host
+    rebuild: always
+    outputs:
+      - type: docker
+
+
 - name: Start netbox with docker compose
   community.docker.docker_compose_v2:
     project_src: "{{ docker.dir.config }}/netbox"
-    pull: always
-    build: always
+    pull: never
+    build: never
+    state: present

@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile-Plugins
       network: host
+      entitlements:
+        - network.host
     restart: always
     dns: {{ dns.servers }}
     labels:
@@ -29,6 +31,8 @@ services:
       context: .
       dockerfile: Dockerfile-Plugins
       network: host
+      entitlements:
+        - network.host
     restart: always
     dns: {{ dns.servers }}
     labels:
