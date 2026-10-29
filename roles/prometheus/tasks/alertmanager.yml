@@ -1,4 +1,9 @@
 ---
+- name: Create a volume for alertmanager data
+  community.docker.docker_volume:
+    name: data_alertmanager
+    state: present
+
 - name: Create alertmanager config directory
   ansible.builtin.file:
     path: "{{ docker.dir.config }}/prometheus_alertmanager"
@@ -24,6 +29,7 @@
       - name: monitoring
     volumes:
       - "{{ docker.dir.config }}/prometheus_alertmanager:/etc/alertmanager"
+      - "data_alertmanager:/alertmanager"
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--storage.path=/alertmanager"

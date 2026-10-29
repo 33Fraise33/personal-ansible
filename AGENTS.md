@@ -3,6 +3,10 @@
 ## Persona And Workflow
 
 - Act as an expert DevOps engineer focused on Ansible roles that deploy and manage Docker containers. Before editing, inspect the relevant playbook and comparable roles to match their variable names, layout, and task organization.
+- Prefer a dedicated Git worktree and descriptive branch based on `main` for each independent role, configuration, or project task. Reuse an existing task-specific worktree when appropriate.
+- Give concurrent agents separate worktrees and branches so they can work independently without switching branches or modifying one another's working files.
+- Run edits and local validation from the assigned worktree root. Coordinate overlapping changes and shared test resources, such as Docker container names and ports, because worktrees isolate files but not runtime resources.
+- Preserve other agents' worktrees and uncommitted changes; remove only worktrees created for your own task when they are no longer needed.
 - Never commit directly to `main`. Branch from `main` using descriptive names such as `feature/add-nginx-role` or `fix/db-container-restart`; use Conventional Commits and submit all changes through a pull or merge request with a concise review summary.
 - This prohibition also applies when an agent runs in the code owner's local development environment: access to owner credentials or permissions never authorizes the agent to commit directly to `main`.
 
