@@ -11,14 +11,38 @@
       icon: si-homeassistant-#18BCF2
       href: https://ha.frai.se
       description: Home Assistant - Home Automation
+  - Zigbee2MQTT:
+      icon: sh-zigbee2mqtt
+      href: https://z2m.frai.se
+      description: Zigbee Device Management
+  - Z-Wave JS:
+      icon: sh-z-wave-js-ui
+      href: https://zwavejs.frai.se
+      description: Z-Wave Device Management
+  - Syncthing:
+      icon: sh-syncthing
+      href: https://syncthing.frai.se
+      description: File Synchronization
   - Miniflux:
       icon: sh-miniflux
       href: https://rss.frai.se
       description: RSS Reader
-      widget:
-        type: miniflux
-        url: https://rss.frai.se
-        key: "{{ miniflux_api_key }}"
+  - Dawarich:
+      icon: sh-dawarich
+      href: https://location.frai.se
+      description: Location History
+  - Solidtime:
+      icon: sh-solidtime
+      href: https://time.unitix.be
+      description: Time Tracking
+  - n8n:
+      icon: sh-n8n
+      href: https://n8n.frai.se
+      description: Workflow Automation
+  - Apprise:
+      icon: sh-apprise
+      href: https://apprise.frai.se
+      description: Notification Management
 
 - Media:
   - Plex:
@@ -27,84 +51,50 @@
       description: Media Server
       # server: localhost
       # container: plex
-      widget:
-        type: tautulli
-        url: https://tautulli.frai.se
-        key: "{{ tautulli_api_key }}"
-  - Overseerr:
-      icon: sh-overseerr
-      href: https://overseerr.frai.se
+  - Jellyfin:
+      icon: sh-jellyfin
+      href: https://jellyfin.frai.se
+      description: Media Server
+  - Immich:
+      icon: sh-immich
+      href: https://immich.frai.se
+      description: Photo & Video Library
+  - Seerr:
+      icon: sh-seerr
+      href: https://seerr.frai.se
       description: Amelle Click Here
-      widget:
-        type: overseerr
-        url: https://overseerr.frai.se
-        key: "{{ overseerr_api_key }}"
   - Prowlarr:
       icon: sh-prowlarr
       href: https://prowlarr.frai.se
       description: Torrent Indexer
-      widget:
-        type: prowlarr
-        url: https://prowlarr.frai.se
-        key: "{{ prowlarr_api_key }}"
   - Qbittorrent:
       icon: si-qbittorrent-#2F67BA
       href: https://qbittorrent.frai.se
       description: Torrent Client
-      widget:
-        type: qbittorrent
-        url: https://qbittorrent.frai.se
-        username: admin
-        password: "{{ qbittorrent_pass }}"
   - SabNZBd:
       icon: sh-sabnzbd
       href: https://sabnzbd.frai.se
       description: Newsreader
-      widget:
-        type: sabnzbd
-        url: https://sabnzbd.frai.se
-        key: "{{ sabnzbd_api_key }}"
   - Radarr:
       icon: si-radarr-#FFCB3D
       href: https://radarr.frai.se
       description: Movie Tracker
-      widget:
-        type: radarr
-        url: https://radarr.frai.se
-        key: "{{ radarr_api_key }}"
   - Sonarr:
       icon: si-sonarr-#2596BE
       href: https://sonarr.frai.se
       description: Series Tracker
-      widget:
-        type: sonarr
-        url: https://sonarr.frai.se
-        key: "{{ sonarr_api_key }}"
   - Bazarr:
       icon: sh-bazarr
       href: https://bazarr.frai.se
       description: Subtitle Tracker
-      widget:
-        type: bazarr
-        url: https://bazarr.frai.se
-        key: "{{ bazarr_api_key }}"
   - Readarr:
       icon: sh-readarr
       href: https://readarr.frai.se
       description: Books Tracker
-      widget:
-        type: readarr
-        url: https://readarr.frai.se
-        key: "{{ readarr_api_key }}"
   - Books:
       icon: si-calibreweb-#45B29D
       href: https://books.frai.se
       description: Calibre Web - Kobo
-      widget:
-        type: calibreweb
-        url: https://books.frai.se
-        username: homepage
-        password: "{{ calibre_pass }}"
   - Calibre:
       icon: sh-calibre
       href: https://calibre.frai.se
@@ -119,60 +109,39 @@
       icon: si-proxmox-#E57000
       href: https://beokpdcosv01.frai.se
       description: Proxmox 1 - BEOKPDCO
-      widget:
-        type: proxmox
-        url: https://beokpdcosv01.frai.se
-        username: homepage@pam!homepage
-        password: "{{ beokpdcosv01_api_key }}"
   - BEJBEGIASV01:
       icon: si-proxmox-#E57000
       href: https://bejbegiasv01.frai.se
       description: Proxmox 2 - BEJBEGIA
-      widget:
-        type: proxmox
-        url: https://bejbegiasv01.frai.se
-        username: homepage@pam!homepage
-        password: "{{ bejbegiasv01_api_key }}"
   - DNS1:
       icon: si-adguard-#68BC71
       href: https://dns1.frai.se
       description: DNS Server 1 - BEOKPDCO
-      widget:
-        type: adguard
-        url: https://dns1.frai.se
-        username: fraise
-        password: "{{ adguard_password }}"
   - DNS2:
       icon: si-adguard-#68BC71
       href: https://dns2.frai.se
       description: DNS Server 2 - BEJBEGIA
-      widget:
-        type: adguard
-        url: https://dns2.frai.se
-        username: fraise
-        password: "{{ adguard_password }}"
   - Portainer:
       icon: si-portainer-#13BEF9
       href: https://portainer.frai.se
       description: Portainer Container Management
-      widget:
-        type: portainer
-        url: https://portainer.frai.se
-        env: 2
-        key: "{{ portainer_api_key }}"
+  - Traefik:
+      icon: sh-traefik
+      href: https://traefik.frai.se
+      description: Reverse Proxy Dashboard
   - Netbox:
       icon: sh-netbox
       href: https://netbox.unitix.be
       description: Network Documentation & IPAM
-  - Mikrotik: 
+  - Mikrotik:
       icon: si-mikrotik-#ffffff
       href: https://bejbegiart01.frai.se
       description: Router
-  - UISP: 
+  - UISP:
       icon: si-ubiquiti-#0559C9
       href: https://uisp.unitix.be
       description: Ubiquiti Network Management
-  - Unifi: 
+  - Unifi:
       icon: si-ubiquiti-#0559C9
       href: https://unifi.unitix.be
       description: Unifi Network Management
@@ -180,14 +149,33 @@
 - Monitoring:
   - Grafana:
       icon: si-grafana-#F46800
-      href: https://grafana.frai.se
+      href: https://grafana.unitix.be
       description: Dashboarding Instance
   - Prometheus:
       icon: si-prometheus-#E6522C
       href: https://prometheus.frai.se
       description: Monitoring Instance
-  - Upptime:
-      icon: https://upptime.js.org/img/icon.svg
-      href: https://status.frai.se
-      description: Github Pages powered Monitoring
-  
+  - Alertmanager:
+      icon: https://raw.githubusercontent.com/prometheus/alertmanager/main/ui/app/public/favicon.ico
+      href: https://alertmanager.frai.se
+      description: Alert Management
+  - Scrutiny:
+      icon: sh-scrutiny
+      href: https://scrutiny.frai.se
+      description: Disk Health Monitoring
+  - WUD — BEJBEGIAVM01:
+      icon: sh-wud
+      href: https://wud-bejbegiavm01.frai.se
+      description: Container Updates — BEJBEGIAVM01
+  - WUD — BEOKPDCOVM01:
+      icon: sh-wud
+      href: https://wud-beokpdcovm01.frai.se
+      description: Container Updates — BEOKPDCOVM01
+  - WUD — BEOKPDCOVM02:
+      icon: sh-wud
+      href: https://wud-beokpdcovm02.frai.se
+      description: Container Updates — BEOKPDCOVM02
+  - WUD — BEOKPDCOVM04:
+      icon: sh-wud
+      href: https://wud-beokpdcovm04.frai.se
+      description: Container Updates — BEOKPDCOVM04

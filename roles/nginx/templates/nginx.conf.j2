@@ -1,12 +1,18 @@
 pid        /tmp/nginx.pid;
 events {}
 http {
+  # Resolve Docker service names at request time so missing upstreams cannot
+  # prevent startup or interrupt the static Matrix discovery endpoints.
+  resolver 127.0.0.11 valid=10s;
+  resolver_timeout 5s;
+
   server {
     listen         8080 default_server;
     server_name    frai.se;
 
    location / {
-      proxy_pass http://homepage:3000;
+      set $homepage_backend homepage:3000;
+      proxy_pass http://$homepage_backend;
       proxy_set_header X-Forwarded-For $remote_addr;
       client_max_body_size 128m;
     }

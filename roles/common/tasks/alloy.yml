@@ -10,8 +10,8 @@
         uris: https://apt.grafana.com
         suites: stable
         components: main
-        architectures: amd64
         signed_by: https://apt.grafana.com/gpg.key
+        install_python_debian: true
     - name: ALLOY - Install alloy
       ansible.builtin.apt:
         update_cache: true

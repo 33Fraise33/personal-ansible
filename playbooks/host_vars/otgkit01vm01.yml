@@ -1,4 +1,26 @@
 ---
+firewall_sets_internal:
+  - elements:
+      - 10.10.48.64/27
+      - 10.10.40.64/27
+    name: MONITORING
+    type: ipv4_addr
+  - elements:
+      - 2001:678:1080:1000::/60
+    name: v6_MONITORING
+    type: ipv6_addr
+  - elements:
+      - 10.10.40.125
+    name: TRAEFIK
+    type: ipv4_addr
+adguard_password: ''
+dns_servers: {}
+domain: {}
+gsuite_smtp_pass: ''
+loki_uri: http://10.10.40.94:3100
+traefik: {}
+traefik_custom_rules: []
+
 firewall:
   sets: "{{ firewall_sets_all + firewall_sets_internal }}"
   filter:

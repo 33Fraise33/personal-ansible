@@ -1,4 +1,14 @@
 ---
+- name: NODE_EXPORTER - Determine target architecture
+  ansible.builtin.set_fact:
+    node_exporter_arch: "{{ node_exporter_arch_map[ansible_facts['architecture']] }}"
+  vars:
+    node_exporter_arch_map:
+      x86_64: amd64
+      amd64: amd64
+      aarch64: arm64
+      arm64: arm64
+
 - name: NODE_EXPORTER - Download node_exporter to localhost
   delegate_to: localhost
   become: false
@@ -9,15 +19,15 @@
         url: "https://github.com/prometheus/node_exporter/releases/download/\
           v{{ node_exporter_version }}/\
           node_exporter-{{ node_exporter_version }}\
-          .linux-amd64.tar.gz"
-        dest: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
-        mode: '0644'
+          .linux-{{ node_exporter_arch }}.tar.gz"
+        dest: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_arch }}.tar.gz"
+        mode: "0644"
 
     - name: NODE_EXPORTER - Unpack node_exporter binary
       ansible.builtin.unarchive:
-        src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+        src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_arch }}.tar.gz"
         dest: "/tmp"
-        creates: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+        creates: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_arch }}/node_exporter"
 
 - name: NODE_EXPORTER - Copy the node_exporter systemd service file
   ansible.builtin.template:
@@ -29,7 +39,7 @@
 
 - name: NODE_EXPORTER - Copy node_exporter binaries
   ansible.builtin.copy:
-    src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_arch }}/node_exporter"
     dest: "/usr/local/bin/node_exporter"
     mode: "0755"
     owner: prometheus

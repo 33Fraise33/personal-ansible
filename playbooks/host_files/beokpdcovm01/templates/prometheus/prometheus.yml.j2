@@ -126,7 +126,7 @@ scrape_configs:
       - <<: *netbox_auth
         url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&platform=debian
       - <<: *netbox_auth
-        url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&platform=proxmox
+        url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&platform=proxmox&platform=debian
     relabel_configs:
       - source_labels: [__meta_netbox_primary_ip]
         target_label: instance
@@ -181,6 +181,8 @@ scrape_configs:
     http_sd_configs:
       - <<: *netbox_auth
         url: https://netbox.unitix.be/api/plugins/prometheus-sd/virtual-machines/?status=active&tag=docker
+      - <<: *netbox_auth
+        url: https://netbox.unitix.be/api/plugins/prometheus-sd/devices/?status=active&tag=docker
     relabel_configs:
       - source_labels: [__meta_netbox_primary_ip]
         target_label: instance

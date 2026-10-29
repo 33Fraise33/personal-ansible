@@ -1,0 +1,21 @@
+---
+- name: Set synthetic invalid configuration
+  ansible.builtin.set_fact:
+    apprise_configurations: "{{ apprise_validation_case.configurations }}"
+    apprise_validation_failure: ""
+
+- name: Check invalid configuration is rejected by the expected validation
+  block:
+    - name: Validate synthetic invalid configuration
+      ansible.builtin.include_role:
+        name: apprise
+        tasks_from: validate
+  rescue:
+    - name: Record validation failure
+      ansible.builtin.set_fact:
+        apprise_validation_failure: "{{ ansible_failed_task.name }}"
+
+- name: Assert invalid configuration failed for the expected reason
+  ansible.builtin.assert:
+    that:
+      - apprise_validation_failure == apprise_validation_case.expected_failure

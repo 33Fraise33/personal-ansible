@@ -8,7 +8,7 @@ adguard_hostname: dns1.frai.se
 docker:
   dir:
     config: /data/docker-config
-    data: /data/docker
+    data: /data/docker/docker
   networks:
     monitoring:
       driver_options:

@@ -1,0 +1,73 @@
+---
+- name: Validate Apprise configuration dictionary
+  ansible.builtin.assert:
+    that:
+      - apprise_configurations is mapping
+      - apprise_configurations | length > 0
+    quiet: true
+  no_log: true
+
+- name: Validate Apprise configuration IDs and service lists
+  ansible.builtin.assert:
+    that:
+      - item.key is string
+      - item.key is match('^[A-Za-z0-9_-]{1,128}$')
+      - item.value is mapping
+      - item.value.services is sequence
+      - item.value.services is not string
+      - item.value.services is not mapping
+      - item.value.services | length > 0
+    quiet: true
+  loop: "{{ apprise_configurations | dict2items }}"
+  no_log: true
+
+- name: Collect Apprise service definitions and reset derived environment
+  ansible.builtin.set_fact:
+    apprise_service_definitions: "{{ apprise_configurations.values() | map(attribute='services') | flatten }}"
+    apprise_template_env: {}
+  no_log: true
+
+- name: Validate Apprise service dictionaries
+  ansible.builtin.assert:
+    that:
+      - item is mapping
+      - item.url is string
+      - item.url is match('^[A-Za-z][A-Za-z0-9+.-]*://')
+      - item.options | default({}) is mapping
+      - item.secrets | default({}) is mapping
+      - item.tags | default([]) is sequence
+      - item.tags | default([]) is not string
+      - item.tags | default([]) is not mapping
+      - item.tags | default([]) | select('string') | list | length == item.tags | default([]) | length
+      - "'tag' not in item.options | default({})"
+      - "'tags' not in item.options | default({})"
+    quiet: true
+  loop: "{{ apprise_service_definitions }}"
+  no_log: true
+
+- name: Collect Apprise template secret definitions
+  ansible.builtin.set_fact:
+    apprise_secret_definitions: >-
+      {{ apprise_service_definitions | map(attribute='secrets', default={}) |
+         map('dict2items') | flatten }}
+  no_log: true
+
+- name: Derive Apprise template environment from service secrets
+  ansible.builtin.set_fact:
+    apprise_template_env: >-
+      {{ apprise_template_env | combine({'APPRISE_TEMPLATE_' ~ item.key | upper: item.value}) }}
+  loop: "{{ apprise_secret_definitions }}"
+  no_log: true
+
+- name: Validate populated secrets and reject conflicting shared names
+  ansible.builtin.assert:
+    that:
+      - item.key is string
+      - item.key is match('^[a-z][a-z0-9_]*$')
+      - item.value is string
+      - item.value | length > 0
+      - item.value == apprise_template_env['APPRISE_TEMPLATE_' ~ item.key | upper]
+    fail_msg: Service secrets must be populated strings with consistent values for shared lowercase names.
+    quiet: true
+  loop: "{{ apprise_secret_definitions }}"
+  no_log: true

@@ -1,0 +1,258 @@
+---
+- name: Verify Apprise deployment
+  hosts: all
+  gather_facts: false
+  vars:
+    apprise_config_path: /var/lib/molecule-apprise/config
+    apprise_network: molecule-apprise
+    apprise_hostname: apprise.test
+  tasks:
+    - name: Gather Apprise service UID and GID
+      ansible.builtin.getent:
+        database: passwd
+        key: apprise
+
+    - name: Inspect Apprise container
+      community.docker.docker_container_info:
+        name: apprise
+      register: apprise_container
+
+    - name: Assert Apprise container configuration
+      ansible.builtin.assert:
+        that:
+          - apprise_container.container.State.Status == 'running'
+          - apprise_container.container.State.Health.Status == 'healthy'
+          - apprise_container.container.Config.Image == 'caronc/apprise:2'
+          - >-
+            apprise_container.container.Config.User ==
+            ansible_facts.getent_passwd['apprise'][1] ~ ':' ~ ansible_facts.getent_passwd['apprise'][2]
+          - apprise_container.container.HostConfig.RestartPolicy.Name == 'always'
+          - "'molecule-apprise' in apprise_container.container.NetworkSettings.Networks"
+          - apprise_container.container.Config.Labels['wud.tag.include'] == '^2$'
+          - apprise_container.container.Config.Labels['traefik.http.routers.apprise.rule'] == 'Host(`apprise.test`)'
+          - apprise_container.container.Config.Env is contains('APPRISE_STATEFUL_MODE=simple')
+          - apprise_container.container.Config.Env is contains('APPRISE_TRUSTED_ORIGINS=https://apprise.test')
+          - apprise_container.container.Config.Env is contains('APPRISE_TEMPLATE_MATRIX_PASSWORD=test-matrix-password')
+          - >-
+            (apprise_container.container.Mounts | selectattr('Destination', 'equalto', '/config') |
+            map(attribute='Source') | first) == '/var/lib/molecule-apprise/config'
+
+    - name: Verify configuration loading and secret substitution without delivery
+      community.docker.docker_container_exec:
+        container: apprise
+        argv:
+          - python
+          - -c
+          - |
+            import json
+            import logging
+            import os
+            import urllib.request
+            from urllib.parse import unquote
+            from apprise import AppriseConfig
+
+            warnings = []
+            class CaptureWarnings(logging.Handler):
+                def emit(self, record):
+                    warnings.append(record.getMessage())
+            logging.getLogger('apprise').addHandler(CaptureWarnings(logging.WARNING))
+            assert os.getuid() != 0
+
+            expected = {
+                'docker': (1, set()),
+                'mikrotik': (2, {'telegram'}),
+                'rssalerts': (1, set()),
+                'tgamalerts': (1, {'telegram'}),
+                'unitix-gg': (1, {'feed-general'}),
+            }
+            status_request = urllib.request.Request(
+                'http://127.0.0.1:8000/status', headers={'Accept': 'application/json'})
+            status = json.load(urllib.request.urlopen(status_request))
+            assert status['status']['details'] == ['OK'], status
+            for key, (count, tags) in expected.items():
+                path = f'/config/{key}.yml'
+                stat = os.stat(path)
+                assert stat.st_uid == os.getuid() and stat.st_gid == os.getgid(), path
+                assert stat.st_mode & 0o777 == 0o600, path
+                content = open(path).read()
+                for secret in ('test-matrix-password', 'test_telegram_token', 'test_discord_token'):
+                    assert secret not in content, path
+                config = AppriseConfig()
+                assert config.add(path), path
+                services = [service.resolve({
+                    name: os.environ[f'APPRISE_TEMPLATE_{name.upper()}']
+                    for name in service.template_names
+                }) for service in config.services()]
+                assert all(services), key
+                assert len(services) == count, (key, len(services))
+                assert set().union(*(service.tags for service in services)) == tags, key
+                request = urllib.request.Request(
+                    f'http://127.0.0.1:8000/get/{key}', data=b'', method='POST')
+                assert urllib.request.urlopen(request).read().decode() == content, key
+                for service in services:
+                    url = unquote(service.url(privacy=False))
+                    assert '${' not in url, key
+                    if url.startswith('matrixs://'):
+                        assert 'test-matrix-password' in url, key
+                        assert ':frai.se' in url, key
+                        assert not service.tags, key
+                    elif url.startswith('tgram://'):
+                        assert 'test_telegram_token' in url and '-782177075' in url, key
+                    elif url.startswith('discord://'):
+                        assert 'test_discord_token' in url, key
+                        assert 'discord://Unitix.gg - Feed Bot@' in url, key
+            assert not warnings, warnings
+            print('All configuration IDs, tags, ownership and template secrets verified')
+      changed_when: false
+
+    - name: Exercise notification delivery to an isolated mock
+      block:
+        - name: Start mock notification receiver
+          community.docker.docker_container:
+            name: apprise-mock
+            image: python:3.13-alpine
+            state: started
+            networks:
+              - name: molecule-apprise
+            command_handling: correct
+            command:
+              - python
+              - -u
+              - -c
+              - |
+                from http.server import BaseHTTPRequestHandler, HTTPServer
+                class Receiver(BaseHTTPRequestHandler):
+                    def do_POST(self):
+                        body = self.rfile.read(int(self.headers['Content-Length']))
+                        print(self.path, body.decode(), flush=True)
+                        self.send_response(200)
+                        self.end_headers()
+                        self.wfile.write(b'{}')
+                HTTPServer(('0.0.0.0', 8080), Receiver).serve_forever()
+
+        - name: Send notification through Apprise API to mock
+          community.docker.docker_container_exec:
+            container: apprise
+            argv:
+              - python
+              - -c
+              - |
+                import json
+                import time
+                import urllib.request
+                for attempt in range(10):
+                    try:
+                        urllib.request.urlopen('http://apprise-mock:8080')
+                    except urllib.error.HTTPError:
+                        break  # The POST-only receiver returns 501 for GET.
+                    except urllib.error.URLError:
+                        time.sleep(1)
+                    else:
+                        break
+                def post(path, payload):
+                    request = urllib.request.Request(
+                        f'http://127.0.0.1:8000/{path}', data=json.dumps(payload).encode(),
+                        headers={'Content-Type': 'application/json'})
+                    response = urllib.request.urlopen(request)
+                    assert response.status == 200, response.status
+                    return response.read().decode()
+                config = (
+                    'template:\n  matrix_password:\nurls:\n'
+                    '  - "json://apprise-mock:8080/${MATRIX_PASSWORD}":\n'
+                    '      tag: test\n'
+                )
+                try:
+                    post('add/molecule-test', {'config': config, 'format': 'yaml'})
+                    print(post('notify/molecule-test', {
+                        'tag': 'test', 'title': 'Molecule', 'body': 'molecule-apprise-delivery',
+                    }))
+                finally:
+                    post('del/molecule-test', {})
+          changed_when: false
+
+        - name: Inspect mock notification receipt
+          ansible.builtin.command:
+            argv:
+              - python3
+              - -c
+              - "import docker; print(docker.from_env().containers.get('apprise-mock').logs().decode())"
+          register: apprise_mock_logs
+          changed_when: false
+
+        - name: Assert mock received the notification
+          ansible.builtin.assert:
+            that:
+              - "'molecule-apprise-delivery' in apprise_mock_logs.stdout"
+              - "'/test-matrix-password' in apprise_mock_logs.stdout"
+      always:
+        - name: Remove mock receiver
+          community.docker.docker_container:
+            name: apprise-mock
+            state: absent
+
+    - name: Verify authoritative configuration and environment lifecycle
+      ansible.builtin.include_tasks: tasks/lifecycle.yml
+
+- name: Verify dictionary validation and optional service settings
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Test rejected configuration dictionaries
+      ansible.builtin.include_tasks: tasks/validate-case.yml
+      loop:
+        - name: Empty secret
+          expected_failure: Validate populated secrets and reject conflicting shared names
+          configurations:
+            example:
+              services:
+                - url: json://localhost
+                  secrets:
+                    credential: ""
+        - name: Conflicting shared secret
+          expected_failure: Validate populated secrets and reject conflicting shared names
+          configurations:
+            example:
+              services:
+                - url: json://localhost
+                  secrets:
+                    credential: first-value
+                - url: json://localhost
+                  secrets:
+                    credential: second-value
+        - name: Unsafe configuration ID
+          expected_failure: Validate Apprise configuration IDs and service lists
+          configurations:
+            ../outside:
+              services:
+                - url: json://localhost
+      loop_control:
+        loop_var: apprise_validation_case
+        label: "{{ apprise_validation_case.name }}"
+
+    - name: Set a service without optional settings
+      ansible.builtin.set_fact:
+        apprise_configurations:
+          example:
+            services:
+              - url: json://localhost
+
+    - name: Validate a service without optional settings
+      ansible.builtin.include_role:
+        name: apprise
+        tasks_from: validate
+
+    - name: Assert removed secrets do not remain in derived environment
+      ansible.builtin.assert:
+        that:
+          - apprise_template_env == {}
+
+    - name: Render generic template with no optional service settings
+      ansible.builtin.set_fact:
+        apprise_minimal_config: "{{ lookup('ansible.builtin.template', '../../roles/apprise/templates/config.yml.j2') | from_yaml }}"
+      vars:
+        apprise_configuration: "{{ apprise_configurations.example }}"
+
+    - name: Assert minimal service has no template or tags
+      ansible.builtin.assert:
+        that:
+          - "apprise_minimal_config == {'urls': ['json://localhost']}"

@@ -5,4 +5,4 @@ docker:
     - fraise
   dir:
     config: /data/docker-config
-    data: /data/docker
+    data: /data/docker/docker

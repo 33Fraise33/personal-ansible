@@ -7,7 +7,7 @@
 
 - name: Set permissions to data volume for syncthing
   ansible.builtin.file:
-    path: "{{ docker.dir.data }}/docker/volumes/config_syncthing/_data"
+    path: "{{ docker.dir.data }}/volumes/config_syncthing/_data"
     state: directory
     mode: "0755"
     owner: "{{ nobody.user }}"

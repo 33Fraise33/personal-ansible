@@ -1,0 +1,10 @@
+---
+- name: Restart Apprise
+  community.docker.docker_container:
+    name: apprise
+    comparisons:
+      '*': ignore
+    state: healthy
+    healthy_wait_timeout: 120
+    restart: true
+  no_log: true

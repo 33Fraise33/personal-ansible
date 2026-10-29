@@ -1,0 +1,40 @@
+---
+# Fill these values locally, then encrypt them before committing or deploying.
+# Telegram requires the complete token, including the numeric prefix and colon.
+apprise_matrix_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  63366661623738366530373933353038623636333032663037383730663562383034613538626661
+  6534646135666432643837303037656261636235633036300a343566386364383434386231373938
+  38653863613766633930666664313439396562303531393037336433336238623962623330653864
+  6339336130633561320a643135656532336561336535363865326632623635626362663361326464
+  39616232613237616662383133393763303665643136393436633435366333616233
+
+apprise_configurations:
+  docker:
+    services:
+      - url: "matrixs://matrix.frai.se/#docker-alerts:frai.se"
+        tags: []
+        options:
+          user: apprise
+          password: "${MATRIX_PASSWORD}"
+        secrets:
+          matrix_password: "{{ apprise_matrix_password }}"
+  mikrotik:
+    services:
+      # The non-secret placeholder satisfies URL parsing; bot_token overrides it.
+      - url: "matrixs://matrix.frai.se/#network-alerts:frai.se"
+        tags: []
+        options:
+          user: apprise
+          password: "${MATRIX_PASSWORD}"
+        secrets:
+          matrix_password: "{{ apprise_matrix_password }}"
+  rssalerts:
+    services:
+      - url: "matrixs://matrix.frai.se/#rss-alerts:frai.se"
+        tags: []
+        options:
+          user: apprise
+          password: "${MATRIX_PASSWORD}"
+        secrets:
+          matrix_password: "{{ apprise_matrix_password }}"
