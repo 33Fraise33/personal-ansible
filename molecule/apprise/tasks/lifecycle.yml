@@ -1,0 +1,204 @@
+---
+- name: Supply synthetic lifecycle credentials
+  ansible.builtin.set_fact:
+    apprise_matrix_password: test-matrix-password
+    apprise_telegram_bot_token: "5562462598:test_telegram_token"
+    apprise_discord_webhook_token: test_discord_token
+
+- name: Load original role configurations and ensure baseline deployment
+  ansible.builtin.include_role:
+    name: apprise
+    public: true
+
+- name: Save baseline configuration dictionary
+  ansible.builtin.set_fact:
+    apprise_original_configurations: "{{ apprise_configurations }}"
+
+- name: Exercise configuration and secret removal
+  block:
+    - name: Add a temporary configuration with its own secret
+      ansible.builtin.set_fact:
+        apprise_configurations: >-
+          {{ apprise_original_configurations | combine({
+            'molecule-extra': {'services': [{
+              'url': 'json://127.0.0.1:9999/${RETIRED_SECRET}',
+              'secrets': {'retired_secret': 'synthetic-retired-secret'}
+            }]}
+          }) }}
+
+    - name: Deploy temporary configuration and secret
+      ansible.builtin.include_role:
+        name: apprise
+
+    - name: Flush lifecycle configuration handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Inspect temporary secret in container environment
+      community.docker.docker_container_info:
+        name: apprise
+      register: apprise_before_removal
+
+    - name: Assert temporary secret was actually deployed
+      ansible.builtin.assert:
+        that:
+          - >-
+            apprise_before_removal.container.Config.Env is
+            contains('APPRISE_TEMPLATE_RETIRED_SECRET=synthetic-retired-secret')
+
+    - name: Seed unmanaged and obsolete notification configurations
+      ansible.builtin.copy:
+        content: "json://127.0.0.1:9999\n"
+        dest: "{{ apprise_config_path }}/{{ item }}"
+        owner: apprise
+        group: apprise
+        mode: "0600"
+      loop:
+        - unmanaged.cfg
+        - unmanaged.yml
+        - unmanaged.yaml
+        - docker.cfg
+        - docker.yaml
+
+    - name: Seed runtime data that must survive configuration reconciliation
+      ansible.builtin.copy:
+        content: "molecule-runtime-state\n"
+        dest: "{{ apprise_config_path }}/{{ item }}"
+        owner: apprise
+        group: apprise
+        mode: "0600"
+      loop:
+        - .molecule-runtime-state
+        - store/molecule-runtime-state.yml
+        - attach/molecule-runtime-state.cfg
+
+    - name: Reconcile only the seeded notification files
+      ansible.builtin.include_role:
+        name: apprise
+
+    - name: Apply configuration-only cleanup handler
+      ansible.builtin.meta: flush_handlers
+
+    - name: Inspect container after configuration-only cleanup
+      community.docker.docker_container_info:
+        name: apprise
+      register: apprise_after_file_cleanup
+
+    - name: Assert file cleanup restarts without recreating the container
+      ansible.builtin.assert:
+        that:
+          - apprise_after_file_cleanup.container.Id == apprise_before_removal.container.Id
+          - apprise_after_file_cleanup.container.State.StartedAt != apprise_before_removal.container.State.StartedAt
+
+    - name: Remove temporary and RSS configurations and rename Telegram configuration
+      ansible.builtin.set_fact:
+        apprise_configurations: >-
+          {{ apprise_original_configurations | dict2items |
+             rejectattr('key', 'in', ['rssalerts', 'tgamalerts']) | items2dict |
+             combine({'telegram-renamed': apprise_original_configurations.tgamalerts}) }}
+
+    - name: Reconcile reduced configuration dictionary
+      ansible.builtin.include_role:
+        name: apprise
+
+    - name: Apply removal handlers before checking running application
+      ansible.builtin.meta: flush_handlers
+
+    - name: Inspect container after secret removal
+      community.docker.docker_container_info:
+        name: apprise
+      register: apprise_after_removal
+
+    - name: Assert container recreation removed retired secret and retained required secrets
+      ansible.builtin.assert:
+        that:
+          - apprise_after_removal.container.Id != apprise_before_removal.container.Id
+          - apprise_after_removal.container.State.Health.Status == 'healthy'
+          - >-
+            apprise_after_removal.container.Config.Env |
+            select('match', '^APPRISE_TEMPLATE_RETIRED_SECRET=') | list | length == 0
+          - >-
+            apprise_after_removal.container.Config.Env is
+            contains('APPRISE_TEMPLATE_MATRIX_PASSWORD=test-matrix-password')
+
+    - name: Verify authoritative files and preserved runtime data inside application
+      community.docker.docker_container_exec:
+        container: apprise
+        argv:
+          - python
+          - -c
+          - |
+            from pathlib import Path
+            from apprise import AppriseConfig
+            root = Path('/config')
+            configs = {path.name for path in root.iterdir()
+                       if path.is_file() and path.suffix in ('.cfg', '.yaml', '.yml')}
+            assert configs == {'docker.yml', 'mikrotik.yml', 'unitix-gg.yml', 'telegram-renamed.yml'}, configs
+            for name in ('.molecule-runtime-state', 'store/molecule-runtime-state.yml',
+                         'attach/molecule-runtime-state.cfg'):
+                assert (root / name).read_text() == 'molecule-runtime-state\n', name
+            config = AppriseConfig()
+            assert config.add('/config/telegram-renamed.yml')
+            services = config.services()
+            assert len(services) == 1 and services[0].tags == {'telegram'}
+            print('Removed/renamed IDs, obsolete files and preserved runtime state verified')
+      changed_when: false
+
+    - name: Repeat reconciliation with unchanged configuration
+      ansible.builtin.include_role:
+        name: apprise
+
+    - name: Flush any handlers from repeated reconciliation
+      ansible.builtin.meta: flush_handlers
+
+    - name: Inspect unchanged container
+      community.docker.docker_container_info:
+        name: apprise
+      register: apprise_unchanged
+
+    - name: Assert unchanged reconciliation does not recreate or restart container
+      ansible.builtin.assert:
+        that:
+          - apprise_unchanged.container.Id == apprise_after_removal.container.Id
+          - apprise_unchanged.container.State.StartedAt == apprise_after_removal.container.State.StartedAt
+  always:
+    - name: Restore baseline configuration dictionary
+      ansible.builtin.set_fact:
+        apprise_configurations: "{{ apprise_original_configurations }}"
+
+    - name: Restore baseline deployment
+      ansible.builtin.include_role:
+        name: apprise
+
+    - name: Flush restoration handlers
+      ansible.builtin.meta: flush_handlers
+
+- name: Pause after lifecycle tests for runtime inspection
+  ansible.builtin.pause:
+    seconds: 5
+
+- name: Inspect restored application logs for warnings and errors
+  ansible.builtin.command:
+    argv:
+      - python3
+      - -c
+      - |
+        from datetime import datetime
+        import docker
+        import re
+        container = docker.from_env().containers.get('apprise')
+        started = datetime.fromisoformat(container.attrs['State']['StartedAt'].replace('Z', '+00:00'))
+        logs = container.logs(since=int(started.timestamp()), timestamps=True).decode()
+        current = []
+        for line in logs.splitlines():
+            timestamp, _, message = line.partition(' ')
+            if datetime.fromisoformat(timestamp.replace('Z', '+00:00')) >= started:
+                current.append(message)
+        output = '\n'.join(current)
+        print(output)
+        assert not re.search(r'(?i)\b(warn(ing)?|error|critical|traceback)\b', output), output
+  register: apprise_lifecycle_logs
+  changed_when: false
+
+- name: Show restored application runtime logs
+  ansible.builtin.debug:
+    var: apprise_lifecycle_logs.stdout

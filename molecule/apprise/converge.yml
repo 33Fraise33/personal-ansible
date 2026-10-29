@@ -1,0 +1,54 @@
+---
+- name: Converge Apprise role
+  hosts: all
+  gather_facts: false
+  vars:
+    apprise_config_path: /var/lib/molecule-apprise/config
+    apprise_network: molecule-apprise
+    apprise_hostname: apprise.test
+  tasks:
+    - name: Override production secrets with higher-precedence synthetic facts
+      ansible.builtin.set_fact:
+        apprise_matrix_password: test-matrix-password
+        apprise_telegram_bot_token: "5562462598:test_telegram_token"
+        apprise_discord_webhook_token: test_discord_token
+
+    - name: Deploy Apprise with synthetic credentials
+      ansible.builtin.include_role:
+        name: apprise
+
+    - name: Apply configuration handlers before inspection
+      ansible.builtin.meta: flush_handlers
+
+    - name: Pause for Apprise runtime inspection
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: Inspect Apprise runtime logs
+      ansible.builtin.command:
+        argv:
+          - python3
+          - -c
+          - |
+            from datetime import datetime
+            import docker
+            container = docker.from_env().containers.get('apprise')
+            started = datetime.fromisoformat(container.attrs['State']['StartedAt'].replace('Z', '+00:00'))
+            logs = container.logs(since=int(started.timestamp()), timestamps=True).decode()
+            for line in logs.splitlines():
+                timestamp, _, message = line.partition(' ')
+                if datetime.fromisoformat(timestamp.replace('Z', '+00:00')) >= started:
+                    print(message)
+      register: apprise_runtime_logs
+      changed_when: false
+
+    - name: Show Apprise runtime logs
+      ansible.builtin.debug:
+        msg: "{{ apprise_runtime_logs.stdout }}\n{{ apprise_runtime_logs.stderr }}"
+
+    - name: Assert Apprise startup has no warnings or errors
+      ansible.builtin.assert:
+        that:
+          - >-
+            (apprise_runtime_logs.stdout ~ apprise_runtime_logs.stderr) is not
+            regex('(?i)(^|[^a-z])(warn(ing)?|error|critical|traceback)([^a-z]|$)')

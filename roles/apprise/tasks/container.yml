@@ -1,0 +1,36 @@
+---
+- name: Start Apprise notification service
+  community.docker.docker_container:
+    name: apprise
+    image: caronc/apprise:2
+    user: "{{ ansible_facts.getent_passwd['apprise'][1] }}:{{ ansible_facts.getent_passwd['apprise'][2] }}"
+    networks:
+      - name: "{{ apprise_network }}"
+    env: "{{ apprise_container_env | combine(apprise_template_env) }}"
+    comparisons:
+      env: strict
+    volumes:
+      - "{{ apprise_config_path }}:/config"
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, http://127.0.0.1:8000/status]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    state: healthy
+    healthy_wait_timeout: 120
+    restart_policy: always
+    pull: true
+    labels:
+      traefik.http.routers.apprise.tls: "true"
+      traefik.http.routers.apprise.rule: "Host(`{{ apprise_hostname }}`)"
+      traefik.http.routers.apprise.tls.certresolver: le
+      traefik.http.services.apprise.loadbalancer.server.port: "8000"
+      wud.tag.include: '^2$'
+  no_log: true
+  vars:
+    apprise_container_env:
+      APPRISE_STATEFUL_MODE: simple
+      APPRISE_WORKER_COUNT: "2"
+      APPRISE_TRUSTED_ORIGINS: "https://{{ apprise_hostname }}"
+      APPRISE_ATTACH_DIR: /config/attach

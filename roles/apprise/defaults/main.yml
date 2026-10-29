@@ -1,0 +1,4 @@
+---
+apprise_config_path: "{{ docker.dir.config }}/apprise"
+apprise_network: services
+apprise_hostname: apprise.frai.se

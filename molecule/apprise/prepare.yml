@@ -1,0 +1,17 @@
+---
+- name: Prepare Apprise dependencies
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Install Docker SDK dependencies
+      ansible.builtin.apt:
+        name:
+          - python3-docker
+          - python3-requests
+        state: present
+        update_cache: true
+
+    - name: Create isolated Apprise network
+      community.docker.docker_network:
+        name: molecule-apprise
+        driver: bridge

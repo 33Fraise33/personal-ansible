@@ -1,0 +1,61 @@
+---
+- name: Create Apprise service user
+  ansible.builtin.user:
+    name: apprise
+    comment: Apprise service user
+    system: true
+    create_home: false
+
+- name: Gather Apprise service UID and GID
+  ansible.builtin.getent:
+    database: passwd
+    key: apprise
+
+- name: Create Apprise configuration and runtime directories
+  ansible.builtin.file:
+    path: "{{ apprise_config_path }}/{{ item }}"
+    state: directory
+    owner: apprise
+    group: apprise
+    mode: "0700"
+  loop:
+    - ""
+    - store
+    - attach
+
+- name: Discover existing Apprise notification configuration files
+  ansible.builtin.find:
+    paths: "{{ apprise_config_path }}"
+    patterns:
+      - '*.cfg'
+      - '*.yml'
+      - '*.yaml'
+    recurse: false
+    hidden: true
+    file_type: file
+  register: apprise_existing_config_files
+
+- name: Remove notification configurations not defined by Ansible
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ apprise_existing_config_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  vars:
+    apprise_expected_config_files: "{{ apprise_configurations.keys() | map('regex_replace', '$', '.yml') | list }}"
+  when: (item.path | basename) not in apprise_expected_config_files
+  notify: Restart Apprise
+
+- name: Render managed Apprise configurations
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: "{{ apprise_config_path }}/{{ item }}.yml"
+    owner: apprise
+    group: apprise
+    mode: "0600"
+  loop: "{{ apprise_configurations.keys() | list }}"
+  vars:
+    apprise_configuration: "{{ apprise_configurations[item] }}"
+  no_log: true
+  notify: Restart Apprise

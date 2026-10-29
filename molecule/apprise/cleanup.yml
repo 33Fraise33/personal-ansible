@@ -1,0 +1,22 @@
+---
+- name: Cleanup Apprise test dependencies
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Remove Apprise test containers
+      community.docker.docker_container:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - apprise
+        - apprise-mock
+
+    - name: Remove Apprise test data
+      ansible.builtin.file:
+        path: /var/lib/molecule-apprise/config
+        state: absent
+
+    - name: Remove isolated Apprise network
+      community.docker.docker_network:
+        name: molecule-apprise
+        state: absent

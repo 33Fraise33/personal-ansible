@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: apprise
+  author: 33Fraise33
+  description: Deploy Apprise API with reproducible notification configurations.
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+dependencies: []

@@ -1,0 +1,16 @@
+---
+# Managed by Ansible. UI edits are overwritten on the next deployment.
+{% set config = namespace(template={}, urls=[]) %}
+{% for service in apprise_configuration.services %}
+{% for name in service.secrets | default({}) %}
+{% set config.template = config.template | combine({name: none}) %}
+{% endfor %}
+{% set options = service.options | default({}) %}
+{% if service.tags | default([]) | length > 0 %}
+{% set options = options | combine({'tag': service.tags}) %}
+{% endif %}
+{% set entry = {service.url: options} if options else service.url %}
+{% set config.urls = config.urls + [entry] %}
+{% endfor %}
+{% set document = {'template': config.template, 'urls': config.urls} if config.template else {'urls': config.urls} %}
+{{ document | to_nice_yaml(indent=2, sort_keys=false) }}

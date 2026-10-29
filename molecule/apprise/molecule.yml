@@ -1,0 +1,42 @@
+---
+driver:
+  name: docker
+
+ansible:
+  cfg:
+    defaults:
+      roles_path: ${MOLECULE_PROJECT_DIRECTORY}/roles
+      # molecule-docker 2.1 uses legacy string conditionals in create/destroy.
+      allow_broken_conditionals: true
+
+scenario:
+  test_sequence:
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - verify
+    - cleanup
+    - destroy
+
+platforms:
+  - name: apprise-instance
+    image: geerlingguy/docker-debian12-ansible:latest
+    pre_build_image: true
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # The sibling application container sees the same host bind-mount path.
+      - /var/lib/molecule-apprise:/var/lib/molecule-apprise
+
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      apprise-instance:
+        ansible_python_interpreter: /usr/bin/python3
+
+verifier:
+  name: ansible
