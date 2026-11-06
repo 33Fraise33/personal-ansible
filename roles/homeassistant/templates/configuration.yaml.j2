@@ -1,11 +1,5 @@
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
-
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - "{{ traefik.home.ip }}"
-    - "{{ traefik.home.ipv6 }}"
     
 # Text to speech
 tts:
@@ -41,23 +35,18 @@ template:
       default_entity_id: cover.garage_door
       open_cover:
         - condition: state
-          entity_id:
-            - binary_sensor.garage_door_switch_state
+          entity_id: binary_sensor.garage_door_switch_state
           state: 'off'
-          match: all
         - target:
-            entity_id:
-              - switch.node_31
+            entity_id: switch.node_31
           action: switch.toggle
       close_cover:
         - target:
-            entity_id:
-              - switch.node_31
+            entity_id: switch.node_31
           action: switch.toggle
       stop_cover:
         - target:
-            entity_id:
-              - switch.node_31
+            entity_id: switch.node_31
           action: switch.toggle
       state: >
         {{ 'open' if is_state('binary_sensor.garage_door_switch_state', 'on') else 'closed' }}
@@ -71,18 +60,6 @@ template:
       state: "{% if is_state('sensor.ultrasync_alarm_area2state', 'Armed Away') %}\n
         \ armed_away\n{% elif is_state('sensor.ultrasync_alarm_area2state', 'Armed Stay')
         %}\n  armed_home\n{% else %}\n  disarmed\n{% endif %}"
-
-sensor:
-  - platform: afvalbeheer
-    wastecollector: RecycleApp
-    resources:
-      - restafval
-      - gft
-      - papier
-      - pmd
-    postcode: 8490
-    streetname: Eernegemweg
-    streetnumber: 96
 
 {% endraw %}
     

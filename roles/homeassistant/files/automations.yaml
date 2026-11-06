@@ -8,13 +8,13 @@
   - condition: not
     conditions:
     - condition: state
-      entity_id: sensor.tomorrow
+      entity_id: sensor.recycleapp_morgen
       state:
       - None
   actions:
   - data:
       title: AFVAL
-      message: '{{ states(''sensor.tomorrow'') }}
+      message: '{{ states(''sensor.recycleapp_morgen'') }}
 
         '
       data:
@@ -268,21 +268,99 @@
   alias: Fingerprint
   description: ''
   triggers:
-  - trigger: state
-    entity_id:
-    - event.deurbel_fingerprint
-    attribute: event_type
-    to:
-    - identified
+  - trigger: event.received
+    target:
+      entity_id: event.deurbel_fingerprint
+    options:
+      event_type:
+      - identified
   conditions: []
   actions:
   - action: notify.mobile_app_pixel_9_pro_xl
     metadata: {}
     data:
-      message: Test
+      message: Alarm Disarmed
   - action: alarm_control_panel.alarm_disarm
     metadata: {}
     target:
       entity_id: alarm_control_panel.ultrasync_alarm
     data: {}
+    enabled: true
+  mode: single
+- id: '1784484328022'
+  alias: Media - Stop kitchen on shield
+  description: ''
+  triggers:
+  - trigger: media_player.started_playing
+    target:
+      entity_id: media_player.living_room_nvidia_shield_living
+    options:
+      behavior: each
+      for: 00:00:00
+  conditions:
+  - condition: media_player.is_playing
+    target:
+      entity_id: media_player.kitchen_1
+    options:
+      behavior: any
+      for: 00:00:00
+  actions:
+  - action: media_player.media_stop
+    metadata: {}
+    target:
+      entity_id: media_player.kitchen_1
+    data: {}
+  mode: single
+- id: '1785359304401'
+  alias: Turn off airco
+  description: ''
+  triggers:
+  - trigger: time
+    at: 01:30:00
+  conditions:
+  - condition: climate.is_on
+    target:
+      device_id: 0c668622cb9fe243e72fec2be7ab6d11
+    options:
+      behavior: any
+  actions:
+  - action: climate.turn_off
+    metadata: {}
+    target:
+      device_id: 0c668622cb9fe243e72fec2be7ab6d11
+    data: {}
+  mode: single
+- id: '1785868605215'
+  alias: 'Automation: Turn on pc led'
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.pc_fraise
+    from:
+    - 'on'
+    - 'off'
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    target:
+      device_id: fe2a105bf8e914ee952de757901ee01f
+    data: {}
+  mode: single
+- id: '1786776273577'
+  alias: 'Automation: post'
+  description: ''
+  triggers:
+  - trigger: motion.detected
+    target:
+      entity_id: binary_sensor.motion_sensor_motion_detection_4
+    options:
+      for: 00:00:00
+  conditions: []
+  actions:
+  - data:
+      message: Check de brievenbus
+      title: Post!
+    action: notify.notify
   mode: single
