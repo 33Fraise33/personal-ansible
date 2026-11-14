@@ -1,5 +1,6 @@
 *.pem
 .venv/
+.worktrees/
 .ansible
 __pycache__/
 *.py[cod]
