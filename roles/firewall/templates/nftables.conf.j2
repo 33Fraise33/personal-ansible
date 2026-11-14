@@ -64,6 +64,10 @@ table inet filter {
 			drop
 
                 include "/etc/nftables.d/forward.conf"
+{% if 'tag_docker' in group_names %}
+                oifname "{{ ansible_facts['default_ipv4']['interface'] }}" counter accept comment "Allow Docker host outbound forwarding"
+{% endif %}
+                counter log prefix "DROPPED: " drop
         }
 
         # Default OUTPUT policy is accept

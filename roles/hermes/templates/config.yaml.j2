@@ -8,5 +8,4 @@ approvals:
 auth:
   adopt_external_logins: false
 dashboard:
-  trusted_proxies:
-    - "{{ traefik.dco.ip }}"
+  trusted_proxies: {{ hermes_trusted_proxies | to_json }}

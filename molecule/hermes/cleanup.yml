@@ -12,3 +12,8 @@
       ansible.builtin.file:
         path: /var/lib/molecule-hermes/data
         state: absent
+
+    - name: Remove Hermes test network
+      community.docker.docker_network:
+        name: molecule-hermes-network
+        state: absent

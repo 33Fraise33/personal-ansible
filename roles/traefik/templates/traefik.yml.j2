@@ -11,7 +11,7 @@ log:
 
 providers:
   docker:
-    endpoint: "tcp://dockerproxy:2375"
+    endpoint: "tcp://{{ traefik_dockerproxy_address if traefik_host_network | default(false) else 'dockerproxy' }}:2375"
     defaultRule: "Host(`{{ traefik.rule | default('{{' + ' .Name ' + '}}.frai.se') }}`)"
     exposedByDefault: true
   file:

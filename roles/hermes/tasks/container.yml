@@ -25,7 +25,17 @@
       HERMES_DASHBOARD_PUBLIC_URL: https://hermes.frai.se
       HERMES_DASHBOARD_OIDC_ISSUER: https://auth.frai.se
       HERMES_DASHBOARD_OIDC_CLIENT_ID: hermes-dashboard
-    network_mode: host
+    networks:
+      - name: "{{ hermes_network }}"
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "{{ hermes_network }}"
+      traefik.http.routers.hermes.rule: Host(`hermes.frai.se`)
+      traefik.http.routers.hermes.entrypoints: web-secure
+      traefik.http.routers.hermes.tls: "true"
+      traefik.http.routers.hermes.tls.certresolver: le
+      traefik.http.routers.hermes.middlewares: management-only@file
+      traefik.http.services.hermes.loadbalancer.server.port: "9119"
     volumes:
       - "{{ hermes_data_path }}:/opt/data"
     memory: 4g

@@ -5,10 +5,15 @@ dawarich_photon_api_use_https: "true"
 
 adguard_hostname: dns1.frai.se
 
-traefik_custom_rules_host:
-  - name: hermes
-    target: http://10.10.48.37:9119
-    management_only: true
+traefik_custom_rules:
+  - name: beokpdcosv01
+    target: https://10.10.48.10:8006/
+  - name: wud-beokpdcovm01
+    target: "http://[2001:678:1080:2202::2]:9103"
+  - name: wud-beokpdcovm02
+    target: "http://[2001:678:1080:2202::3]:9103"
+  - name: wud-beokpdcovm04
+    target: "http://[2001:678:1080:2202::5]:9103"
 
 docker:
   dir:
