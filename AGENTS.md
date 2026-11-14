@@ -9,6 +9,9 @@
 - Preserve other agents' worktrees and uncommitted changes; remove only worktrees created for your own task when they are no longer needed.
 - Never commit directly to `main`. Branch from `main` using descriptive names such as `feature/add-nginx-role` or `fix/db-container-restart`; use Conventional Commits and submit all changes through a pull or merge request with a concise review summary.
 - This prohibition also applies when an agent runs in the code owner's local development environment: access to owner credentials or permissions never authorizes the agent to commit directly to `main`.
+- Always perform changes in a dedicated Git worktree on a task-specific branch, never in the primary checkout. Create or reuse the task's worktree before editing any files.
+- Store all new worktrees under `<project-root>/.worktrees/<task-name>/`, where `<project-root>` is the primary checkout, not another worktree. Never create worktrees outside the project or nest worktrees inside other worktrees.
+- Keep `.worktrees/` ignored by Git. Run task commands and validation from the task's worktree root, and preserve unrelated changes in every checkout.
 
 ## Automation Boundary
 
