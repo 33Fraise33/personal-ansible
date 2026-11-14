@@ -1,6 +1,21 @@
 ---
 netbox_interface: true
 firewall_filter_input_host:
+  - comment: "Block tubes bridge to host RFC1918"
+    source:
+      interface: '"br-tubes"'
+    destination:
+      ip: "@RFC1918"
+    statement: drop
+    counter: true
+  - comment: "Block tubes bridge to host AS211184"
+    type: ip6
+    source:
+      interface: '"br-tubes"'
+    destination:
+      ip: "@AS211184"
+    statement: drop
+    counter: true
   - comment: "Allow HTTPS to Traefik"
     destination:
       port: 443
@@ -17,6 +32,21 @@ firewall:
   filter:
     input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"
     forward:
+      - comment: "Block tubes bridge to RFC1918"
+        source:
+          interface: '"br-tubes"'
+        destination:
+          ip: "@RFC1918"
+        statement: drop
+        counter: true
+      - comment: "Block tubes bridge to AS211184"
+        type: ip6
+        source:
+          interface: '"br-tubes"'
+        destination:
+          ip: "@AS211184"
+        statement: drop
+        counter: true
       - comment: "Block forwarded traffic to the Docker socket proxy"
         destination:
           ip: "{{ traefik_dockerproxy_address }}"
@@ -39,7 +69,31 @@ docker:
           gateway: 10.10.48.193
         - subnet: 2001:678:1080:2210::/64
           gateway: 2001:678:1080:2210::1
+    tubes:
+      type: bridge
+      ipv6: true
+      driver_options:
+        com.docker.network.bridge.name: br-tubes
+      ipam:
+        - subnet: 10.10.48.208/29
+          gateway: 10.10.48.209
+        - subnet: 2001:678:1080:2211::/64
+          gateway: 2001:678:1080:2211::1
 traefik_host_network: true
+traefik_internal_default: true
+traefik_extra_entrypoints:
+  - name: tubes-public
+    address: "127.0.0.1:18443"
+    proxy_protocol_trusted_ips:
+      - "127.0.0.1/32"
+traefik_tcp_routers:
+  - name: tubes-public
+    entrypoints:
+      - web-secure
+    rule: "HostSNI(`tubes.unitix.be`)"
+    target: "127.0.0.1:18443"
+    tls_passthrough: true
+    proxy_protocol_version: 2
 traefik_dockerproxy_subnet: 169.254.241.0/29
 traefik_dockerproxy_gateway: 169.254.241.1
 traefik_dockerproxy_address: 169.254.241.2

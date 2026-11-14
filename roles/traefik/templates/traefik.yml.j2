@@ -29,6 +29,12 @@ entryPoints:
 
   web-secure:
     address: ":443"
+{% if traefik_internal_default | default(false) | bool %}
+    asDefault: true
+    http:
+      middlewares:
+        - internal-only@file
+{% endif %}
     forwardedHeaders:
       trustedIPs:
         - "127.0.0.1/32"
@@ -40,6 +46,17 @@ entryPoints:
         - "{{ traefik.media.ip }}"
         - "{{ traefik.media.ipv6 }}"
 
+{% for entrypoint in traefik_extra_entrypoints | default([]) %}
+  {{ entrypoint.name }}:
+    address: {{ entrypoint.address | to_json }}
+{% if entrypoint.proxy_protocol_trusted_ips | default([]) | length > 0 %}
+    proxyProtocol:
+      trustedIPs:
+{% for ip in entrypoint.proxy_protocol_trusted_ips %}
+        - {{ ip | to_json }}
+{% endfor %}
+{% endif %}
+{% endfor %}
   traefik:
     address: ":8080"
 

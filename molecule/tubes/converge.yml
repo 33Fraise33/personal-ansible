@@ -1,0 +1,35 @@
+---
+- name: Converge relay
+  hosts: all
+  gather_facts: false
+  vars:
+    tubes_data_path: /var/lib/molecule-tubes/data
+    tubes_network: molecule-tubes-network
+    tubes_container_name: molecule-tubes
+    tubes_trusted_proxies: "192.0.2.1/32"
+  tasks:
+    - name: Deploy relay
+      ansible.builtin.include_role:
+        name: tubes
+
+    - name: Pause for startup log inspection
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: Read relay logs
+      ansible.builtin.command:
+        argv:
+          - python3
+          - -c
+          - "import docker; print(docker.from_env().containers.get('molecule-tubes').logs().decode())"
+      register: tubes_logs
+      changed_when: false
+
+    - name: Show startup logs
+      ansible.builtin.debug:
+        var: tubes_logs.stdout_lines
+
+    - name: Check for startup warnings and errors
+      ansible.builtin.assert:
+        that:
+          - tubes_logs.stdout is not regex('(?i)(^|[^a-z])(warn(ing)?|error|critical|traceback)([^a-z]|$)')

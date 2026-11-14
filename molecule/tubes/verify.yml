@@ -1,0 +1,47 @@
+---
+- name: Verify relay configuration
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Read relay service IDs
+      ansible.builtin.getent:
+        database: passwd
+        key: tubes
+
+    - name: Inspect relay
+      community.docker.docker_container_info:
+        name: molecule-tubes
+      register: tubes_info
+
+    - name: Verify relay container
+      ansible.builtin.assert:
+        that:
+          - tubes_info.container.State.Status == 'running'
+          - tubes_info.container.State.Health.Status == 'healthy'
+          - tubes_info.container.Config.User == ansible_facts.getent_passwd.tubes[1] ~ ':' ~ ansible_facts.getent_passwd.tubes[2]
+          - tubes_info.container.HostConfig.RestartPolicy.Name == 'unless-stopped'
+          - tubes_info.container.HostConfig.PortBindings | default({}, true) | length == 0
+          - "'molecule-tubes-network' in tubes_info.container.NetworkSettings.Networks"
+          - tubes_info.container.Config.Labels['traefik.http.routers.tubes.observability.accesslogs'] == 'false'
+          - tubes_info.container.Config.Labels['traefik.http.routers.tubes.entrypoints'] == 'tubes-public'
+          - "'RELAY_URL=wss://tubes.unitix.be/fed' in tubes_info.container.Config.Env"
+          - "'RELAY_NAME=(BE) UNITIX - AS211184' in tubes_info.container.Config.Env"
+
+    - name: Verify relay status command
+      community.docker.docker_container_exec:
+        container: molecule-tubes
+        argv: [/relay, status]
+      changed_when: false
+      register: tubes_status
+      failed_when: tubes_status.rc != 0
+
+    - name: Inspect private data directory
+      ansible.builtin.stat:
+        path: /var/lib/molecule-tubes/data
+      register: tubes_dir
+
+    - name: Verify ownership and permissions
+      ansible.builtin.assert:
+        that:
+          - tubes_dir.stat.pw_name == 'tubes'
+          - tubes_dir.stat.mode == '0700'

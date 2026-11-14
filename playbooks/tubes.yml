@@ -1,0 +1,7 @@
+---
+- name: Deploy Series of Tubes relay
+  hosts: BEOKPDCOVM04
+  become: true
+  roles:
+    - role: tubes
+      tags: tubes

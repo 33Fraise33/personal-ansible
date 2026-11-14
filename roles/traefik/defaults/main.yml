@@ -1,2 +1,4 @@
 ---
 traefik_custom_rules: []
+traefik_tcp_routers: []
+traefik_extra_entrypoints: []

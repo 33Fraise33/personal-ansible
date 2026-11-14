@@ -1,0 +1,35 @@
+---
+driver:
+  name: docker
+ansible:
+  cfg:
+    defaults:
+      roles_path: ${MOLECULE_PROJECT_DIRECTORY}/roles
+      allow_broken_conditionals: true
+scenario:
+  test_sequence:
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - verify
+    - cleanup
+    - destroy
+platforms:
+  - name: tubes-instance
+    image: geerlingguy/docker-debian12-ansible:latest
+    pre_build_image: true
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/molecule-tubes:/var/lib/molecule-tubes
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      tubes-instance:
+        ansible_python_interpreter: /usr/bin/python3
+verifier:
+  name: ansible

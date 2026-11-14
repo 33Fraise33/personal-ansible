@@ -1,0 +1,26 @@
+---
+- name: Create relay system group
+  ansible.builtin.group:
+    name: tubes
+    system: true
+
+- name: Create relay system user
+  ansible.builtin.user:
+    name: tubes
+    group: tubes
+    system: true
+    create_home: false
+    shell: /usr/sbin/nologin
+
+- name: Read relay user IDs
+  ansible.builtin.getent:
+    database: passwd
+    key: tubes
+
+- name: Create private relay data directory
+  ansible.builtin.file:
+    path: "{{ tubes_data_path }}"
+    state: directory
+    owner: tubes
+    group: tubes
+    mode: "0700"

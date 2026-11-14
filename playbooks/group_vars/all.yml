@@ -305,24 +305,22 @@ domain:
       answer: "{{ traefik.home.ipv6 }}"
     - domain: wud-bejbegiavm01.frai.se
       answer: "{{ traefik.home.ip }}"
-  external:  # specific ipv4 at the front, no ipv4 = ddclient
+  external: # specific ipv4 at the front, no ipv4 = ddclient
     # UNITIX.BE
-    # - name: beokpdcort01
-    #   ipv6: "2a12:4946:4002::1"
-    #   ipv4: "31.24.249.70"
-    #   domain: unitix.be
-    - name: inform
-      ipv4: "31.24.249.70"
+    - name: beokpdcort01
+      ipv6: "2001:678:1080::2"
+      ipv4: "185.174.7.52"
       domain: unitix.be
-    # FRAI.SE
-    - name: wireguard
-      domain: frai.se
-      # ipv6: ""
-      ipv4: "31.24.249.70"
-    - name: acc
-      domain: frai.se
-    - name: home
-      domain: frai.se
+    - name: inform
+      ipv4: "185.174.7.52"
+      domain: unitix.be
+    - name: mavinform
+      ipv4: "91.183.157.204"
+      domain: unitix.be
+    - name: tubes
+      ipv4: "185.174.7.52"
+      ipv6: "{{ traefik.dco_vm04.ipv6 }}"
+      domain: unitix.be
 
 matrix_base_url: matrix.frai.se
 
@@ -365,7 +363,7 @@ firewall_sets_all:
   - name: MGMT
     type: ipv4_addr
     elements:
-      - 10.10.35.0/24  # Wireguard Roadwarrior
+      - 10.10.35.0/24 # Wireguard Roadwarrior
   - name: v6_MGMT
     type: ipv6_addr
     elements:
@@ -374,7 +372,7 @@ firewall_sets_internal:
   - name: v6_NPTv6_HOME
     type: ipv6_addr
     elements:
-      - 2a02:578:856d:1e00::/56  # EDPNET
+      - 2a02:578:856d:1e00::/56 # EDPNET
   - name: DCO_RemoteSites
     type: ipv4_addr
     elements:
@@ -515,7 +513,7 @@ firewall_filter_input_all:
       protocol: tcp
   - comment: "Explicit DROP"
     counter: true
-    statement: 'drop'
+    statement: "drop"
 firewall_filter_input_host: []
 
 firewall_filter_forward_all: []

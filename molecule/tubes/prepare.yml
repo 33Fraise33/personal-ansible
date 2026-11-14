@@ -1,0 +1,15 @@
+---
+- name: Prepare relay test dependencies
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Install Docker SDK
+      ansible.builtin.apt:
+        name: [python3-docker, python3-requests]
+        state: present
+        update_cache: true
+
+    - name: Create isolated relay test network
+      community.docker.docker_network:
+        name: molecule-tubes-network
+        driver: bridge

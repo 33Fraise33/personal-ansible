@@ -1,0 +1,6 @@
+---
+- name: Prepare relay storage
+  ansible.builtin.import_tasks: storage.yml
+
+- name: Run relay
+  ansible.builtin.import_tasks: container.yml
