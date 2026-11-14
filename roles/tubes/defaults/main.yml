@@ -1,0 +1,5 @@
+---
+tubes_data_path: "{{ docker.dir.config }}/tubes"
+tubes_network: tubes
+tubes_container_name: tubes-relay
+tubes_trusted_proxies: "10.10.48.209/32,2001:678:1080:2211::1/128"

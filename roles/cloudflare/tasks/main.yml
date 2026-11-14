@@ -24,7 +24,7 @@
   loop: "{{ domain.external }}"
   when: item.ipv6 is defined
 
-- name: Set proxied cname records
+- name: Set cname records
   community.general.cloudflare_dns:
     zone: "{{ item.domain }}"
     type: CNAME
@@ -32,10 +32,18 @@
     value: "{{ item.value }}"
     account_email: "{{ cloudflare_api_email }}"
     account_api_token: "{{ cloudflare_api_token }}"
-    proxied: true
+    proxied: "{{ item.proxied | default(true) }}"
     state: present
     solo: true
   loop:
+    - record: 'roadwarrior'
+      value: 'beokpdcort01.unitix.be'
+      domain: unitix.be
+      proxied: false
+    - record: home
+      value: b8f60adc0cd2.sn.mynetname.net
+      domain: frai.se
+      proxied: false
     - record: 'calendar'
       value: 'ghs.googlehosted.com'
       domain: frai.se
@@ -45,9 +53,6 @@
     - record: 'mail'
       value: 'ghs.googlehosted.com'
       domain: frai.se
-    - record: 'status'
-      value: '33fraise33.github.io'
-      domain: frai.se
     - record: 'calendar'
       value: 'ghs.googlehosted.com'
       domain: unitix.be
@@ -57,18 +62,6 @@
     - record: 'mail'
       value: 'ghs.googlehosted.com'
       domain: unitix.be
-
-- name: Set non proxied cname records
-  community.general.cloudflare_dns:
-    zone: "{{ item.domain }}"
-    type: CNAME
-    record: "{{ item.record }}"
-    value: "{{ item.value }}"
-    account_email: "{{ cloudflare_api_email }}"
-    account_api_token: "{{ cloudflare_api_token }}"
-    state: present
-    solo: true
-  loop: []
 
 - name: Create TXT records
   community.general.cloudflare_dns:
@@ -82,13 +75,13 @@
     solo: "{{ item.solo | default(omit) }}"
   with_items:
     - record: '@'
-      value: 'v=spf1 include:_spf.google.com ~all'
+      value: '"v=spf1 include:_spf.google.com -all"'
       domain: frai.se
     - record: '@'
       value: 'google-site-verification=oqKYMwGek5PSBAxJw6uvZKK9Zkc6mrx9fwwkfocDWpU'
       domain: frai.se
     - record: '_dmarc'
-      value: "v=DMARC1; p=quarantine; rua=mailto:e699fa84d7b84b44bb0c453e1c3ebe00@dmarc-reports.cloudflare.net;"
+      value: '"v=DMARC1; p=reject; rua=mailto:e699fa84d7b84b44bb0c453e1c3ebe00@dmarc-reports.cloudflare.net;"'
       solo: true
       domain: frai.se
     - record: 'google._domainkey'
@@ -101,10 +94,10 @@
       solo: true
       domain: frai.se
     - record: '@'
-      value: 'v=spf1 include:_spf.google.com ~all'
+      value: '"v=spf1 include:_spf.google.com -all"'
       domain: unitix.be
     - record: '_dmarc'
-      value: "v=DMARC1; p=quarantine; rua=mailto:b61ffcaac5d044d2ad7ed20c29d21822@dmarc-reports.cloudflare.net;"
+      value: '"v=DMARC1; p=reject; rua=mailto:b61ffcaac5d044d2ad7ed20c29d21822@dmarc-reports.cloudflare.net;"'
       domain: unitix.be
       solo: true
     - record: 'google._domainkey'

@@ -70,6 +70,23 @@ firewall:
     input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"
     forward:
       # WAN
+      - comment: "Allow internet HTTPS to BEOKPDCOVM04"
+        source:
+          interface: enp2s0
+        destination:
+          ip: 10.10.48.37
+          protocol: tcp
+          port: 443
+        counter: true
+      - comment: "Allow internet IPv6 HTTPS to BEOKPDCOVM04"
+        type: ip6
+        source:
+          interface: enp2s0
+        destination:
+          ip: 2001:678:1080:2202::5
+          protocol: tcp
+          port: 443
+        counter: true
       - comment: "Allow to WAN"
         destination:
           interface: "@WAN"
@@ -372,6 +389,14 @@ firewall_nat:
         ip: "@RFC1918"
       counter: true
   dstnat:
+    - comment: DNAT HTTPS to BEOKPDCOVM04
+      statement: dnat ip to 10.10.48.37
+      source:
+        interface: enp2s0
+      destination:
+        port: 443
+        protocol: tcp
+      counter: true
     - comment: DNAT to Plex
       statement: dnat ip to 10.10.48.150
       source:

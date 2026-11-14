@@ -1,0 +1,19 @@
+---
+- name: Clean up isolated relay test resources
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Remove test relay
+      community.docker.docker_container:
+        name: molecule-tubes
+        state: absent
+
+    - name: Remove test data
+      ansible.builtin.file:
+        path: /var/lib/molecule-tubes/data
+        state: absent
+
+    - name: Remove test network
+      community.docker.docker_network:
+        name: molecule-tubes-network
+        state: absent

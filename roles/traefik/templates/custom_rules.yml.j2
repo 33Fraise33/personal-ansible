@@ -21,6 +21,16 @@ http:
             - main: "*.frai.se"
 {% endfor %}
   middlewares:
+{% if traefik_internal_default | default(false) | bool %}
+    internal-only:
+      ipAllowList:
+        sourceRange:
+{% for item in firewall_sets_all if item.name in ['RFC1918', 'AS211184'] %}
+{% for cidr in item.elements %}
+          - "{{ cidr }}"
+{% endfor %}
+{% endfor %}
+{% endif %}
     management-only:
       ipAllowList:
         sourceRange:
@@ -60,3 +70,31 @@ http:
         accessControlAllowHeaders: "*"
         accessControlAllowOriginList:
           - https://frai.se
+{% if traefik_tcp_routers | default([]) | length > 0 %}
+tcp:
+  routers:
+{% for router in traefik_tcp_routers %}
+    {{ router.name }}:
+      entryPoints:
+{% for entrypoint in router.entrypoints %}
+        - {{ entrypoint | to_json }}
+{% endfor %}
+      rule: {{ router.rule | to_json }}
+      service: {{ router.name | to_json }}
+{% if router.tls_passthrough | default(false) | bool %}
+      tls:
+        passthrough: true
+{% endif %}
+{% endfor %}
+  services:
+{% for router in traefik_tcp_routers %}
+    {{ router.name }}:
+      loadBalancer:
+        servers:
+          - address: {{ router.target | to_json }}
+{% if router.proxy_protocol_version is defined %}
+        proxyProtocol:
+          version: {{ router.proxy_protocol_version }}
+{% endif %}
+{% endfor %}
+{% endif %}

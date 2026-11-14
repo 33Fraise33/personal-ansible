@@ -37,9 +37,9 @@ For host-networked Traefik, the role sets `net.ipv4.ip_unprivileged_port_start`
 to `80` on the host. This allows all unprivileged local processes, not just
 Traefik, to bind ports 80 and above, including IPv4 and IPv6 port 443.
 
-Access `https://hermes.frai.se` over the VPN. Both Traefik routers restrict
-dashboard access to management networks (the local router also allows the
-trusted DCO Traefik IPv4 address). The bridge backend uses unencrypted HTTP and
+Access `https://hermes.frai.se` over the VPN. The DCO Traefik router restricts
+dashboard access to management networks; the local router allows RFC1918 and
+AS211184 sources when `traefik_internal_default` is enabled. The bridge backend uses unencrypted HTTP and
 must not be exposed to untrusted bridge peers. The dashboard listens on IPv4;
 Traefik supports IPv6 clients.
 

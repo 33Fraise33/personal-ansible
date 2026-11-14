@@ -1,0 +1,38 @@
+---
+- name: Start Series of Tubes relay
+  community.docker.docker_container:
+    name: "{{ tubes_container_name }}"
+    image: ghcr.io/fjaeckel/seriesoftubes-relay:latest
+    user: "{{ ansible_facts.getent_passwd['tubes'][1] }}:{{ ansible_facts.getent_passwd['tubes'][2] }}"
+    env:
+      RELAY_URL: wss://tubes.unitix.be/fed
+      RELAY_NAME: "(BE) UNITIX - AS211184"
+      RELAY_SYNC: open
+      RELAY_LISTEN: "0.0.0.0:8080"
+      RELAY_TRUSTED_PROXIES: "{{ tubes_trusted_proxies }}"
+    networks:
+      - name: "{{ tubes_network }}"
+    dns_servers:
+      - 1.1.1.1
+      - "2606:4700:4700::1111"
+    volumes:
+      - "{{ tubes_data_path }}:/data"
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "{{ tubes_network }}"
+      traefik.http.routers.tubes.rule: "Host(`tubes.unitix.be`) && Path(`/fed`)"
+      traefik.http.routers.tubes.entrypoints: tubes-public
+      traefik.http.routers.tubes.tls: "true"
+      traefik.http.routers.tubes.tls.certresolver: le
+      traefik.http.routers.tubes.observability.accesslogs: "false"
+      traefik.http.services.tubes.loadbalancer.server.port: "8080"
+    healthcheck:
+      test: [CMD, /relay, status]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart_policy: unless-stopped
+    state: healthy
+    healthy_wait_timeout: 180
+    pull: true
