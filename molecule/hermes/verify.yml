@@ -1,0 +1,107 @@
+---
+- name: Verify Hermes deployment
+  hosts: all
+  gather_facts: false
+  vars:
+    hermes_data_path: /var/lib/molecule-hermes/data
+    hermes_container_name: molecule-hermes
+    traefik:
+      dco:
+        ip: 10.10.48.125
+    hermes_matrix_allowed_users:
+      - "@molecule:example.test"
+  tasks:
+    - name: Gather service user information
+      ansible.builtin.getent:
+        database: passwd
+        key: hermes
+
+    - name: Inspect Hermes container
+      community.docker.docker_container_info:
+        name: molecule-hermes
+      register: hermes_container
+
+    - name: Check container isolation and configuration
+      ansible.builtin.assert:
+        that:
+          - hermes_container.container.State.Status == 'running'
+          - hermes_container.container.State.Health.Status == 'healthy'
+          - hermes_container.container.Config.Image == 'nousresearch/hermes-agent:latest'
+          - hermes_container.container.HostConfig.RestartPolicy.Name == 'unless-stopped'
+          - hermes_container.container.HostConfig.Memory == 4294967296
+          - hermes_container.container.HostConfig.PortBindings | default({}, true) | length == 0
+          - hermes_container.container.HostConfig.NetworkMode == 'host'
+          - hermes_container.container.Mounts | length == 1
+          - hermes_container.container.Mounts[0].Destination == '/opt/data'
+          - hermes_container.container.Mounts[0].Source == '/var/lib/molecule-hermes/data'
+          - "'HERMES_UID=' ~ ansible_facts.getent_passwd['hermes'][1] in hermes_container.container.Config.Env"
+          - "'HERMES_GID=' ~ ansible_facts.getent_passwd['hermes'][2] in hermes_container.container.Config.Env"
+          - hermes_container.container.Config.Cmd == ['gateway', 'run']
+          - "'MATRIX_HOMESERVER=https://matrix.frai.se' in hermes_container.container.Config.Env"
+          - "'MATRIX_USER_ID=@hermes:frai.se' in hermes_container.container.Config.Env"
+          - "'MATRIX_ALLOWED_USERS=@molecule:example.test' in hermes_container.container.Config.Env"
+          - "'MATRIX_E2EE_MODE=required' in hermes_container.container.Config.Env"
+          - "'GATEWAY_ALLOW_ALL_USERS=false' in hermes_container.container.Config.Env"
+          - "'API_SERVER_ENABLED=false' in hermes_container.container.Config.Env"
+          - "'HERMES_DASHBOARD=1' in hermes_container.container.Config.Env"
+          - "'HERMES_DASHBOARD_HOST=0.0.0.0' in hermes_container.container.Config.Env"
+          - "'HERMES_DASHBOARD_OIDC_CLIENT_ID=hermes-dashboard' in hermes_container.container.Config.Env"
+
+    - name: Verify CLI runs unprivileged and Matrix encryption dependencies load
+      community.docker.docker_container_exec:
+        container: molecule-hermes
+        user: hermes
+        argv:
+          - python3
+          - -c
+          - |
+            import os
+            import subprocess
+            uid = int(os.environ['HERMES_UID'])
+            assert uid != 0
+            assert os.getuid() == uid
+            import mautrix.crypto
+            import olm
+            subprocess.run(['hermes', '--version'], check=True)
+      changed_when: false
+
+    - name: Check initial configuration and file permissions
+      ansible.builtin.stat:
+        path: /var/lib/molecule-hermes/data/config.yaml
+      register: hermes_config
+
+    - name: Assert configuration is private
+      ansible.builtin.assert:
+        that:
+          - hermes_config.stat.mode == '0600'
+          - hermes_config.stat.pw_name == 'hermes'
+
+    - name: Read seeded configuration
+      ansible.builtin.slurp:
+        src: /var/lib/molecule-hermes/data/config.yaml
+      register: hermes_seed
+
+    - name: Assert initial safety settings
+      ansible.builtin.assert:
+        that:
+          - (hermes_seed.content | b64decode | from_yaml).approvals.mode == 'manual'
+          - (hermes_seed.content | b64decode | from_yaml).approvals.unattended_mode == 'deny'
+
+    - name: Simulate an interactive model selection
+      ansible.builtin.lineinfile:
+        path: /var/lib/molecule-hermes/data/config.yaml
+        line: 'model: molecule-test-model'
+
+    - name: Reapply role after interactive configuration
+      ansible.builtin.include_role:
+        name: hermes
+
+    - name: Read configuration after role reapplication
+      ansible.builtin.slurp:
+        src: /var/lib/molecule-hermes/data/config.yaml
+      register: hermes_updated_config
+
+    - name: Assert interactive changes are preserved
+      ansible.builtin.assert:
+        that:
+          - (hermes_updated_config.content | b64decode | from_yaml).model == 'molecule-test-model'

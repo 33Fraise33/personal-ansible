@@ -1,0 +1,14 @@
+---
+- name: Clean up Hermes test resources
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Remove Hermes test container
+      community.docker.docker_container:
+        name: molecule-hermes
+        state: absent
+
+    - name: Remove Hermes test data
+      ansible.builtin.file:
+        path: /var/lib/molecule-hermes/data
+        state: absent

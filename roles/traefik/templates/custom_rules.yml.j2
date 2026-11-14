@@ -1,22 +1,34 @@
 http:
   services:
-{% for rule in traefik_custom_rules %}
+{% for rule in traefik_custom_rules + (traefik_custom_rules_host | default([])) %}
     {{ rule.name }}:
         loadBalancer:
           servers:
             - url: "{{ rule.target }}"
 {% endfor %}
   routers:
-{% for rule in traefik_custom_rules %}
+{% for rule in traefik_custom_rules + (traefik_custom_rules_host | default([])) %}
     {{ rule.name }}:
         rule: "Host(`{{ rule.name }}.frai.se`)"
         service: "{{ rule.name }}"
+{% if rule.management_only | default(false) %}
+        middlewares:
+          - management-only
+{% endif %}
         tls:
           certResolver: le
           domains:
             - main: "*.frai.se"
 {% endfor %}
   middlewares:
+    management-only:
+      ipAllowList:
+        sourceRange:
+{% for item in firewall_sets_all if item.name in ['MGMT', 'v6_MGMT'] %}
+{% for cidr in item.elements %}
+          - "{{ cidr }}"
+{% endfor %}
+{% endfor %}
     auth-unitix:
       forwardAuth:
         maxBodySize: 1048576
@@ -48,4 +60,3 @@ http:
         accessControlAllowHeaders: "*"
         accessControlAllowOriginList:
           - https://frai.se
-

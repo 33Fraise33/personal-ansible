@@ -1,0 +1,8 @@
+---
+- name: Set up Hermes Agent
+  hosts: BEOKPDCOVM04
+  connection: ssh
+  become: true
+  roles:
+    - role: hermes
+      tags: hermes

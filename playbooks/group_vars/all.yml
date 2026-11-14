@@ -112,6 +112,10 @@ domain:
     - domain: sync.frai.se
       answer: 172.16.48.120
     # DCO
+    - domain: hermes.frai.se
+      answer: "{{ traefik.dco.ip }}"
+    - domain: hermes.frai.se
+      answer: "{{ traefik.dco.ipv6 }}"
     - domain: alertmanager.frai.se
       answer: "{{ traefik.dco.ipv6 }}"
     - domain: alertmanager.frai.se

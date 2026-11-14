@@ -1,8 +1,37 @@
 ---
 netbox_interface: true
+firewall_filter_input_host:
+  - comment: "Allow Hermes dashboard from DCO Traefik"
+    source:
+      ip: "{{ traefik.dco.ip }}"
+    destination:
+      port: 9119
+      protocol: tcp
+    counter: true
+  - comment: "Allow Hermes dashboard from MGMT"
+    source:
+      ip: "@MGMT"
+    destination:
+      port: 9119
+      protocol: tcp
+    counter: true
+  - comment: "Allow Hermes dashboard from IPv6 MGMT"
+    type: ip6
+    source:
+      ip: "@v6_MGMT"
+    destination:
+      port: 9119
+      protocol: tcp
+    counter: true
+firewall:
+  sets: "{{ firewall_sets_all + firewall_sets_internal }}"
+  filter:
+    input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"
 docker:
   users:
     - fraise
   dir:
     config: /data/docker-config
     data: /data/docker/docker
+hermes_matrix_allowed_users:
+  - "@gianni:frai.se"

@@ -1,0 +1,46 @@
+---
+- name: Gather Hermes service UID and GID for container
+  ansible.builtin.getent:
+    database: passwd
+    key: hermes
+
+- name: Start Hermes gateway container
+  community.docker.docker_container:
+    name: "{{ hermes_container_name }}"
+    image: nousresearch/hermes-agent:latest
+    command_handling: correct
+    command: [gateway, run]
+    env:
+      HERMES_UID: "{{ ansible_facts.getent_passwd['hermes'][1] }}"
+      HERMES_GID: "{{ ansible_facts.getent_passwd['hermes'][2] }}"
+      MATRIX_HOMESERVER: https://matrix.frai.se
+      MATRIX_USER_ID: "@hermes:frai.se"
+      MATRIX_ALLOWED_USERS: "{{ hermes_matrix_allowed_users | join(',') }}"
+      MATRIX_E2EE_MODE: required
+      GATEWAY_ALLOW_ALL_USERS: "false"
+      MATRIX_ALLOW_ALL_USERS: "false"
+      API_SERVER_ENABLED: "false"
+      HERMES_DASHBOARD: "1"
+      HERMES_DASHBOARD_HOST: 0.0.0.0
+      HERMES_DASHBOARD_PUBLIC_URL: https://hermes.frai.se
+      HERMES_DASHBOARD_OIDC_ISSUER: https://auth.frai.se
+      HERMES_DASHBOARD_OIDC_CLIENT_ID: hermes-dashboard
+    network_mode: host
+    volumes:
+      - "{{ hermes_data_path }}:/opt/data"
+    memory: 4g
+    log_driver: json-file
+    log_options:
+      max-size: 10m
+      max-file: "3"
+    healthcheck:
+      test: [CMD, hermes, --version]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 120s
+    state: healthy
+    healthy_wait_timeout: 240
+    restart_policy: unless-stopped
+    pull: true
+  no_log: true

@@ -5,6 +5,11 @@ dawarich_photon_api_use_https: "true"
 
 adguard_hostname: dns1.frai.se
 
+traefik_custom_rules_host:
+  - name: hermes
+    target: http://10.10.48.37:9119
+    management_only: true
+
 docker:
   dir:
     config: /data/docker-config

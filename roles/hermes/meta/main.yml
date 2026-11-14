@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: hermes
+  author: 33Fraise33
+  description: Deploy Hermes Agent with an encrypted Matrix gateway.
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+dependencies: []

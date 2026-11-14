@@ -66,11 +66,33 @@ notifier:
 
 identity_providers:
   oidc:
+    authorization_policies:
+      hermes:
+        default_policy: 'deny'
+        rules:
+{% if authelia_hermes_allowed_user | default('') | length > 0 %}
+          - policy: 'two_factor'
+            subject: {{ ('user:' ~ authelia_hermes_allowed_user) | to_json }}
+{% else %}
+          []
+{% endif %}
     jwks:
       - algorithm: 'RS256'
         key: {% raw %}{{ secret "/secrets/rsa.4096.key" | mindent 10 "|" | msquote }}{% endraw %}
     
     clients:
+      - client_id: 'hermes-dashboard'
+        client_name: 'Hermes dashboard'
+        public: true
+        authorization_policy: 'hermes'
+        require_pkce: true
+        pkce_challenge_method: 'S256'
+        redirect_uris:
+          - 'https://hermes.frai.se/auth/callback'
+        scopes: ['openid', 'profile', 'email']
+        response_types: ['code']
+        grant_types: ['authorization_code']
+        token_endpoint_auth_method: 'none'
       - client_id: "{{ authelia_oidc_clients.immich.client_id }}"
         client_name: 'immich'
         client_secret: '{{ authelia_oidc_clients.immich.client_secret }}'

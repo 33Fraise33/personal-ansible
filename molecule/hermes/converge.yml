@@ -1,0 +1,38 @@
+---
+- name: Converge Hermes role
+  hosts: all
+  gather_facts: false
+  vars:
+    hermes_data_path: /var/lib/molecule-hermes/data
+    hermes_container_name: molecule-hermes
+    traefik:
+      dco:
+        ip: 10.10.48.125
+    hermes_matrix_allowed_users:
+      - "@molecule:example.test"
+  tasks:
+    - name: Deploy Hermes
+      ansible.builtin.include_role:
+        name: hermes
+
+    - name: Pause for startup log inspection
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: Read Hermes container logs
+      ansible.builtin.command:
+        argv:
+          - python3
+          - -c
+          - "import docker; print(docker.from_env().containers.get('molecule-hermes').logs().decode())"
+      register: hermes_logs
+      changed_when: false
+
+    - name: Show Hermes container logs
+      ansible.builtin.debug:
+        var: hermes_logs.stdout_lines
+
+    - name: Check startup logs for warnings and failures
+      ansible.builtin.assert:
+        that:
+          - hermes_logs.stdout is not regex('(?i)(^|[^a-z])(warn(ing)?|error|critical|traceback)([^a-z]|$)')

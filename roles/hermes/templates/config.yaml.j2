@@ -1,0 +1,12 @@
+---
+# Seed only: Hermes owns this file after first creation.
+approvals:
+  mode: manual
+  cron_mode: deny
+  single_query_mode: deny
+  unattended_mode: deny
+auth:
+  adopt_external_logins: false
+dashboard:
+  trusted_proxies:
+    - "{{ traefik.dco.ip }}"
