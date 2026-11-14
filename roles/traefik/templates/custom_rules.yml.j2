@@ -1,13 +1,13 @@
 http:
   services:
-{% for rule in traefik_custom_rules + (traefik_custom_rules_host | default([])) %}
+{% for rule in traefik_custom_rules %}
     {{ rule.name }}:
         loadBalancer:
           servers:
             - url: "{{ rule.target }}"
 {% endfor %}
   routers:
-{% for rule in traefik_custom_rules + (traefik_custom_rules_host | default([])) %}
+{% for rule in traefik_custom_rules %}
     {{ rule.name }}:
         rule: "Host(`{{ rule.name }}.frai.se`)"
         service: "{{ rule.name }}"

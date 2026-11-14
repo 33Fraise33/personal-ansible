@@ -1,4 +1,16 @@
 ---
+traefik_custom_rules:
+  - name: bejbegiart01
+    target: https://172.16.33.1:8443
+  - name: unifi
+    target: https://172.16.54.10
+  - name: bejbegiasv01
+    target: https://172.16.33.3:8006/
+  - name: accweb
+    target: http://172.16.33.6
+  - name: wud-bejbegiavm01
+    target: "http://[2001:678:1080:4033::5]:9103"
+
 mounts:
   - mountpoint: /data/
     source: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi2

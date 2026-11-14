@@ -40,8 +40,8 @@
   register: hermes_existing_config
   no_log: true
 
-- name: Require the exact trusted proxy in existing Hermes configuration
+- name: Require the trusted proxies in existing Hermes configuration
   ansible.builtin.assert:
     that:
-      - traefik.dco.ip in ((hermes_existing_config.content | b64decode | from_yaml).dashboard.trusted_proxies | default([]))
-    fail_msg: Add the DCO Traefik IPv4 address to dashboard.trusted_proxies in the existing Hermes config before deployment.
+      - hermes_trusted_proxies | difference((hermes_existing_config.content | b64decode | from_yaml).dashboard.trusted_proxies | default([])) | length == 0
+    fail_msg: Add the configured proxy addresses to dashboard.trusted_proxies in the existing Hermes config before deployment.

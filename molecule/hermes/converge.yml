@@ -5,6 +5,10 @@
   vars:
     hermes_data_path: /var/lib/molecule-hermes/data
     hermes_container_name: molecule-hermes
+    hermes_network: molecule-hermes-network
+    hermes_trusted_proxies:
+      - 10.10.48.193
+      - 2001:678:1080:2210::1
     traefik:
       dco:
         ip: 10.10.48.125

@@ -2,10 +2,9 @@
 
 Deploys the official stable Docker image as an always-on Matrix gateway. It
 uses `https://matrix.frai.se` and `@hermes:frai.se`; Matrix E2EE is required.
-Hermes uses host networking because Docker firewall management is disabled on
-the VM. The dashboard listens on TCP 9119; the API server is disabled. Any
-other listener enabled in Hermes configuration also binds directly on the host
-network. The Docker health
+Hermes uses the `aiagents` Docker bridge. The dashboard listens on TCP 9119
+inside the container, without a published host port; the API server is disabled.
+The Docker health
 check only verifies the CLI starts: it does not establish gateway readiness,
 Matrix connectivity, encryption, or a working model provider.
 
@@ -22,24 +21,36 @@ Set `authelia_hermes_allowed_user` to the exact Authelia username before
 deploying Authelia; its Hermes policy denies everyone when the variable is
 unset. Only this user may authorize, with two-factor authentication.
 
-Before deploying the role, the operator must apply the firewall role from
-`playbooks/common.yml` for this host. Its host-specific rules allow dashboard
-TCP 9119 only from the shared `MGMT` and `v6_MGMT` sets; the common input
-ruleset drops other new connections. The DCO Traefik address is also allowed;
-its Hermes router separately restricts clients to those management sets.
-Verify the firewall is active before starting Hermes. Access the dashboard at
-`https://hermes.frai.se` over the VPN; Traefik terminates TLS. Direct backend
-HTTP is unencrypted and should not be used over an untrusted network. The
-dashboard binds IPv4 `0.0.0.0`; its IPv6 firewall rule does not make this
-listener IPv6-capable. DNS supports IPv6 access to Traefik, which uses IPv4 to
-connect to Hermes.
+Before deploying Hermes, the operator must create the `aiagents` network through
+the Docker role and apply the firewall role from `playbooks/common.yml`. The
+firewall permits HTTPS on TCP 443; port 80 is not externally accessible.
+Deploy `playbooks/traefik.yml` on BEOKPDCOVM04. Its host-networked Traefik uses
+the Docker socket proxy on its dedicated bridge and can reach local bridge
+addresses. The proxy allows connections from the bridge gateway; the host
+firewall drops forwarded traffic to the proxy. Its read-only Docker API remains
+accessible to local host processes. Traefik's administrative endpoint listens
+on port 8080; the host firewall does not allow external access to it. The
+existing DCO Traefik forwards Hermes traffic to this
+instance over HTTPS.
 
-The initial configuration trusts only the DCO Traefik IPv4 address for
-forwarded headers. Existing installations keep their configuration: add that
-address to `dashboard.trusted_proxies` before running the updated role, or it
+For host-networked Traefik, the role sets `net.ipv4.ip_unprivileged_port_start`
+to `80` on the host. This allows all unprivileged local processes, not just
+Traefik, to bind ports 80 and above, including IPv4 and IPv6 port 443.
+
+Access `https://hermes.frai.se` over the VPN. Both Traefik routers restrict
+dashboard access to management networks (the local router also allows the
+trusted DCO Traefik IPv4 address). The bridge backend uses unencrypted HTTP and
+must not be exposed to untrusted bridge peers. The dashboard listens on IPv4;
+Traefik supports IPv6 clients.
+
+The initial configuration trusts the `aiagents` bridge's IPv4 and IPv6 gateway
+addresses for forwarded headers. Verify the source address Hermes actually sees
+when host-networked Traefik connects. Existing installations keep their
+configuration: add the configured addresses to `dashboard.trusted_proxies`
+before running the updated role, or it
 will fail rather than replace interactive settings. Apply DNS, Authelia,
 firewall and Traefik configuration before starting the new dashboard and test
-the complete OIDC redirect and VPN-only access from both allowed and denied
+the complete OIDC redirect and management-only access from both allowed and denied
 networks. The username restriction is essential: dashboard users have full
 agent control.
 

@@ -1,5 +1,7 @@
 ---
 hermes_data_path: "{{ docker.dir.config }}/hermes"
 hermes_container_name: hermes
+hermes_network: aiagents
+hermes_trusted_proxies: []
 # Set to trusted full Matrix user IDs before deploying the gateway.
 hermes_matrix_allowed_users: []

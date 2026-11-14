@@ -1,37 +1,50 @@
 ---
 netbox_interface: true
 firewall_filter_input_host:
-  - comment: "Allow Hermes dashboard from DCO Traefik"
-    source:
-      ip: "{{ traefik.dco.ip }}"
+  - comment: "Allow HTTPS to Traefik"
     destination:
-      port: 9119
+      port: 443
       protocol: tcp
     counter: true
-  - comment: "Allow Hermes dashboard from MGMT"
-    source:
-      ip: "@MGMT"
-    destination:
-      port: 9119
-      protocol: tcp
-    counter: true
-  - comment: "Allow Hermes dashboard from IPv6 MGMT"
+  - comment: "Allow IPv6 HTTPS to Traefik"
     type: ip6
-    source:
-      ip: "@v6_MGMT"
     destination:
-      port: 9119
+      port: 443
       protocol: tcp
     counter: true
 firewall:
   sets: "{{ firewall_sets_all + firewall_sets_internal }}"
   filter:
     input: "{{ firewall_filter_input_host + firewall_filter_input_all }}"
+    forward:
+      - comment: "Block forwarded traffic to the Docker socket proxy"
+        destination:
+          ip: "{{ traefik_dockerproxy_address }}"
+        statement: drop
+        counter: true
 docker:
   users:
     - fraise
   dir:
     config: /data/docker-config
     data: /data/docker/docker
+  networks:
+    aiagents:
+      type: bridge
+      ipv6: true
+      driver_options:
+        com.docker.network.bridge.name: br-aiagents
+      ipam:
+        - subnet: 10.10.48.192/28
+          gateway: 10.10.48.193
+        - subnet: 2001:678:1080:2210::/64
+          gateway: 2001:678:1080:2210::1
+traefik_host_network: true
+traefik_dockerproxy_subnet: 169.254.241.0/29
+traefik_dockerproxy_gateway: 169.254.241.1
+traefik_dockerproxy_address: 169.254.241.2
+hermes_trusted_proxies:
+  - "{{ docker.networks.aiagents.ipam[0].gateway }}"
+  - "{{ docker.networks.aiagents.ipam[1].gateway }}"
 hermes_matrix_allowed_users:
   - "@gianni:frai.se"

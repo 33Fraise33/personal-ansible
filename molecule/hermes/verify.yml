@@ -5,6 +5,10 @@
   vars:
     hermes_data_path: /var/lib/molecule-hermes/data
     hermes_container_name: molecule-hermes
+    hermes_network: molecule-hermes-network
+    hermes_trusted_proxies:
+      - 10.10.48.193
+      - 2001:678:1080:2210::1
     traefik:
       dco:
         ip: 10.10.48.125
@@ -30,7 +34,10 @@
           - hermes_container.container.HostConfig.RestartPolicy.Name == 'unless-stopped'
           - hermes_container.container.HostConfig.Memory == 4294967296
           - hermes_container.container.HostConfig.PortBindings | default({}, true) | length == 0
-          - hermes_container.container.HostConfig.NetworkMode == 'host'
+          - hermes_container.container.HostConfig.NetworkMode != 'host'
+          - "'molecule-hermes-network' in hermes_container.container.NetworkSettings.Networks"
+          - hermes_container.container.Config.Labels['traefik.docker.network'] == 'molecule-hermes-network'
+          - hermes_container.container.Config.Labels['traefik.http.routers.hermes.middlewares'] == 'management-only@file'
           - hermes_container.container.Mounts | length == 1
           - hermes_container.container.Mounts[0].Destination == '/opt/data'
           - hermes_container.container.Mounts[0].Source == '/var/lib/molecule-hermes/data'
@@ -86,6 +93,7 @@
         that:
           - (hermes_seed.content | b64decode | from_yaml).approvals.mode == 'manual'
           - (hermes_seed.content | b64decode | from_yaml).approvals.unattended_mode == 'deny'
+          - (hermes_seed.content | b64decode | from_yaml).dashboard.trusted_proxies == hermes_trusted_proxies
 
     - name: Simulate an interactive model selection
       ansible.builtin.lineinfile:

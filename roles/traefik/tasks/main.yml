@@ -42,6 +42,20 @@
   ansible.builtin.set_fact:
     traefik_network: "{{ traefik_network | default('services') }}"
 
+- name: Set Traefik bridge network configuration
+  ansible.builtin.set_fact:
+    traefik_container_networks:
+      - name: "{{ traefik_network }}"
+        ipv4_address: "{{ docker.networks[traefik_network].ipam[0].subnet
+          | ansible.utils.ipsubnet(24, 0)
+          | ansible.utils.ipaddr(docker.networks[traefik_network].hosts.traefik)
+          | ansible.utils.ipaddr('address') if docker.networks[traefik_network].hosts.traefik is defined else omit }}"
+        ipv6_address: "{{ (docker.networks[traefik_network].ipam[1].subnet | ansible.utils.ipaddr('network')
+          + docker.networks[traefik_network].hosts.traefik | string) if docker.ipv6 | default(true)
+          and docker.networks[traefik_network].hosts.traefik is defined else omit }}"
+      - name: dockerproxy_network
+  when: not (traefik_host_network | default(false) | bool)
+
 - name: Gather numeric UID and GID of the host traefik user
   ansible.builtin.getent:
     database: passwd
@@ -57,6 +71,8 @@
     name: dockerproxy_network
     driver: bridge
     internal: true
+    ipam_config: "{{ [{'subnet': traefik_dockerproxy_subnet, 'gateway': traefik_dockerproxy_gateway}]
+      if traefik_host_network | default(false) | bool else omit }}"
 
 - name: Setup dockerproxy docker container
   community.docker.docker_container:
@@ -64,10 +80,11 @@
     image: ghcr.io/wollomatic/socket-proxy:1
     networks:
       - name: dockerproxy_network
+        ipv4_address: "{{ traefik_dockerproxy_address if traefik_host_network | default(false) | bool else omit }}"
     dns_servers: "{{ dns.servers }}"
     command:
       - '-loglevel=info' # set to debug for far more logging
-      - '-allowfrom=traefik'
+      - "{{ '-allowfrom=' ~ traefik_dockerproxy_gateway ~ '/32' if traefik_host_network | default(false) | bool else '-allowfrom=traefik' }}"
       - '-listenip=0.0.0.0'
       - '-allowGET=/v1\..{1,2}/(version|containers/.*|events.*)'
       - '-allowHEAD=/_ping'
@@ -89,21 +106,22 @@
     labels:
       traefik.enable: "false"
 
+- name: Allow non-root host-networked Traefik to bind HTTP and HTTPS
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: "80"
+    state: present
+    sysctl_file: /etc/sysctl.d/90-traefik-unprivileged-ports.conf
+    reload: true
+  when: traefik_host_network | default(false) | bool
+
 - name: Setup traefik docker container
   community.docker.docker_container:
     name: traefik
     image: traefik:latest
     user: "{{ ansible_facts['getent_passwd']['traefik'][1] }}:{{ ansible_facts['getent_passwd']['traefik'][2] }}"
-    networks:
-      - name: "{{ traefik_network }}"
-        ipv4_address: "{{ docker.networks[traefik_network].ipam[0].subnet \
-          | ansible.utils.ipsubnet(24, 0) \
-          | ansible.utils.ipaddr(docker.networks[traefik_network].hosts.traefik) \
-          | ansible.utils.ipaddr('address') if docker.networks[traefik_network].hosts.traefik is defined else omit }}"
-        ipv6_address: "{{ (docker.networks[traefik_network].ipam[1].subnet | ansible.utils.ipaddr('network') \
-          + docker.networks[traefik_network].hosts.traefik | string) if docker.ipv6 | default(true)
-          and docker.networks[traefik_network].hosts.traefik is defined else omit }}"
-      - name: dockerproxy_network
+    network_mode: "{{ 'host' if traefik_host_network | default(false) | bool else omit }}"
+    networks: "{{ omit if traefik_host_network | default(false) | bool else traefik_container_networks }}"
     dns_servers: "{{ dns.servers }}"
     volumes:
       - "{{ docker.dir.config }}/traefik/letsencrypt:/letsencrypt"
