@@ -361,8 +361,6 @@ firewall:
         source:
           interface: "@WAN"
         statement: 'drop'
-      - counter: true
-        statement: 'log prefix "DROPPED: " drop'
 firewall_nat:
   srcnat:  # default masquerade
     - comment: SNAT to inet

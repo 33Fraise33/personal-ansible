@@ -71,8 +71,6 @@ firewall:
           port: 9001
           protocol: tcp
         counter: true
-      - counter: true
-        statement: 'log prefix "DROPPED: " drop'
 firewall_nat:
   srcnat: []
   dstnat:

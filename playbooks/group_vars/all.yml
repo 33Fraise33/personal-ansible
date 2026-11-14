@@ -518,9 +518,7 @@ firewall_filter_input_all:
     statement: 'drop'
 firewall_filter_input_host: []
 
-firewall_filter_forward_all:
-  - counter: true
-    statement: 'log prefix "DROPPED: " drop'
+firewall_filter_forward_all: []
 
 firewall:
   sets: "{{ firewall_sets_all + firewall_sets_internal }}"

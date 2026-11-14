@@ -29,8 +29,6 @@ firewall:
       - comment: "Allow to Unite"
         destination:
           ip: 10.10.41.0/26
-      - counter: true
-        statement: 'log prefix "DROPPED: " drop'
 firewall_nat:
   srcnat: []
   dstnat:
