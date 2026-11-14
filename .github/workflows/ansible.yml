@@ -52,3 +52,5 @@ jobs:
       #   env:
       #     ANSIBLE_ALLOW_BROKEN_CONDITIONALS: 'true'
       #   run: molecule test --scenario-name immich
+      # - name: Test Hermes role
+      #   run: molecule test --scenario-name hermes

@@ -1,0 +1,47 @@
+---
+- name: Create Hermes service group
+  ansible.builtin.group:
+    name: hermes
+    system: true
+
+- name: Create Hermes service user
+  ansible.builtin.user:
+    name: hermes
+    group: hermes
+    system: true
+    create_home: false
+    shell: /usr/sbin/nologin
+
+- name: Gather Hermes service UID and GID
+  ansible.builtin.getent:
+    database: passwd
+    key: hermes
+
+- name: Create private Hermes data directory
+  ansible.builtin.file:
+    path: "{{ hermes_data_path }}"
+    state: directory
+    owner: hermes
+    group: hermes
+    mode: "0700"
+
+- name: Seed Hermes configuration without replacing interactive settings
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ hermes_data_path }}/config.yaml"
+    owner: hermes
+    group: hermes
+    mode: "0600"
+    force: false
+
+- name: Read existing Hermes configuration
+  ansible.builtin.slurp:
+    src: "{{ hermes_data_path }}/config.yaml"
+  register: hermes_existing_config
+  no_log: true
+
+- name: Require the exact trusted proxy in existing Hermes configuration
+  ansible.builtin.assert:
+    that:
+      - traefik.dco.ip in ((hermes_existing_config.content | b64decode | from_yaml).dashboard.trusted_proxies | default([]))
+    fail_msg: Add the DCO Traefik IPv4 address to dashboard.trusted_proxies in the existing Hermes config before deployment.

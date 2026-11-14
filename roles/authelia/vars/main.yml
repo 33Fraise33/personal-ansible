@@ -1,5 +1,7 @@
 ---
 authelia_major_version: 4
+authelia_hermes_allowed_user: fraise
+
 authelia_secret_jwt: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   30373736343030393236623135323136646439343363323737626331333432393237313832663633

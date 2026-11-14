@@ -1,0 +1,18 @@
+---
+- name: Validate Matrix authorization
+  ansible.builtin.assert:
+    that:
+      - hermes_matrix_allowed_users is sequence
+      - hermes_matrix_allowed_users is not string
+      - hermes_matrix_allowed_users | length > 0
+      - hermes_matrix_allowed_users | select('match', '^@[^:\s,]+:[^\s,]+$') | list | length == hermes_matrix_allowed_users | length
+    fail_msg: Set hermes_matrix_allowed_users to a nonempty list of trusted full Matrix user IDs.
+  tags: always
+
+- name: Prepare Hermes storage
+  ansible.builtin.import_tasks: storage.yml
+  tags: hermes_storage
+
+- name: Configure Hermes container
+  ansible.builtin.import_tasks: container.yml
+  tags: hermes_container
